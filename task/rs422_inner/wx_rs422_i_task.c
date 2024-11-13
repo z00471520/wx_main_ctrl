@@ -4,7 +4,7 @@
 #include "wx_rs422_i_intf.h"
 #include "wx_log.h"
 #include "queue.h"
-
+#include "wx_rs422_i_decode_adu.h"
 WxRs422ITask g_wxRs422ITask = {0};
 
 VOID *WX_GetRs422IIntrDataRef(VOID)
@@ -119,41 +119,69 @@ WxFailCode WX_RS422I_CreateTask(VOID)
     return WX_SUCCESS;
 }
 
+WxRs422IMsgType WX_RS422I_GetRspMsgType(WxRs422IMsgType reqMsgType)
+{
+    switch (reqMsgType) {
+        case WX_RS422I_MSG_READ_DATA: {
+            return WX_RS422I_MSG_READ_DATA_RSP;
+        }
+        case WX_RS422I_MSG_WRITE_DATA: {
+            return WX_RS422I_MSG_WRITE_DATA_RSP;
+        }
+        case WX_RS422I_MSG_READ_FILE: {
+            return WX_RS422I_MSG_READ_FILE_RSP;
+        }
+        case WX_RS422I_MSG_WRITE_FILE: {
+            return WX_RS422I_MSG_WRITE_FILE_RSP;
+        }
+        default:
+            wx_excp_cnt(WX_EXCP_UNEXPECT_MSG_TYPE); 
+            return reqMsgType;
+    }
+}
 
+WxFailCode WX_RS422I_ProcMsg(WxRs422ITask *this, WxRs422IMsg *msg)
+{
+    WxFailCode rc = WX_RS422I_EncodeAdu(&this->rs422Msg, &this->txAdu);
+    if (rc != WX_SUCCESS) {
+        return rc;
+    }
+    /*
+     * send the adu by RS422 buf
+     */
+    rc = WX_RS422I_TxAdu(this, &this->txAdu);
+    if (rc != WX_SUCCESS) {
+        return rc;
+    }
+    /* 请求和相应是一条消息，只需要把消息类型反转一下即可，没有必须新建一个消息 */
+    this->rs422Msg.msgType = WX_RS422I_GetRspMsgType(his->rs422Msg.msgType);
+    
+    /* wait to recieve the resbonse */
+    rc = WX_RS422I_RxAdu(this);
+    if (rc != WX_SUCCESS) {
+        return rc;
+    }
+    
+    /* decode the rx ADU into msg */
+    rc = WX_RS422I_DecodeAdu(this, this->rxAdu, &this->rs422Msg);
+    if (rc != WX_SUCCESS) {
+        return rc;
+    }
+
+    return rc;
+}
 
 /* 用于消息收发 */
 VOID WX_RS422I_MainTask(VOID *pvParameters)
 {
-    WxFailCode rc;
     WxRs422ITask *this = &g_wxRs422ITask;
     while(1) {
         /* block to receive the msg util the msg arrive */
-        if (xQueueReceive(this->msgQueHandle, &this->msgTempBuf, (TickType_t)portMAX_DELAY) == pdTRUE) {
-            rc = WX_RS422I_EncodeAdu(&this->msgTempBuf, &this->txAdu);
-            if (rc != WX_SUCCESS) {
-                continue;
-            }
-            /*
-             * send the adu by RS422 buf
-             */
-            rc = WX_RS422I_TxAdu(this, &this->txAdu);
-            if (rc != WX_SUCCESS) {
-                /* 这里可以选择重发, 暂不支持，后续优化 */
-                continue;
-            }
-
-            /* wait to recieve the resbonse */
-            rc = WX_RS422I_RxAdu(this);
-            if (rc != WX_SUCCESS) {
-                /* 这里可以选择重发, 暂不支持，后续优化 */
-                continue;
-            }
-            /* decode the rx ADU into msg */
-            rc = WX_RS422I_DecodeAdu(this, this->rxAdu, &this->rxMsgTempBuf);
-            if (rc != WX_SUCCESS) {
-                /* 这里可以选择重发, 暂不支持，后续优化 */
-                continue;
-            }
+        if (xQueueReceive(this->msgQueHandle, &this->rs422Msg, (TickType_t)portMAX_DELAY) == pdTRUE) {
+            this->rs422Msg.failCode = WX_RS422I_ProcMsg(this, &this->rs422Msg);
+            
         }
+    
+           
     }
 }

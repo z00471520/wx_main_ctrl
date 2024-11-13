@@ -50,7 +50,7 @@ static const uint8_t aucCRCLo[] = {
     0x41, 0x81, 0x80, 0x40
 };
 
-uint16_t WX_Modbus_Crc16( uint8_t * pFrame, uint16_t len )
+uint16_t WX_Modbus_Crc16( uint8_t *pFrame, uint16_t len )
 {
     uint8_t           ucCRCHi = 0xFF;
     uint8_t           ucCRCLo = 0xFF;

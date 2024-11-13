@@ -33,8 +33,7 @@ typedef struct {
 typedef struct {
     WxRs422ITxAdu txAdu; /* the adu to be send by rs422 */
     WxRs422IRxAdu rxAdu;  /* the adu recieve from rs422 */
-    WxRs422IMsg msgTempBuf; /* A buffer used to store the tx msg from the other module */
-    WxRs422IMsg rxMsgTempBuf; /* A buffer uesed to store the rx msg from rs422-i */
+    WxRs422IMsg rs422Msg; /* A buffer used to store the tx/rx msg from the other module */
     QueueHandle_t msgQueHandle; /* 用于缓存外部模块发送给RS422的待发送的消息队列 */
     XUartNs550 *rs422InstPtr; /* 实例指针 */
     SemaphoreHandle_t aduTxFinishSemaphore; /* 二进制信号，用于表征ADU是否发送完毕 */

@@ -10,7 +10,7 @@ typedef struct
     CHAR *desc;         /* 设备的异常码的描述 */
 } WxRs422IExcpDesc;
 
-
+/* Function-code到内部MB操作的转换 */
 inline WxRs422IModbusOprType WX_RS422I_ErrFuncCode2OprType(UINT8 funcCode)
 {
     switch (funcCode)
@@ -32,4 +32,5 @@ inline WxRs422IModbusOprType WX_RS422I_ErrFuncCode2OprType(UINT8 funcCode)
             return WX_RS422I_MB_OPR_BUTT;
     }
 }
+WxFailCode WX_RS422I_DecodeAduExcpResponce(WxRs422ITask *this, WxRs422ITxAdu *txAdu, WxRs422IRxAdu *rxAdu, WxRs422IMsg *rxMsg);
 #endif
