@@ -2,7 +2,7 @@
 #ifndef WT_RS422_INNER_TASK_H
 #define WT_RS422_INNER_TASK_H
 #include "wx_typedef.h"
-#include "wx_rs422_i_intf.h"
+#include "wx_rs422_i_master_intf.h"
 #define WX_RS422I_MSG_ITERM_MAX_NUM 10 /* 发送消息队列支持的最大支持缓存的消息数 */
 #define WX_RS422_ADU_MSX_SIZE 256 /* */
 #define WX_RS422I_WAIT_TX_FINISH_TIME  portMAX_DELAY /* 等待发送完成的定时器 portMAX_DELAY: 死等 */

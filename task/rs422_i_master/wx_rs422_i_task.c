@@ -1,26 +1,16 @@
 #include "wx_typedef.h"
 #include "wx_rs422_i_task.h"
 #include "wx_failcode.h"
-#include "wx_rs422_i_intf.h"
+#include "wx_rs422_i_master_intf.h"
 #include "wx_log.h"
 #include "queue.h"
 #include "wx_rs422_i_decode_adu.h"
 WxRs422ITask g_wxRs422ITask = {0};
 
+/* 中断的引用的获取 */
 VOID *WX_GetRs422IIntrDataRef(VOID)
 {
     return &g_wxRs422ITask;
-}
-
-WxFailCode WX_SendMsg2RS422Inner(WxRs422IMsg *msg, WxRs422InnerTaskInfo* rs422I)
-{
-    if (rs422I->msgQueHandle == 0) {
-        return WX_RS422I_MSGQUE_HANDLE_NULL,
-    }
-    if (xQueueSend(rs422I->msgQueHandle, (void * )msg, (TickType_t) 0 ) != pdPASS) {
-        return WX_RS422I_MSGQUE_SEND_FAIL;
-    }
-    return WX_SUCCESS;
 }
 
 /* RS422I中断处理函数 */
@@ -90,36 +80,7 @@ WxFailCode WX_RS422I_RxAdu(WxRs422ITask *this)
     return WX_SUCCESS;    
 }
 
-WxFailCode WX_RS422I_CreateTask(VOID)
-{
-    WxRs422ITask *this = &g_wxRs422ITask;
-    /* create the msg que to buff the msg to tx */
-    if (this->msgQueHandle == 0) {
-        this->msgQueHandle = xQueueCreate(WX_RS422I_MSG_ITERM_MAX_NUM, sizeof(WxRs422IMsg));
-        if (this->msgQueHandle == 0) {
-            wx_log(WX_CRITICAL, "Error Exit: xQueueCreate fail");
-            return WX_RS422I_CREATE_MSG_QUE_FAIL;
-        }
-    }
-
-    /* the inst or rs422 used for uart data tx/rx */
-    this->rs422InstPtr = WX_GetRs422IInstPtr();
-    if (this->rs422InstPtr == NULL) {
-        return WX_RS422I_CREATE_TASK_FAIL_INST_NULL;
-    }
-
-    /* 该二进制信号量用于表达RS422是否把ADU消息全部发送完毕 */
-    this->aduTxFinishSemaphore = xSemaphoreCreateBinary();
-    if (this->aduTxFinishSemaphore == NULL) {
-        /* There was insufficient FreeRTOS heap available for the semaphore to
-           be created successfully. */
-        return WX_RS422I_CREATE_TASK_FAIL_TXSEMAPHORE_NULL;
-    }
-    wx_log(WX_DBG, "Create RS422 task success!");
-    return WX_SUCCESS;
-}
-
-WxRs422IMsgType WX_RS422I_GetRspMsgType(WxRs422IMsgType reqMsgType)
+WxMsgType WX_RS422I_GetRspMsgType(WxMsgType reqMsgType)
 {
     switch (reqMsgType) {
         case WX_RS422I_MSG_READ_DATA: {
@@ -181,7 +142,34 @@ VOID WX_RS422I_MainTask(VOID *pvParameters)
             this->rs422Msg.failCode = WX_RS422I_ProcMsg(this, &this->rs422Msg);
             
         }
-    
-           
     }
+}
+
+WxFailCode WX_RS422I_CreateTask(VOID)
+{
+    WxRs422ITask *this = &g_wxRs422ITask;
+    /* create the msg que to buff the msg to tx */
+    if (this->msgQueHandle == 0) {
+        this->msgQueHandle = xQueueCreate(WX_RS422I_MSG_ITERM_MAX_NUM, sizeof(WxRs422IMsg));
+        if (this->msgQueHandle == 0) {
+            wx_log(WX_CRITICAL, "Error Exit: xQueueCreate fail");
+            return WX_RS422I_CREATE_MSG_QUE_FAIL;
+        }
+    }
+
+    /* the inst or rs422 used for uart data tx/rx */
+    this->rs422InstPtr = WX_GetRs422IInstPtr();
+    if (this->rs422InstPtr == NULL) {
+        return WX_RS422I_CREATE_TASK_FAIL_INST_NULL;
+    }
+
+    /* 该二进制信号量用于表达RS422是否把ADU消息全部发送完毕 */
+    this->aduTxFinishSemaphore = xSemaphoreCreateBinary();
+    if (this->aduTxFinishSemaphore == NULL) {
+        /* There was insufficient FreeRTOS heap available for the semaphore to
+           be created successfully. */
+        return WX_RS422I_CREATE_TASK_FAIL_TXSEMAPHORE_NULL;
+    }
+    wx_log(WX_DBG, "Create RS422 task success!");
+    return WX_SUCCESS;
 }

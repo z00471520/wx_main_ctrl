@@ -1,7 +1,7 @@
 #include "wx_debug.h"
 #include "wx_rs422_i_task.h"
 #include "wx_modbus.h"
-#include "wx_rs422_i_intf.h"
+#include "wx_rs422_i_master_intf.h"
 #include "wx_rs422_i_decode_adu_read_data_rsp.h"
 #include "wx_rs422_i_encode_adu_read_data_req.h"
 /* 读数据响应解码 */

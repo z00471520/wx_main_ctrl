@@ -10,7 +10,7 @@ WxRs422IExcpDesc g_wxRs422IExcpDesc[] = {
 
 
 /* 参数合法性由调用者保证 */
-inline WxRs422IMsgType WX_RS422I_GetRspMsgTypeByMbOpr(WxRs422IModbusOprType oprType)
+inline WxMsgType WX_RS422I_GetRspMsgTypeByMbOpr(WxRs422IModbusOprType oprType)
 {
     return g_wxRs422IRspMsgType[oprType];
 }

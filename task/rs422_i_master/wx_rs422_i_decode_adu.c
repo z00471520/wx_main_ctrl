@@ -1,17 +1,11 @@
 
 #include "wx_typedef.h"
 #include "wx_debug.h"
-#include "wx_rs422_i_intf.h"
+#include "wx_rs422_i_master_intf.h"
 #include "wx_modbus.h"
 #include "wx_rs422_i_task.h"
 #include "wx_rs422_i_decode_adu_err_response.h"
 
-/* 读数据响应解码 */
-WxFailCode WX_RS422I_DecodeAduReadDataResponce(WxRs422ITask *this, WxRs422ITxAdu *txAdu, WxRs422IRxAdu *rxAdu, WxRs422IMsg *rxMsgBuf)
-{
-    UINT32 expecLen = ; /* 预期的响应长度 */
-    if ()
-}
 
 /* 写数据响应解码处理 */
 WxFailCode WX_RS422I_DecodeAduWriteDataResponce(WxRs422ITask *this, WxRs422ITxAdu *txAdu, WxRs422IRxAdu *rxAdu, WxRs422IMsg *rxMsgBuf)
