@@ -25,54 +25,53 @@
 #include "wx_failcode.h"
 #include "xil_exception.h"
 #define INTC_DEVICE_ID		XPAR_SCUGIC_SINGLE_DEVICE_ID
-WxMainCtrlCpu0Info g_wxMainCtrlCpu0Info = {0};
 
+INTC g_wxIntrCtrlInst = {0};
 
-
-/* 获取RS422I的实例指针 */
-XUartNs550 *WX_GetRs422IInstPtr(VOID)
+/* 获取中断控制实例 */
+INTC *WX_GetIntrCtrlInst(VOID)
 {
-	return &g_wxMainCtrlCpu0Info.rs422Devices.uartNs550[WX_RS422_UART_NS_550_TYPE_2_INNER_DEVICE].inst;
-}
- 
+	return &g_wxIntrCtrlInst;
+} 
 
-/* 创建不同设备的各个实例 */
-WxFailCode WX_InitDeviceInsts(WxMainCtrlCpu0Info *this)
+/* 初始化中断控制实例 */
+WxFailCode WX_InitIntrCtrlInst(INTC *intcInst)
 {
-	WxFailCode rc = WX_RS422_InitDevices(this->rs422Devices);
-	if (rc != WX_SUCCESS) {
-		wx_log(WX_CRITICAL, "Error Exit: WX_RS422_InitDevices fail(%u)", rc);
-		return rc;
-	}
-	/* if more device please add here */
-	return WX_OK;
-}
-
-/* 初始化 */
-WxFailCode WX_Init(WxMainCtrlCpu0Info *this)
-{
-	WxFailCode rc;
-	rc = WX_InitDeviceInsts(this);
-	if (rc != WX_OK) {
-		wx_log(WX_CRITICAL, "Error Exit: WX_InitDeviceInst fail(%u)", rc);
-		return rc;
+	/* 创建中断控制器实例 */
+	XScuGic_Config *intcConfig = XScuGic_LookupConfig(INTC_DEVICE_ID);
+	if (NULL == intcConfig) {
+		wx_log(WX_CRITICAL, "Error Exit: XScuGic_LookupConfig(%u) fail(%u)", INTC_DEVICE_ID, rc);
+		return WX_SCUGIC_LOOKUP_CFG_FAIL;
 	}
 
-	rc = WX_SetupIntrSystem(this);
-	if (rc != WX_SUCCESS) {
-		wx_log(WX_CRITICAL, "Error Exit: WX_SetupIntrSystem fail(%u)", rc);
-		return rc;
+	int Status = XScuGic_CfgInitialize(intcInst, intcConfig, intcConfig->CpuBaseAddress);
+	if (Status != XST_SUCCESS) {
+		return WX_SCUGIC_CFG_INIT_FAIL;
 	}
+	/*
+	 * Initialize the exception table.
+	 */
+	Xil_ExceptionInit();
+	/*
+	 * Register the interrupt controller handler with the exception table.
+	 */
+	Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_INT, (Xil_ExceptionHandler)XScuGic_InterruptHandler, intcInst);
 
+	/*
+	 * Enable exceptions.
+	 */
+	// Xil_ExceptionEnable();
 	return WX_SUCCESS;
 }
 
 int main(void)
 {
-	WxMainCtrlCpu0Info *this = &g_wxMainCtrlCpu0Info;
-	WxFailCode rc = WX_Init();
+	/*
+	 * inst the interrupt controller inst
+	 */
+	WxFailCode rc = WX_InitIntrCtrlInst(&g_wxIntrCtrlInst);
 	if (rc != WX_SUCCESS) {
-		xil_printf("Error Exit: WX_Init fail(%u)", rc);
+		wx_log(WX_CRITICAL, "Error Exit: WX_InitIntrCtrlInst fail(%u)", rc);
 		return rc;
 	}
 

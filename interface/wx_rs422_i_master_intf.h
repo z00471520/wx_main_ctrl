@@ -3,17 +3,15 @@
 #include "wx_typedef.h"
 #include "wx_modbus.h"
 #include "wx_msg_intf.h"
-#define WX_RS422I_MSG_BODY_SIZE WX_MODBUS_ADU_MAX_SIZE             /* 消息体的长度 */
+#define WX_RS422I_Master_MSG_BODY_SIZE WX_MODBUS_ADU_MAX_SIZE             /* 消息体的长度 */
 
-/* RS422 I 从机地址定义 */
+/* RS422 I Master的从机地址定义 */
 typedef enum {
-    WX_RS422I_SLAVE_ADDR_NA,
-    WX_RS422I_SLAVE_ADDR_XXX,
-    WX_RS422I_SLAVE_ADDR_YYY,
-    WX_RS422I_SLAVE_ADDR_BUTT,
-} WxRs422ISlaveAddrDef;
-
-
+    WX_RS422I_Master_SLAVE_ADDR_NA,
+    WX_RS422I_Master_SLAVE_ADDR_XXX,
+    WX_RS422I_Master_SLAVE_ADDR_YYY,
+    WX_RS422I_Master_SLAVE_ADDR_BUTT,
+} WxRs422IMasterSlaveAddrDef;
 
 /******************************************************************************
  * 读数据请求/响应的消息子类型定义
@@ -80,7 +78,7 @@ typedef struct {
  *****************************************************************************/
 typedef struct {
     WxMsgHeader header; /* 消息头  */
-    UINT8 msgBody[WX_RS422I_MSG_BODY_SIZE];  /* Msg body 由msgType和msgSubType确定，由通信双方自行约束 */
-} WxRs422IMsg;
+    UINT8 msgBody[WX_RS422I_Master_MSG_BODY_SIZE];  /* Msg body 由msgType和msgSubType确定，由通信双方自行约束 */
+} WxRs422IMasterMsg;
 
 #endif

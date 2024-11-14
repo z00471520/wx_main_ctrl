@@ -20,7 +20,7 @@
 #define WX_MODBUS_FUNC_CODE_WRITE_DATA_ERR   (WX_MODBUS_FUNC_CODE_WRITE_DATA + 0x80)    /* 写数据 */
 #define WX_MODBUS_FUNC_CODE_READ_FILE_ERR    (WX_MODBUS_FUNC_CODE_READ_FILE + 0x80)    /* 读文件 */
 #define WX_MODBUS_FUNC_CODE_WRITE_FILE_ERR   (WX_MODBUS_FUNC_CODE_WRITE_FILE + 0x80)    /* 写文件 */
-
+#define WX_MODBUS_IS_EXCP_FUNC_CODE(funcCode) ((funcCode) & 0x80)
 /* Read data response format */
 #define WX_MODBUS_RD_RSP_MIN_LEN            (6)
 #define WX_MODBUS_RD_RSP_SLAVE_ADDR_IDX     0   /* oct0 is slave address */
@@ -39,5 +39,12 @@
 #define WX_MODBUS_ADU_MAX_SIZE              256
 #define WX_MODBUS_MAX_EXCP_CODE_NUM         256
 #define WX_MODBUS_CRC_VALUE(hi, lo)         (((UINT16)(hi) << 8) + (lo)) /* 用于拼接CRC U8的(HI, LO)到一个U16 */
+
+typedef struct {
+    UINT32 aduLen;
+    volatile UINT32 expectRspLen;     /* 预期从机响应的报文长度, 当报文为TX是有效 */
+    UINT8 adu[WX_MODBUS_ADU_MAX_SIZE]; /* 数组 */
+} WxModbusAdu;
+
 uint16_t WX_Modbus_Crc16(uint8_t *pFrame, uint16_t len);
 #endif
