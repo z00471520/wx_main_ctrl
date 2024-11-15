@@ -1,10 +1,10 @@
 #include "wx_rs422_i_master_task.h"
-WxFailCode WxRs422I_EncodeDataMMM(UINT8 buf[], UINT8 bufSize, VOID *data)
+UINT32 WxRs422I_EncodeDataMMM(UINT8 buf[], UINT8 bufSize, VOID *data)
 {
     return WX_ERR;
 }
 
-WxFailCode WxRs422I_EncodeDataMMM(UINT8 buf[], UINT8 bufSize, VOID *data)
+UINT32 WxRs422I_EncodeDataMMM(UINT8 buf[], UINT8 bufSize, VOID *data)
 {
     return WX_ERR;
 }
@@ -18,7 +18,7 @@ WxRs422IWriteDataEncodeInfo g_wxRs422IReadDataHandles[WX_RS422_I_MSG_READ_DATA_B
 };
 
 /* |salve address: 1byte| func code: 1byte| data addr: 2byte | data len：1byte | data: N | */
-WxFailCode WX_RS422I_Master_EncodeAduWriteDataReq(WxRs422IMasterMsg *txMsg, WxRs422IAdu *txAdu)
+UINT32 WX_RS422I_Master_EncodeAduWriteDataReq(WxRs422IMasterMsg *txMsg, WxRs422IAdu *txAdu)
 {
     if (txMsg->msgSubType >= WX_RS422_I_MSG_WRITE_DATA_BUTT) {
         return WX_RS422I_Master_INVALID_SUB_OPR_TYPE;
@@ -36,7 +36,7 @@ WxFailCode WX_RS422I_Master_EncodeAduWriteDataReq(WxRs422IMasterMsg *txMsg, WxRs
 
     /* the length size can be used to encode */
     UINT16 lelfLen = WX_RS422_ADU_MSX_SIZE - txAdu->valueLen - WX_MODBUS_CRC_LEN; /* the crc and adu len */
-    WxFailCode rc = encodeInfo->dataStrucEncodeFunc(txAdu->value[txAdu->valueLen], lelfLen, &txMsg->msgBody[0]);
+    UINT32 rc = encodeInfo->dataStrucEncodeFunc(txAdu->value[txAdu->valueLen], lelfLen, &txMsg->msgBody[0]);
     if (rc != WX_SUCCESS) {
         return rc;
     }

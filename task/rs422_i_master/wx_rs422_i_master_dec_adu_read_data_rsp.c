@@ -1,7 +1,7 @@
 #include "wx_include.h"
 #include "wx_rs422_i_master_task.h"
 /* 读数据响应解码 */
-WxFailCode WX_RS422I_Master_DecodeAduReadDataResponce(WxRs422IMasterTask *this, WxModbusAdu *txAdu, WxModbusAdu *rxAdu, WxRs422IMasterMsg *rspMsp)
+UINT32 WX_RS422I_Master_DecodeAduReadDataResponce(WxRs422IMasterTask *this, WxModbusAdu *txAdu, WxModbusAdu *rxAdu, WxRs422IMasterMsg *rspMsp)
 {
     if (rxAdu->valueLen < WX_MODBUS_ADU_RD_RSP_MIN_LEN) {
         return WX_RS422I_Master_RECV_RSP_RD_LEN_ERR
@@ -21,6 +21,6 @@ WxFailCode WX_RS422I_Master_DecodeAduReadDataResponce(WxRs422IMasterTask *this, 
         return WX_RS422I_Master_RECV_RSP_RD_GET_DEC_FUNC_FAIL;
     }
     /* 调用解码函数解码，把数据流解码到结构体  */
-    WxFailCode rc = decFunc(&rxAdu->value[WX_MODBUS_ADU_RD_RSP_DATA_START_IDX], rxAdu->valueLen - WX_MODBUS_ADU_RD_RSP_DATA_START_IDX, (WxRs422IReadDataRsp *)rspMsp->msgBody);
+    UINT32 rc = decFunc(&rxAdu->value[WX_MODBUS_ADU_RD_RSP_DATA_START_IDX], rxAdu->valueLen - WX_MODBUS_ADU_RD_RSP_DATA_START_IDX, (WxRs422IReadDataRsp *)rspMsp->msgBody);
     return rc;
 }

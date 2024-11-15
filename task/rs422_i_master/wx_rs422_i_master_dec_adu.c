@@ -3,7 +3,7 @@
 #include "wx_rs422_i_master_task.h"
 
 /* 写数据响应解码处理 */
-WxFailCode WX_RS422I_Master_DecodeAduWriteDataResponce(WxRs422IMasterTask *this, WxModbusAdu *txAdu, WxModbusAdu *rxAdu, WxRs422IMasterMsg *rxMsgBuf)
+UINT32 WX_RS422I_Master_DecodeAduWriteDataResponce(WxRs422IMasterTask *this, WxModbusAdu *txAdu, WxModbusAdu *rxAdu, WxRs422IMasterMsg *rxMsgBuf)
 {
     /* 写数据的响应的写操作的数据预期是一模一样的 */
     if (rxAdu->valueLen != txAdu->valueLen) {
@@ -17,21 +17,21 @@ WxFailCode WX_RS422I_Master_DecodeAduWriteDataResponce(WxRs422IMasterTask *this,
 }
 
 /* 读文件响应处理 - 暂不支持 */
-WxFailCode WX_RS422I_Master_DecodeAduReadFileResponce(WxRs422IMasterTask *this, WxModbusAdu *txAdu, WxModbusAdu *rxAdu, WxRs422IMasterMsg *rxMsgBuf)
+UINT32 WX_RS422I_Master_DecodeAduReadFileResponce(WxRs422IMasterTask *this, WxModbusAdu *txAdu, WxModbusAdu *rxAdu, WxRs422IMasterMsg *rxMsgBuf)
 {
     return WX_RS422I_Master_RECV_RD_FILE_RSP_UNSPT;
 }
 
 /* 写文件响应处理 - 暂不支持 */
-WxFailCode WX_RS422I_Master_DecodeAduWriteFileResponce(WxRs422IMasterTask *this, WxRs422IMasterTask *this, WxModbusAdu *txAdu, WxModbusAdu *rxAdu, WxRs422IMasterMsg *rxMsgBuf)
+UINT32 WX_RS422I_Master_DecodeAduWriteFileResponce(WxRs422IMasterTask *this, WxRs422IMasterTask *this, WxModbusAdu *txAdu, WxModbusAdu *rxAdu, WxRs422IMasterMsg *rxMsgBuf)
 {
     return WX_RS422I_Master_RECV_WR_FILE_RSP_UNSPT;
 }
 
 /* 解码接收到ADU转换成消息发送 */
-WxFailCode WX_RS422I_Master_DecodeAdu(WxRs422IMasterTask *this, WxModbusAdu *rxAdu, WxRs422IMasterMsg *rxMsg)
+UINT32 WX_RS422I_Master_DecodeAdu(WxRs422IMasterTask *this, WxModbusAdu *rxAdu, WxRs422IMasterMsg *rxMsg)
 {
-    WxFailCode rc = WX_SUCCESS;
+    UINT32 rc = WX_SUCCESS;
     WxModbusAdu *txAdu = &this->txAdu;
     /* 长度检查 */
     if (rxAdu->valueLen < WX_MODBUS_ADU_ERR_RSP_LEN) {

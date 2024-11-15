@@ -49,7 +49,7 @@ void WX_RS422I_Master_IntrHandler(void *CallBackRef, u32 Event, unsigned int Eve
 	}
 }
 
-WxFailCode WX_RS422I_Master_EncodeAdu(WxRs422IMasterMsg *txMsg, WxRs422IAdu *txAdu)
+UINT32 WX_RS422I_Master_EncodeAdu(WxRs422IMasterMsg *txMsg, WxRs422IAdu *txAdu)
 {
     switch (txMsg->msgType) {
         case WX_RS422I_Master_MSG_READ_DATA:
@@ -66,7 +66,7 @@ WxFailCode WX_RS422I_Master_EncodeAdu(WxRs422IMasterMsg *txMsg, WxRs422IAdu *txA
 
 
 /* 这个函数会阻塞直到发送完成或者异常 */
-WxFailCode WX_RS422I_Master_TxAdu(WxRs422IMasterTask *this, WxModbusAdu *txAdu)
+UINT32 WX_RS422I_Master_TxAdu(WxRs422IMasterTask *this, WxModbusAdu *txAdu)
 {
     /* 清空并预设预期接收的报文大小，防止任务被抢占来不及缓存导致串口消息丢失 */
     UINT32 recvCount; 
@@ -91,7 +91,7 @@ WxFailCode WX_RS422I_Master_TxAdu(WxRs422IMasterTask *this, WxModbusAdu *txAdu)
 
 
 /* 接收报文 */
-WxFailCode WX_RS422I_Master_RxAdu(WxRs422IMasterTask *this)
+UINT32 WX_RS422I_Master_RxAdu(WxRs422IMasterTask *this)
 {
     /* 这里会阻塞等待接收完成，如果长时间不完成则认为是异常 */
     if (xSemaphoreTake(this->valueRxFinishSemaphore, (TickType_t)WX_RS422I_MASTER_WAIT_RX_FINISH_TIME) == pdFALSE) {
@@ -122,9 +122,9 @@ WxMsgType WX_RS422I_Master_GetRspMsgType(WxMsgType reqMsgType)
     }
 }
 
-WxFailCode WX_RS422I_Master_ProcMsg(WxRs422IMasterTask *this, WxRs422IMasterMsg *msg)
+UINT32 WX_RS422I_Master_ProcMsg(WxRs422IMasterTask *this, WxRs422IMasterMsg *msg)
 {
-    WxFailCode rc = WX_RS422I_Master_EncodeAdu(&this->rs422Msg, &this->txAdu);
+    UINT32 rc = WX_RS422I_Master_EncodeAdu(&this->rs422Msg, &this->txAdu);
     if (rc != WX_SUCCESS) {
         return rc;
     }
@@ -167,9 +167,9 @@ VOID WX_RS422I_Master_MainTask(VOID *pvParameters)
 }
 
 /* 创建RS422I主机任务 */
-WxFailCode WX_RS422I_Master_CreateTask(VOID)
+UINT32 WX_RS422I_Master_CreateTask(VOID)
 {
-    WxFailCode rc;
+    UINT32 rc;
     WxRs422IMasterTaskCfgInfo *cfg = &g_wxRs422IMasterCfgInfo;
     WxRs422IMasterTask *this = &g_wxRs422IMasterTask;
     /* create the msg que to buff the msg to tx */

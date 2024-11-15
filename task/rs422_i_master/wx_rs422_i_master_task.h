@@ -25,10 +25,10 @@ typedef enum {
 } WxRs422IModbusOprType;
 
 /* 编码函数 */
-typedef WxFailCode (*WxRs422IEncodeDataStructFunc)(UINT8 buf[], UINT8 bufSize);
+typedef UINT32 (*WxRs422IEncodeDataStructFunc)(UINT8 buf[], UINT8 bufSize);
 
 /* 解码函数 */
-typedef WxFailCode (*WxRs422IReadDateDecodeFunc)(UINT8 data[], UINT8 dataLen, WxRs422IReadDataRsp *rspStruct);
+typedef UINT32 (*WxRs422IReadDateDecodeFunc)(UINT8 data[], UINT8 dataLen, WxRs422IReadDataRsp *rspStruct);
 
 /* 不同读类型对应的编码 */
 typedef struct {
@@ -37,7 +37,7 @@ typedef struct {
     UINT16  dataLen;  /* 读数据的数据长度, 0- 无效值 */
     WxRs422IReadDateDecodeFunc decFunc; /* 读数据的解码函数，把数据流转换位消息结构体 */
 } WxRs422IReadDataHandle;
-WxFailCode WX_RS422I_Master_EncodeAduReadDataReq(WxRs422IMasterMsg *txMsg, WxRs422IAdu *txAdu);
+UINT32 WX_RS422I_Master_EncodeAduReadDataReq(WxRs422IMasterMsg *txMsg, WxRs422IAdu *txAdu);
 WxRs422IReadDateDecodeFunc WX_RS422I_Master_GetDecodeFunc(WxRs422IReadDataType dataType);
 
 /* 不同写请求对应的编码信息 */
@@ -46,7 +46,7 @@ typedef struct {
     UINT16 dataAddr; /* 写操作的数据地址 */
     WxRs422IEncodeDataStructFunc dataStrucEncodeFunc; /* 数据结构体编码函数 */
 } WxRs422IWriteDataEncodeInfo;
-WxFailCode WX_RS422I_Master_EncodeAduWriteDataReq(WxRs422IMasterMsg *txMsg, WxRs422IAdu *txAdu);
+UINT32 WX_RS422I_Master_EncodeAduWriteDataReq(WxRs422IMasterMsg *txMsg, WxRs422IAdu *txAdu);
 
 /* 不同读类型对应的编码 */
 typedef struct {
@@ -55,7 +55,7 @@ typedef struct {
     UINT16  dataLen;  /* 读数据的数据长度, 0- 无效值 */
 } WxRs422IReadDataHandle;
 
-typedef WxFailCode (*WxRs422IEncodeDataStructFunc)(UINT8 buf[], UINT8 bufSize, VOID *data);
+typedef UINT32 (*WxRs422IEncodeDataStructFunc)(UINT8 buf[], UINT8 bufSize, VOID *data);
 
 /* 不同写请求对应的编码信息 */
 typedef struct {
@@ -84,8 +84,8 @@ typedef struct {
 } WxRs422IMasterTask;
 
 void WX_RS422I_Master_IntrHandler(void *CallBackRef, u32 Event, unsigned int EventData);
-WxFailCode WX_RS422I_Master_DecodeAdu(WxModbusAdu *txAdu, WxModbusAdu *rxAdu, WxRs422IMasterMsg *rxMsgBuf);;
-WxFailCode WX_RS422I_Master_EncodeAdu(WxRs422IMasterMsg *txMsg, WxRs422IAdu *txAdu);
-WxFailCode WX_RS422I_Master_DecodeAduReadDataResponce(WxRs422IMasterTask *this, WxModbusAdu *txAdu, WxModbusAdu *rxAdu, WxRs422IMasterMsg *rspMsp);
-WxFailCode WX_RS422I_Master_DecodeAduExcpResponce(WxRs422IMasterTask *this, WxModbusAdu *txAdu, WxModbusAdu *rxAdu, WxRs422IMasterMsg *rxMsg);
+UINT32 WX_RS422I_Master_DecodeAdu(WxModbusAdu *txAdu, WxModbusAdu *rxAdu, WxRs422IMasterMsg *rxMsgBuf);;
+UINT32 WX_RS422I_Master_EncodeAdu(WxRs422IMasterMsg *txMsg, WxRs422IAdu *txAdu);
+UINT32 WX_RS422I_Master_DecodeAduReadDataResponce(WxRs422IMasterTask *this, WxModbusAdu *txAdu, WxModbusAdu *rxAdu, WxRs422IMasterMsg *rspMsp);
+UINT32 WX_RS422I_Master_DecodeAduExcpResponce(WxRs422IMasterTask *this, WxModbusAdu *txAdu, WxModbusAdu *rxAdu, WxRs422IMasterMsg *rxMsg);
 #endif

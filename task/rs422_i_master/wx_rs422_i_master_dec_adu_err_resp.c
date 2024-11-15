@@ -12,7 +12,7 @@ inline WxMsgType WX_RS422I_Master_GetRspMsgTypeByMbOpr(WxRs422IModbusOprType opr
     return g_wxRs422IRspMsgType[oprType];
 }
 
-WxFailCode g_wxMbOpr2FailCode[WX_RS422I_Master_MB_OPR_BUTT] = {
+UINT32 g_wxMbOpr2FailCode[WX_RS422I_Master_MB_OPR_BUTT] = {
     [WX_RS422I_Master_MB_OPR_RD_DATA] = WX_RS422I_Master_RECV_RSP_RD_DATA_ERR,
     [WX_RS422I_Master_MB_OPR_WR_DATA] = WX_RS422I_Master_RECV_RSP_WR_DATA_ERR,
     [WX_RS422I_Master_MB_OPR_RD_FILE] = WX_RS422I_Master_RECV_RSP_RD_FILE_ERR,
@@ -43,7 +43,7 @@ inline WxRs422IModbusOprType WX_RS422I_Master_ErrFuncCode2OprType(UINT8 funcCode
 }
 
 /* 异常响应处理 */
-WxFailCode WX_RS422I_Master_DecodeAduExcpResponce(WxRs422IMasterTask *this, WxModbusAdu *txAdu, WxModbusAdu *rxAdu, WxRs422IMasterMsg *rxMsg)
+UINT32 WX_RS422I_Master_DecodeAduExcpResponce(WxRs422IMasterTask *this, WxModbusAdu *txAdu, WxModbusAdu *rxAdu, WxRs422IMasterMsg *rxMsg)
 {
     if (txAdu->valueLen != WX_MODBUS_ADU_ERR_RSP_LEN) {
         return WX_RS422I_Master_RECV_EXCP_RSP_LEN_ERR;

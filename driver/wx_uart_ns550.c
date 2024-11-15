@@ -3,7 +3,7 @@
 /*
  * 初始化指定的UART NS550 IP core
  */
-WxFailCode WX_InitUartNs550(XUartNs550 *this, UINT32 deviceId, XUartNs550Format *format)
+UINT32 WX_InitUartNs550(XUartNs550 *this, UINT32 deviceId, XUartNs550Format *format)
 {
 	/*
 	 * Initialize the UART Lite driver so that it's ready to use,
@@ -35,7 +35,7 @@ WxFailCode WX_InitUartNs550(XUartNs550 *this, UINT32 deviceId, XUartNs550Format 
  * uartInstPtr - uart实例指针
  * uartIntrCfg - 中断配置信息
  **/
-WxFailCode WX_SetupUartNs550Interrupt(XUartNs550 *uartInstPtr, WxUartNs550IntrCfg *uartIntrCfg)
+UINT32 WX_SetupUartNs550Interrupt(XUartNs550 *uartInstPtr, WxUartNs550IntrCfg *uartIntrCfg)
 {
 	INTC *intcInst = WX_GetIntrCtrlInst();
 	if (intcInst == NULL) {

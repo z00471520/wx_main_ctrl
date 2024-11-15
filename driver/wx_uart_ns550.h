@@ -10,7 +10,7 @@ typedef struct {
 } WxUartNs550IntrCfg;
 
 /* 根据配置信息初始化UartNs550 IP core */
-WxFailCode WX_InitUartNs550(XUartNs550 *this, UINT32 deviceId, XUartNs550Format *format);
+UINT32 WX_InitUartNs550(XUartNs550 *this, UINT32 deviceId, XUartNs550Format *format);
 /* 设置URART的中断 */
-WxFailCode WX_SetupUartNs550Interrupt(XUartNs550 *uartInstPtr, WxUartNs550IntrCfg *uartIntrCfg);
+UINT32 WX_SetupUartNs550Interrupt(XUartNs550 *uartInstPtr, WxUartNs550IntrCfg *uartIntrCfg);
 #endif

@@ -11,7 +11,7 @@ typedef struct {
 /* 不同模块的消息队列信息， 由各模块自行注册，如果模块想要和其他模块通信则需要注册其消息接收队列 */
 QueueHandle_t g_wxMsgQueHandles[WX_MODULE_BUTT] = {0};
 
-WxFailCode WX_RegMsgQue(WxMsgReceiver receiver, QueueHandle_t queHandle, UINT32 itermSize) 
+UINT32 WX_RegMsgQue(WxMsgReceiver receiver, QueueHandle_t queHandle, UINT32 itermSize) 
 {
     if (receiver >= WX_MODULE_BUTT) {
         return WX_MSG_QUE_REG_INVALID_RECVER;
@@ -22,7 +22,7 @@ WxFailCode WX_RegMsgQue(WxMsgReceiver receiver, QueueHandle_t queHandle, UINT32 
     return WX_SUCCESS;
 }
 /* 用于发送消息到指定的模块，消息头中的sender和receiver会发生变化 */
-WxFailCode WX_MSG_Dispatch(WxMsgSender sender, WxMsgReceiver receiver, WxMsgHeader *msgHead)
+UINT32 WX_MSG_Dispatch(WxMsgSender sender, WxMsgReceiver receiver, WxMsgHeader *msgHead)
 {
     if (msgHead == NULL) {
         return WX_MSG_DISPATCH_INVALID_MSG_HEADER;

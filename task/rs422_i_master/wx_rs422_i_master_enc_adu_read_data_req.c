@@ -17,7 +17,7 @@ WxRs422IReadDateDecodeFunc WX_RS422I_Master_GetDecodeFunc(WxRs422IReadDataType d
 }
 
 /* |slave address：1byte| func code: 1byte | data address: 2byte | data len：1byte | */
-WxFailCode WX_RS422I_Master_EncodeAduReadDataReq(WxRs422IMasterMsg *txMsg, WxRs422IAdu *txAdu)
+UINT32 WX_RS422I_Master_EncodeAduReadDataReq(WxRs422IMasterMsg *txMsg, WxRs422IAdu *txAdu)
 {
     if (txMsg->msgSubType >= WX_RS422_I_MSG_READ_DATA_BUTT) {
         return WX_RS422I_Master_INVALID_SUB_OPR_TYPE;

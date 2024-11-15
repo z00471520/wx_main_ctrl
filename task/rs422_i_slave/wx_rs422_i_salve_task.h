@@ -8,8 +8,8 @@
 /******************************************************************************
  * 读数据请求
 ******************************************************************************/
-typedef WxFailCode (*WxRs422ISlaveGetDataHandle)(WxRs422ISlaveData *data);
-typedef WxFailCode (*WxRs422ISlaveEncDataHandle)(WxRs422ISlaveData *data, WxRs422ISlaveMsg *req, WxModbusAdu *adu);
+typedef UINT32 (*WxRs422ISlaveGetDataHandle)(WxRs422ISlaveData *data);
+typedef UINT32 (*WxRs422ISlaveEncDataHandle)(WxRs422ISlaveData *data, WxRs422ISlaveMsg *req, WxModbusAdu *adu);
 /* 读数据的hanlde - g_wxRs422ISlaveDataReadHandles for detail */
 typedef struct {
     WxRs422ISlaveGetDataHandle readData; /* 数据获取的handle */
@@ -20,9 +20,9 @@ typedef struct {
  * 写数据请求
 ******************************************************************************/
 /* 码流解码到数据结构体 */
-typedef WxFailCode (*WxRs422ISlaveDecAduHandle)(WxModbusAdu *adu, WxRs422ISlaveData *data);
+typedef UINT32 (*WxRs422ISlaveDecAduHandle)(WxModbusAdu *adu, WxRs422ISlaveData *data);
 /* 数据写到本地 */
-typedef WxFailCode (*WxRs422ISlaveWriteDataHandle)(WxRs422ISlaveData *data);
+typedef UINT32 (*WxRs422ISlaveWriteDataHandle)(WxRs422ISlaveData *data);
 
 /* 读数据的hanlde - g_wxRs422ISlaveDataReadHandles for detail */
 typedef struct {

@@ -6,7 +6,7 @@ WxRs422ISlaveTask g_wxRs422ISlaveTask = {0};
 /*
  * This is the configuration of the RS422I-master
  **/
-WxRs422ISlaveTaskCfgInfo g_wxRs422ISlaveCfgInfo = {
+WxRs422CanSlaveCfgInfo g_wxRs422ISlaveCfgInfo = {
     .waitTxFinishBlockTime = 0, /* portMAX_DELAY: 死等 */
     .waitRxFinishBlockTime = portMAX_DELAY,
     .salveAddr = 10,
@@ -228,10 +228,10 @@ VOID WX_RS422I_Slave_MainTask(VOID *pvParameters)
 }
 
 /* 创建RS422I主机任务 */
-UINT32 WX_RS422I_Slave_CreateTask(VOID)
+UINT32 WX_CAN_SalveRS422I_Slave_CreateTask(VOID)
 {
     UINT32 rc;
-    WxRs422ISlaveTaskCfgInfo *cfg = &g_wxRs422ISlaveCfgInfo;
+    WxRs422CanSlaveCfgInfo *cfg = &g_wxRs422ISlaveCfgInfo;
     WxRs422ISlaveTask *this = &g_wxRs422ISlaveTask;
     /* create the msg que to buff the msg to tx */
     if (this->msgQueHandle == 0) {

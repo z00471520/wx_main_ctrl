@@ -35,7 +35,7 @@ INTC *WX_GetIntrCtrlInst(VOID)
 } 
 
 /* 初始化中断控制实例 */
-WxFailCode WX_InitIntrCtrlInst(INTC *intcInst)
+UINT32 WX_InitIntrCtrlInst(INTC *intcInst)
 {
 	/* 创建中断控制器实例 */
 	XScuGic_Config *intcConfig = XScuGic_LookupConfig(INTC_DEVICE_ID);
@@ -69,7 +69,7 @@ int main(void)
 	/*
 	 * inst the interrupt controller inst
 	 */
-	WxFailCode rc = WX_InitIntrCtrlInst(&g_wxIntrCtrlInst);
+	UINT32 rc = WX_InitIntrCtrlInst(&g_wxIntrCtrlInst);
 	if (rc != WX_SUCCESS) {
 		wx_log(WX_CRITICAL, "Error Exit: WX_InitIntrCtrlInst fail(%u)", rc);
 		return rc;

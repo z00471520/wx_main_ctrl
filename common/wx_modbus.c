@@ -80,7 +80,7 @@ UINT16 WX_Modbug_GetAduCrcValue(WxModbusAdu *adu)
 }
 
 /* WX_SUCCESS-校验成功; 其他-校验失败 */
-WxFailCode WX_Modbus_AduCrcCheck(WxModbusAdu *adu)
+UINT32 WX_Modbus_AduCrcCheck(WxModbusAdu *adu)
 {
     if (adu->valueLen < WX_MODBUS_ADU_MIN_SIZE) {
         return WX_ERR;
@@ -100,7 +100,7 @@ WxFailCode WX_Modbus_AduCrcCheck(WxModbusAdu *adu)
  * WX_SUCCESS - 编码成功
  * 其他        - 编码失败
  **/
-WxFailCode WX_Modbus_AduEncodeBasic(WxModbusAdu *adu, intptr_t value, UINT32 valueSize)
+UINT32 WX_Modbus_AduEncodeBasic(WxModbusAdu *adu, intptr_t value, UINT32 valueSize)
 {
     /* 编码空间不足 */
     if (adu->valueLen + valueSize > sizeof(adu->value)) {
@@ -158,7 +158,7 @@ WxFailCode WX_Modbus_AduEncodeBasic(WxModbusAdu *adu, intptr_t value, UINT32 val
  * WX_SUCCESS - 编码成功
  * 其他        - 编码失败
  **/
-WxFailCode WX_Modbus_AduEncodeBlock(WxModbusAdu *adu, UINT8 block, UINT32 blockSize)
+UINT32 WX_Modbus_AduEncodeBlock(WxModbusAdu *adu, UINT8 block, UINT32 blockSize)
 {
     /* 编码空间不足 */
     if (adu->valueLen + blockSize > sizeof(adu->value)) {
@@ -175,7 +175,7 @@ WxFailCode WX_Modbus_AduEncodeBlock(WxModbusAdu *adu, UINT8 block, UINT32 blockS
 /*
  * 函数功能: 解码基础类型
  **/
-WxFailCode WX_Modbus_AduDecodeBasic(WxModbusAdu *adu, UINT32 *startPtr, UINT32 len, VOID *buff)
+UINT32 WX_Modbus_AduDecodeBasic(WxModbusAdu *adu, UINT32 *startPtr, UINT32 len, VOID *buff)
 {
     /* 入参检查 */
     UINT32 start = *startPtr;
@@ -245,7 +245,7 @@ WxFailCode WX_Modbus_AduDecodeBasic(WxModbusAdu *adu, UINT32 *startPtr, UINT32 l
 /*
  * 函数功能：解码ADU的指定位置和长度的数据块到buf, 解码完毕后数据的startPrt取值为下一个待解码位置
  **/
-WxFailCode WX_Modbus_AduDecodeBlock(WxModbusAdu *adu, UINT32 *startPtr, UINT32 len, UINT8 *buff, UINT32 buffSize)
+UINT32 WX_Modbus_AduDecodeBlock(WxModbusAdu *adu, UINT32 *startPtr, UINT32 len, UINT8 *buff, UINT32 buffSize)
 {
     /* 入参检查 */
     UINT32 start = *startPtr;
