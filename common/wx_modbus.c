@@ -158,7 +158,7 @@ UINT32 WX_Modbus_AduEncodeBasic(WxModbusAdu *adu, intptr_t value, UINT32 valueSi
  * WX_SUCCESS - 编码成功
  * 其他        - 编码失败
  **/
-UINT32 WX_Modbus_AduEncodeBlock(WxModbusAdu *adu, UINT8 block, UINT32 blockSize)
+UINT32 WX_Modbus_AduEncodeBlock(WxModbusAdu *adu, UINT8 *block, UINT32 blockSize)
 {
     /* 编码空间不足 */
     if (adu->valueLen + blockSize > sizeof(adu->value)) {

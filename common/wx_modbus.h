@@ -78,7 +78,7 @@ uint16_t WX_Modbus_Crc16(uint8_t *pFrame, uint16_t len);
 UINT32 WX_Modbus_AduCrcCheck(WxModbusAdu *adu);
 UINT16 WX_Modbug_GetAduCrcValue(WxModbusAdu *adu);
 UINT32 WX_Modbus_AduEncodeBasic(WxModbusAdu *adu, intptr_t value, UINT32 valueSize);
-UINT32 WX_Modbus_AduEncodeBlock(WxModbusAdu *adu, UINT8 block, UINT32 blockSize);
+UINT32 WX_Modbus_AduEncodeBlock(WxModbusAdu *adu, UINT8 *block, UINT32 blockSize);
 UINT32 WX_Modbus_AduDecodeBasic(WxModbusAdu *adu, UINT32 *startPtr, UINT32 len, VOID *buff);
 UINT32 WX_Modbus_AduDecodeBlock(WxModbusAdu *adu, UINT32 *startPtr, UINT32 len, UINT8 *buff, UINT32 buffSize);
 #define WX_MODBUS_ADU_ENCODE_BASIC(adu, v) WX_Modbus_AduEncodeBasic(adu, (intptr_t)v, sizeof(v))
