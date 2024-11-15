@@ -27,24 +27,24 @@ WxFailCode WX_RS422I_Master_EncodeAduWriteDataReq(WxRs422IMasterMsg *txMsg, WxRs
     if (encodeInfo->dataStrucEncodeFunc == NULL) {
         return WX_RS422I_Master_WR_REQ_ENCODE_FUNC_UNDEF;
     }
-    txAdu->adu[0] = encodeInfo->slaveDevice; /* slave address */
-    txAdu->adu[1] = WX_MODBUS_FUNC_CODE_WRITE_DATA; /* func code */
-    txAdu->adu[2] = (UINT8)((encodeInfo->dataAddr >> 8) & 0xff); /* data address hi */
-    txAdu->adu[3] = (UINT8)(encodeInfo->dataAddr & 0xff); /* data address lo */
-    txAdu->aduLen = 4;
-    txAdu->adu[4] = 0; /* 4- it is the data len we init */
+    txAdu->value[0] = encodeInfo->slaveDevice; /* slave address */
+    txAdu->value[1] = WX_MODBUS_FUNC_CODE_WRITE_DATA; /* func code */
+    txAdu->value[2] = (UINT8)((encodeInfo->dataAddr >> 8) & 0xff); /* data address hi */
+    txAdu->value[3] = (UINT8)(encodeInfo->dataAddr & 0xff); /* data address lo */
+    txAdu->valueLen = 4;
+    txAdu->value[4] = 0; /* 4- it is the data len we init */
 
     /* the length size can be used to encode */
-    UINT16 lelfLen = WX_RS422_ADU_MSX_SIZE - txAdu->aduLen - WX_MODBUS_CRC_LEN; /* the crc and adu len */
-    WxFailCode rc = encodeInfo->dataStrucEncodeFunc(txAdu->adu[txAdu->aduLen], lelfLen, &txMsg->msgBody[0]);
+    UINT16 lelfLen = WX_RS422_ADU_MSX_SIZE - txAdu->valueLen - WX_MODBUS_CRC_LEN; /* the crc and adu len */
+    WxFailCode rc = encodeInfo->dataStrucEncodeFunc(txAdu->value[txAdu->valueLen], lelfLen, &txMsg->msgBody[0]);
     if (rc != WX_SUCCESS) {
         return rc;
     }
-    txAdu->aduLen += txAdu->adu[4] + 1; /* 编码adu[4]存放的是长度，其本身占用1字节*/
+    txAdu->valueLen += txAdu->value[4] + 1; /* 编码adu[4]存放的是长度，其本身占用1字节*/
     /* to calc the crc value */
-    UINT16 crcValue = WX_Modbus_Crc16(txAdu->adu, txAdu->aduLen);
-    txAdu->adu[txAdu->aduLen++] = (UINT8)((crcValue >> 8) & 0xff);   
-    txAdu->adu[txAdu->aduLen++] = (UINT8)(crcValue & 0xff); 
-    txAdu->expectRspLen = txAdu->aduLen; /* 写多少字节，响应就应该是多少字节 */
+    UINT16 crcValue = WX_Modbus_Crc16(txAdu->adu, txAdu->valueLen);
+    txAdu->value[txAdu->valueLen++] = (UINT8)((crcValue >> 8) & 0xff);   
+    txAdu->value[txAdu->valueLen++] = (UINT8)(crcValue & 0xff); 
+    txAdu->expectRspLen = txAdu->valueLen; /* 写多少字节，响应就应该是多少字节 */
     return WX_SUCCESS;
 }

@@ -1,5 +1,7 @@
 #include <stdint.h>
-#include "wx_modus.h"
+#include "wx_include.h"
+#include "wx_modbus.h"
+
 static const uint8_t aucCRCHi[] = {
     0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x01, 0xC0, 0x80, 0x41,
     0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81, 0x40,
@@ -63,4 +65,199 @@ uint16_t WX_Modbus_Crc16( uint8_t *pFrame, uint16_t len )
         ucCRCHi = aucCRCLo[iIndex];
     }
     return ( uint16_t )( ucCRCHi << 8 | ucCRCLo );
+}
+
+
+/* 获取ADU的报文CRC校验结果 */
+UINT16 WX_Modbug_GetAduCrcValue(WxModbusAdu *adu)
+{
+    if (adu->valueLen < WX_MODBUS_ADU_MIN_SIZE) {
+        return 0;
+    }
+    UINT16 lo = (UINT16)adu->value[adu->valueLen - 1];
+    UINT16 hi = (UINT16)adu->value[adu->valueLen - 2];
+    return ((hi << 8) + lo);
+}
+
+/* WX_SUCCESS-校验成功; 其他-校验失败 */
+WxFailCode WX_Modbus_AduCrcCheck(WxModbusAdu *adu)
+{
+    if (adu->valueLen < WX_MODBUS_ADU_MIN_SIZE) {
+        return WX_ERR;
+    }
+    UINT16 expectCrc16 = WX_Modbus_Crc16(adu->value, adu->valueLen - WX_MODBUS_CRC_LEN);
+    UINT16 realCrc16 = WX_Modbug_GetAduCrcValue(adu);
+    return (realCrc16 == expectCrc16) ? WX_SUCCESS : WX_MODBUS_ADU_CRC_CHECK_FAIL;
+}
+
+/* 
+ * 函数功能：编码基础类型的数据数据到ADU
+ * 参数说明：
+ * adu       - 待编码的ADU
+ * valuePtr  - 数据的地址
+ * valueSize - 数据的长度 取值1,2,4,8
+ * 返回值说明：
+ * WX_SUCCESS - 编码成功
+ * 其他        - 编码失败
+ **/
+WxFailCode WX_Modbus_AduEncodeBasic(WxModbusAdu *adu, const VOID* const valuePtr, UINT32 valueSize)
+{
+    /* 编码空间不足 */
+    if (adu->valueLen + valueSize > sizeof(adu->value)) {
+        return WX_MODBUS_ADU_ENCODE_INSUFFICIENT_SPACE;
+    }
+
+    switch (valueSize)
+    {
+        case 1: {
+            UINT8 value8 = *(UINT8 *)(valuePtr);
+            adu->value[adu->valueLen++] = value8;
+            break;
+        }
+        case 2: {
+            UINT16 value16 = *(UINT16 *)(valuePtr);
+            adu->value[adu->valueLen++] = (UINT8)((value16 >> 8) & 0xFF);
+            adu->value[adu->valueLen++] = (UINT8)(value16 & 0xFF);
+            break;
+        }
+        case 4: {
+            UINT32 value32 = *(UINT16 *)(valuePtr);
+            adu->value[adu->valueLen++] = (UINT8)((value32 >> 24) & 0xFF);
+            adu->value[adu->valueLen++] = (UINT8)((value32 >> 16) & 0xFF);
+            adu->value[adu->valueLen++] = (UINT8)((value32 >> 8)  & 0xFF);
+            adu->value[adu->valueLen++] = (UINT8)(value32 & 0xFF);
+            break;
+        }
+        case 8: {
+            UINT64 value64 = *(UINT16 *)(valuePtr);
+            adu->value[adu->valueLen++] = (UINT8)((value64 >> 56) & 0xFF);
+            adu->value[adu->valueLen++] = (UINT8)((value64 >> 48) & 0xFF);
+            adu->value[adu->valueLen++] = (UINT8)((value64 >> 40) & 0xFF);
+            adu->value[adu->valueLen++] = (UINT8)((value64 >> 32) & 0xFF);
+            adu->value[adu->valueLen++] = (UINT8)((value64 >> 24) & 0xFF);
+            adu->value[adu->valueLen++] = (UINT8)((value64 >> 16) & 0xFF);
+            adu->value[adu->valueLen++] = (UINT8)((value64 >> 8)  & 0xFF);
+            adu->value[adu->valueLen++] = (UINT8)(value64 & 0xFF);
+            break;
+        }
+        default: {
+            return WX_MODBUS_ADU_ENCODE_INVALID_VALUE_SIZE;
+        }
+    }
+
+    return WX_SUCCESS;
+}
+
+/* 
+ * 函数功能：编码数据块到ADU
+ * 参数说明：
+ * adu       - 待编码的ADU
+ * block  - 数据块的地址
+ * blockSize - 数据块的长度
+ * 返回值说明：
+ * WX_SUCCESS - 编码成功
+ * 其他        - 编码失败
+ **/
+WxFailCode WX_Modbus_AduEncodeBlock(WxModbusAdu *adu, UINT8 block, UINT32 blockSize)
+{
+    /* 编码空间不足 */
+    if (adu->valueLen + blockSize > sizeof(adu->value)) {
+        return WX_MODBUS_ADU_ENCODE_INSUFFICIENT_SPACE;
+    }
+
+    for (UINT32 i = 0; i < blockSize; i++) {
+         adu->value[adu->valueLen++] = block[i];
+    }
+
+    return WX_SUCCESS;
+}
+
+/*
+ * 函数功能: 解码基础类型
+ **/
+WxFailCode WX_Modbus_AduDecodeBasic(WxModbusAdu *adu, UINT32 *startPtr, UINT32 len, VOID *buff)
+{
+    /* 入参检查 */
+    UINT32 start = *startPtr;
+    if (start + len > adu->valueLen) {
+        return WX_MODBUS_ADU_DECODE_INVALID_START_LEN;
+    }
+
+    switch (len)
+    {
+        case 1: {
+            *((UINT8 *)buff) = adu->value[start];
+            break;
+        }
+        case 2: {
+            UINT16 value16 = 0;
+            value16 |= adu->value[start];
+            value16 <<= 8;
+            value16 |= adu->value[start + 1];
+            value16 <<= 8;
+            *((UINT16 *)buff) = value16;
+            break;
+        }
+        case 4: {
+            UINT32 value32 = 0;
+            value32 |= adu->value[start];
+            value32 <<= 8;
+            value32 |= adu->value[start + 1];
+            value32 <<= 8;
+            value32 |= adu->value[start + 2];
+            value32 <<= 8;
+            value32 |= adu->value[start + 3];
+            value32 <<= 8;
+            *((UINT32 *)buff) = value32;
+            break;
+        }
+        case 8: {
+            UINT64 value64 = 0;
+            value64 |= adu->value[start];
+            value64 <<= 8;
+            value64 |= adu->value[start + 1];
+            value64 <<= 8;
+            value64 |= adu->value[start + 2];
+            value64 <<= 8;
+            value64 |= adu->value[start + 3];
+            value64 <<= 8;
+            value64 |= adu->value[start + 4];
+            value64 <<= 8;
+            value64 |= adu->value[start + 5];
+            value64 <<= 8;
+            value64 |= adu->value[start + 6];
+            value64 <<= 8;
+            value64 |= adu->value[start + 7];
+            value64 <<= 8;
+            *((UINT64 *)buff) = value64;
+            break;
+        }
+        default: {
+            return WX_MODBUS_ADU_DECODE_INVALID_LEN;
+        }
+    }
+    *startPtr += len; /* 解码完毕后进行偏移 */
+    return WX_SUCCESS;
+}
+
+
+
+/*
+ * 函数功能：解码ADU的指定位置和长度的数据块到buf, 解码完毕后数据的startPrt取值为下一个待解码位置
+ **/
+WxFailCode WX_Modbus_AduDecodeBlock(WxModbusAdu *adu, UINT32 *startPtr, UINT32 len, UINT8 *buff, UINT32 buffSize)
+{
+    /* 入参检查 */
+    UINT32 start = *startPtr;
+    if (start + len > adu->valueLen) {
+        return WX_MODBUS_ADU_DECODE_INVALID_START_LEN;
+    }
+
+    if (len > buffSize) {
+        return WX_MODBUS_ADU_DECODE_BUF_SIZE_ERR;
+    }
+    memcpy(buff, adu->value[start], len);
+    *startPtr += len;
+
+    return WX_SUCCESS;
 }

@@ -45,20 +45,17 @@ inline WxRs422IModbusOprType WX_RS422I_Master_ErrFuncCode2OprType(UINT8 funcCode
 /* 异常响应处理 */
 WxFailCode WX_RS422I_Master_DecodeAduExcpResponce(WxRs422IMasterTask *this, WxModbusAdu *txAdu, WxModbusAdu *rxAdu, WxRs422IMasterMsg *rxMsg)
 {
-    if (txAdu->aduLen != WX_MODBUS_ERR_ADU_LEN) {
+    if (txAdu->valueLen != WX_MODBUS_ADU_ERR_RSP_LEN) {
         return WX_RS422I_Master_RECV_EXCP_RSP_LEN_ERR;
     }
 
-    UINT16 expectCrcValue = WX_Modbus_Crc16(rxAdu->adu, rxAdu->aduLen - 2);
-    UINT16 crcValue = WX_MODBUS_CRC_VALUE(rxAdu->adu[WX_MODBUS_ERR_ADU_CRC_HI_IDX] + rxAdu->adu[WX_MODBUS_ERR_ADU_CRC_LO_IDX]);
-    if (expectCrcValue != crcValue) {
+    if (WX_Modbus_AduCrcCheck(rxAdu) != WX_SUCCESS) {
         return WX_RS422I_Master_RECV_EXCP_RSP_CRC_ERR;
     }
     
-
-    UINT8 funcCode = rxAdu->adu[WX_MODBUS_ERR_ADU_FUNC_CODE_IDX];
-    UINT8 slaveAddr = rxAdu->adu[WX_MODBUS_ERR_ADU_SLAVE_ADDR_IDX];
-    UINT8 excpCode = rxAdu->adu[WX_MODBUS_ERR_ADU_FUNC_CODE_IDX];
+    UINT8 funcCode = rxAdu->value[WX_MODBUS_ADU_ERR_RSP_FUNC_CODE_IDX];
+    UINT8 slaveAddr = rxAdu->value[WX_MODBUS_ADU_ERR_RSP_SLAVE_ADDR_IDX];
+    UINT8 excpCode = rxAdu->value[WX_MODBUS_ADU_ERR_RSP_FUNC_CODE_IDX];
     WxRs422IModbusOprType mbOpr = WX_RS422I_Master_ErrFuncCode2OprType(funcCode);
     if (mbOpr >= WX_RS422I_Master_MB_OPR_BUTT) {
         return WX_RS422I_Master_RECV_UNEXPEC_MB_OPR;

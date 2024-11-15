@@ -34,7 +34,7 @@ void WX_RS422I_Master_IntrHandler(void *CallBackRef, u32 Event, unsigned int Eve
 	 * All of the data has been received.
 	 */
 	if (Event == XUN_EVENT_RECV_DATA) {
-        this->rxAdu.aduLen = EventData;
+        this->rxAdu.valueLen = EventData;
         xSemaphoreGiveFromISR(this->aduRxFinishSemaphore);
 	}
 
@@ -44,7 +44,7 @@ void WX_RS422I_Master_IntrHandler(void *CallBackRef, u32 Event, unsigned int Eve
 	 */
 	if (Event == XUN_EVENT_RECV_TIMEOUT) {
         this->rxAdu.isTimeout = TRUE;
-        this->rxAdu.aduLen = EventData;
+        this->rxAdu.valueLen = EventData;
         xSemaphoreGiveFromISR(this->aduRxFinishSemaphore);
 	}
 }
@@ -75,7 +75,7 @@ WxFailCode WX_RS422I_Master_TxAdu(WxRs422IMasterTask *this, WxModbusAdu *txAdu)
     } while (recvCount);
 
     /* 首次发送消息会被缓存到实例，返回缓存了多少报文 */
-    unsigned int sendCount = XUartNs550_Send(&this->rs422Inst, txAdu->adu, (unsigned int)txAdu->aduLen);
+    unsigned int sendCount = XUartNs550_Send(&this->rs422Inst, txAdu->adu, (unsigned int)txAdu->valueLen);
     if (sendCount == 0) {
         /* 是不可能出现发送0情况，这里算是异常了 */
         return WX_RS422I_Master_SNED_ADU_BUFFER_FAIL;

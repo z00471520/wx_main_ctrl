@@ -27,16 +27,16 @@ WxFailCode WX_RS422I_Master_EncodeAduReadDataReq(WxRs422IMasterMsg *txMsg, WxRs4
     if (encodeInfo->dataLen == 0) {
         return WX_RS422I_Master_READ_REQ_ENCODE_INFO_UNDEF;
     }
-    txAdu->aduLen = 0;
-    txAdu->adu[txAdu->aduLen++] = encodeInfo->slaveDevice; /* slave address */
-    txAdu->adu[txAdu->aduLen++] = WX_MODBUS_FUNC_CODE_READ_DATA; /* func code */
-    txAdu->adu[txAdu->aduLen++] = (UINT8)((encodeInfo->dataAddr >> 8) & 0xff); /* data address hi */
-    txAdu->adu[txAdu->aduLen++] = (UINT8)(encodeInfo->dataAddr & 0xff); /* data address lo */
-    txAdu->adu[txAdu->aduLen++] = encodeInfo->dataLen; /* data len */
+    txAdu->valueLen = 0;
+    txAdu->value[txAdu->valueLen++] = encodeInfo->slaveDevice; /* slave address */
+    txAdu->value[txAdu->valueLen++] = WX_MODBUS_FUNC_CODE_READ_DATA; /* func code */
+    txAdu->value[txAdu->valueLen++] = (UINT8)((encodeInfo->dataAddr >> 8) & 0xff); /* data address hi */
+    txAdu->value[txAdu->valueLen++] = (UINT8)(encodeInfo->dataAddr & 0xff); /* data address lo */
+    txAdu->value[txAdu->valueLen++] = encodeInfo->dataLen; /* data len */
     /* to calc the crc value */
-    UINT16 crcValue = WX_Modbus_Crc16(txAdu->adu, txAdu->aduLen);
-    txAdu->adu[txAdu->aduLen++] = (UINT8)((crcValue >> 8) & 0xff);   
-    txAdu->adu[txAdu->aduLen++] = (UINT8)(crcValue & 0xff); 
+    UINT16 crcValue = WX_Modbus_Crc16(txAdu->adu, txAdu->valueLen);
+    txAdu->value[txAdu->valueLen++] = (UINT8)((crcValue >> 8) & 0xff);   
+    txAdu->value[txAdu->valueLen++] = (UINT8)(crcValue & 0xff); 
     /* 从站：1byte + 功能码：1byte + 数据长度：1byte + 数据： N byte + CRC: 2BYTE */
     txAdu->expectRspLen = 1 + 1 + 1 + encodeInfo->dataLen + WX_MODBUS_CRC_LEN;
 

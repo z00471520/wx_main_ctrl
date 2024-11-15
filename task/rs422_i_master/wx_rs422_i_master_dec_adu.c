@@ -6,11 +6,11 @@
 WxFailCode WX_RS422I_Master_DecodeAduWriteDataResponce(WxRs422IMasterTask *this, WxModbusAdu *txAdu, WxModbusAdu *rxAdu, WxRs422IMasterMsg *rxMsgBuf)
 {
     /* 写数据的响应的写操作的数据预期是一模一样的 */
-    if (rxAdu->aduLen != txAdu->aduLen) {
+    if (rxAdu->valueLen != txAdu->valueLen) {
         return WX_RS422I_Master_RECV_WR_DATA_LEN_MISMATCH;
     }
 
-    if (memcmp(rxAdu->adu, txAdu->adu, rxAdu->aduLen) != 0) {
+    if (memcmp(rxAdu->adu, txAdu->adu, rxAdu->valueLen) != 0) {
         return WX_RS422I_Master_RECV_WR_DATA_RSP_CTX_MISMATCH;
     }
     return WX_SUCCESS;
@@ -34,7 +34,7 @@ WxFailCode WX_RS422I_Master_DecodeAdu(WxRs422IMasterTask *this, WxModbusAdu *rxA
     WxFailCode rc = WX_SUCCESS;
     WxModbusAdu *txAdu = &this->txAdu;
     /* 长度检查 */
-    if (rxAdu->aduLen < WX_MODBUS_ERR_ADU_LEN) {
+    if (rxAdu->valueLen < WX_MODBUS_ADU_ERR_RSP_LEN) {
         if (rxAdu->isTimeout) {
             /* TODO: ADD CNT */
             return WX_RS422I_Master_RECV_TIMEOUT;
@@ -42,15 +42,15 @@ WxFailCode WX_RS422I_Master_DecodeAdu(WxRs422IMasterTask *this, WxModbusAdu *rxA
         return WX_RS422I_Master_RECV_UNEXPECT_LEN;
     }
     /* check the save addr shoule be same with the tx slave addr */
-    UINT8 txSlaceAddr = txAdu->adu[0];
-    UINT8 rxSlaveAddr = rxAdu->adu[0];
+    UINT8 txSlaceAddr = txAdu->value[0];
+    UINT8 rxSlaveAddr = rxAdu->value[0];
     if (txSlaceAddr != rxSlaveAddr) {
         return WX_RS422I_Master_RECV_SLAVE_ADDR_MISMATCH;
     }
 
     /* chech the function-code, the oct 1 is the function-code should samve with the tx or responding err code */
-    UINT8 txFuncCode = txAdu->adu[1];
-    UINT8 rxFuncCode = txAdu->adu[1];
+    UINT8 txFuncCode = txAdu->value[1];
+    UINT8 rxFuncCode = txAdu->value[1];
 
     if (txFuncCode != rxFuncCode && (txFuncCode + 0x80 != rxFuncCode)) {
         return WX_RS422I_Master_RECV_UNEXPECT_FUNC_CODE;

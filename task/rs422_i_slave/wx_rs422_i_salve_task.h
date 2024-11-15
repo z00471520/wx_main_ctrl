@@ -9,7 +9,7 @@
  * 读数据请求
 ******************************************************************************/
 typedef WxFailCode (*WxRs422ISlaveGetDataHandle)(WxRs422ISlaveData *data);
-typedef WxFailCode (*WxRs422ISlaveEncDataHandle)(WxRs422ISlaveData *data, WxModbusAdu *adu);
+typedef WxFailCode (*WxRs422ISlaveEncDataHandle)(WxRs422ISlaveData *data, WxRs422ISlaveMsg *req, WxModbusAdu *adu);
 /* 读数据的hanlde - g_wxRs422ISlaveDataReadHandles for detail */
 typedef struct {
     WxRs422ISlaveGetDataHandle readData; /* 数据获取的handle */
