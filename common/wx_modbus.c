@@ -94,13 +94,13 @@ WxFailCode WX_Modbus_AduCrcCheck(WxModbusAdu *adu)
  * 函数功能：编码基础类型的数据数据到ADU
  * 参数说明：
  * adu       - 待编码的ADU
- * valuePtr  - 数据的地址
+ * value     - 要编码的数据
  * valueSize - 数据的长度 取值1,2,4,8
  * 返回值说明：
  * WX_SUCCESS - 编码成功
  * 其他        - 编码失败
  **/
-WxFailCode WX_Modbus_AduEncodeBasic(WxModbusAdu *adu, const VOID* const valuePtr, UINT32 valueSize)
+WxFailCode WX_Modbus_AduEncodeBasic(WxModbusAdu *adu, intptr_t value, UINT32 valueSize)
 {
     /* 编码空间不足 */
     if (adu->valueLen + valueSize > sizeof(adu->value)) {
@@ -110,18 +110,18 @@ WxFailCode WX_Modbus_AduEncodeBasic(WxModbusAdu *adu, const VOID* const valuePtr
     switch (valueSize)
     {
         case 1: {
-            UINT8 value8 = *(UINT8 *)(valuePtr);
+            UINT8 value8 = (UINT8)value;
             adu->value[adu->valueLen++] = value8;
             break;
         }
         case 2: {
-            UINT16 value16 = *(UINT16 *)(valuePtr);
+            UINT16 value16 = (UINT16)value;
             adu->value[adu->valueLen++] = (UINT8)((value16 >> 8) & 0xFF);
             adu->value[adu->valueLen++] = (UINT8)(value16 & 0xFF);
             break;
         }
         case 4: {
-            UINT32 value32 = *(UINT16 *)(valuePtr);
+            UINT32 value32 = (UINT32)value;
             adu->value[adu->valueLen++] = (UINT8)((value32 >> 24) & 0xFF);
             adu->value[adu->valueLen++] = (UINT8)((value32 >> 16) & 0xFF);
             adu->value[adu->valueLen++] = (UINT8)((value32 >> 8)  & 0xFF);
@@ -129,7 +129,7 @@ WxFailCode WX_Modbus_AduEncodeBasic(WxModbusAdu *adu, const VOID* const valuePtr
             break;
         }
         case 8: {
-            UINT64 value64 = *(UINT16 *)(valuePtr);
+            UINT64 value64 =(UINT64)value;
             adu->value[adu->valueLen++] = (UINT8)((value64 >> 56) & 0xFF);
             adu->value[adu->valueLen++] = (UINT8)((value64 >> 48) & 0xFF);
             adu->value[adu->valueLen++] = (UINT8)((value64 >> 40) & 0xFF);

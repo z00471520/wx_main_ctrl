@@ -29,14 +29,14 @@ WxRs422ISlaveTaskCfgInfo g_wxRs422ISlaveCfgInfo = {
 WxFailCode WX_RS422I_Slave_SendAdu(WxRs422ISlaveTask *this, WxModbusAdu *txAdu)
 {
     /* 首次发送消息会被缓存到实例，返回缓存了多少报文 */
-    unsigned int sendCount = XUartNs550_Send(&this->rs422Inst, txAdu->adu, (unsigned int)txAdu->valueLen);
+    unsigned int sendCount = XUartNs550_Send(&this->rs422Inst, txAdu->value, (unsigned int)txAdu->valueLen);
     if (sendCount == 0) {
         /* 是不可能出现发送0情况，这里算是异常了 */
         return WX_RS422I_SLAVE_SEND_ADU_FAIL;
     }
 
     /* 这里会阻塞等待发送完成，如果长时间不完成则认为是异常 */
-    if (xSemaphoreTake(this->aduTxFinishSemaphore, (TickType_t)WX_RS422I_SLAVE_WAIT_TX_FINISH_TIME) == FALSE) {
+    if (xSemaphoreTake(this->valueTxFinishSemaphore, (TickType_t)WX_RS422I_SLAVE_WAIT_TX_FINISH_TIME) == FALSE) {
         if (WX_RS422I_SLAVE_WAIT_TX_FINISH_TIME == 0) {
             return WX_SUCCESS;
         }
@@ -49,8 +49,28 @@ WxFailCode WX_RS422I_Slave_SendAdu(WxRs422ISlaveTask *this, WxModbusAdu *txAdu)
 /* 发送异常响应 */
 WxFailCode WX_RS422I_Slave_SendExcpRsp(WxRs422ISlaveTask *this, WxRs422ISlaveMsg *req, UINT8 excpCode)
 {
+    WxFailCode ret = WX_SUCCESS;
     this->txAdu.valueLen = 0;
-    
+    UINT8 slaveAddr = WX_RS422I_SLAVE_ADDR;
+    UINT8 funcCode = req->funcCode + 0x80;
+
+    ret |= WX_MODBUS_ADU_ENCODE_BASIC(&this->txAdu, slaveAddr);
+    ret |= WX_MODBUS_ADU_ENCODE_BASIC(&this->txAdu, funcCode);
+    ret |= WX_MODBUS_ADU_ENCODE_BASIC(&this->txAdu, excpCode);
+    UINT16 crc16 = WX_Modbus_Crc16(this->txAdu.value, this->txAdu.valueLen);
+    ret |= WX_MODBUS_ADU_ENCODE_BASIC(&this->txAdu, crc16);
+    if (ret != WX_SUCCESS) {
+        return WX_MODBUS_ADU_ENCODE_FAIL;
+    }
+
+     /* 这里不返回失败 */
+    ret = WX_RS422I_Slave_SendAdu(this, &this->txAdu);
+    if (ret != WX_SUCCESS) {
+        wx_excp_cnt(WX_EXCP_RS422_SLAVE_SEND_ERR_ADU_FAIL);
+        return ret;
+    }
+
+    return WX_SUCCESS;
 }
 
 /* 发送读数据响应， 如果失败请务必设置异常码以便外部统一处理 */
@@ -195,7 +215,7 @@ VOID WX_RS422I_Slave_MainTask(VOID *pvParameters)
         } while (recvCount);
 
         /* 这里会阻塞等待接收完成，如果长时间不完成则认为是异常 */
-        if (xSemaphoreTake(this->aduRxFinishSemaphore, (TickType_t)WX_RS422I_SLAVE_WAIT_RX_FINISH_TIME) == pdTRUE) {
+        if (xSemaphoreTake(this->valueRxFinishSemaphore, (TickType_t)WX_RS422I_SLAVE_WAIT_RX_FINISH_TIME) == pdTRUE) {
             
             /* 处理dataReq请求(内部会发送响应) */
             rc = WX_RS422I_Slave_ProcRxAdu(this, &this->rxAdu);

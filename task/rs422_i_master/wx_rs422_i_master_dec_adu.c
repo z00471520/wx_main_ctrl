@@ -10,7 +10,7 @@ WxFailCode WX_RS422I_Master_DecodeAduWriteDataResponce(WxRs422IMasterTask *this,
         return WX_RS422I_Master_RECV_WR_DATA_LEN_MISMATCH;
     }
 
-    if (memcmp(rxAdu->adu, txAdu->adu, rxAdu->valueLen) != 0) {
+    if (memcmp(rxAdu->value, txAdu->value, rxAdu->valueLen) != 0) {
         return WX_RS422I_Master_RECV_WR_DATA_RSP_CTX_MISMATCH;
     }
     return WX_SUCCESS;

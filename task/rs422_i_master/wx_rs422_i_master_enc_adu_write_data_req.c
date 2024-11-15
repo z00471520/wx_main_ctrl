@@ -42,7 +42,7 @@ WxFailCode WX_RS422I_Master_EncodeAduWriteDataReq(WxRs422IMasterMsg *txMsg, WxRs
     }
     txAdu->valueLen += txAdu->value[4] + 1; /* 编码adu[4]存放的是长度，其本身占用1字节*/
     /* to calc the crc value */
-    UINT16 crcValue = WX_Modbus_Crc16(txAdu->adu, txAdu->valueLen);
+    UINT16 crcValue = WX_Modbus_Crc16(txAdu->value, txAdu->valueLen);
     txAdu->value[txAdu->valueLen++] = (UINT8)((crcValue >> 8) & 0xff);   
     txAdu->value[txAdu->valueLen++] = (UINT8)(crcValue & 0xff); 
     txAdu->expectRspLen = txAdu->valueLen; /* 写多少字节，响应就应该是多少字节 */

@@ -27,7 +27,7 @@ void WX_RS422I_Master_IntrHandler(void *CallBackRef, u32 Event, unsigned int Eve
 	 */
 	if (Event == XUN_EVENT_SENT_DATA) {
         /* 接着发送实例缓存中的数据，如果发送为0则说明发送完毕，否则继续等待下次中断 */
-        xSemaphoreGiveFromISR(this->aduTxFinishSemaphore);
+        xSemaphoreGiveFromISR(this->valueTxFinishSemaphore);
 	}
 
     /*
@@ -35,7 +35,7 @@ void WX_RS422I_Master_IntrHandler(void *CallBackRef, u32 Event, unsigned int Eve
 	 */
 	if (Event == XUN_EVENT_RECV_DATA) {
         this->rxAdu.valueLen = EventData;
-        xSemaphoreGiveFromISR(this->aduRxFinishSemaphore);
+        xSemaphoreGiveFromISR(this->valueRxFinishSemaphore);
 	}
 
 	/*
@@ -45,7 +45,7 @@ void WX_RS422I_Master_IntrHandler(void *CallBackRef, u32 Event, unsigned int Eve
 	if (Event == XUN_EVENT_RECV_TIMEOUT) {
         this->rxAdu.isTimeout = TRUE;
         this->rxAdu.valueLen = EventData;
-        xSemaphoreGiveFromISR(this->aduRxFinishSemaphore);
+        xSemaphoreGiveFromISR(this->valueRxFinishSemaphore);
 	}
 }
 
@@ -71,18 +71,18 @@ WxFailCode WX_RS422I_Master_TxAdu(WxRs422IMasterTask *this, WxModbusAdu *txAdu)
     /* 清空并预设预期接收的报文大小，防止任务被抢占来不及缓存导致串口消息丢失 */
     UINT32 recvCount; 
     do {
-        recvCount = XUartNs550_Recv(&this->rs422Inst, rxAdu->adu, txAdu->expectRspLen);
+        recvCount = XUartNs550_Recv(&this->rs422Inst, rxAdu->value, txAdu->expectRspLen);
     } while (recvCount);
 
     /* 首次发送消息会被缓存到实例，返回缓存了多少报文 */
-    unsigned int sendCount = XUartNs550_Send(&this->rs422Inst, txAdu->adu, (unsigned int)txAdu->valueLen);
+    unsigned int sendCount = XUartNs550_Send(&this->rs422Inst, txAdu->value, (unsigned int)txAdu->valueLen);
     if (sendCount == 0) {
         /* 是不可能出现发送0情况，这里算是异常了 */
         return WX_RS422I_Master_SNED_ADU_BUFFER_FAIL;
     }
 
     /* 这里会阻塞等待发送完成，如果长时间不完成则认为是异常 */
-    if (xSemaphoreTake(this->aduTxFinishSemaphore, (TickType_t)WX_RS422I_MASTER_WAIT_TX_FINISH_TIME) == FALSE) {
+    if (xSemaphoreTake(this->valueTxFinishSemaphore, (TickType_t)WX_RS422I_MASTER_WAIT_TX_FINISH_TIME) == FALSE) {
         return WX_RS422I_Master_SEND_ADU_TIMEOUT,
     }
 
@@ -94,7 +94,7 @@ WxFailCode WX_RS422I_Master_TxAdu(WxRs422IMasterTask *this, WxModbusAdu *txAdu)
 WxFailCode WX_RS422I_Master_RxAdu(WxRs422IMasterTask *this)
 {
     /* 这里会阻塞等待接收完成，如果长时间不完成则认为是异常 */
-    if (xSemaphoreTake(this->aduRxFinishSemaphore, (TickType_t)WX_RS422I_MASTER_WAIT_RX_FINISH_TIME) == pdFALSE) {
+    if (xSemaphoreTake(this->valueRxFinishSemaphore, (TickType_t)WX_RS422I_MASTER_WAIT_RX_FINISH_TIME) == pdFALSE) {
         return WX_RS422I_Master_SEND_ADU_TIMEOUT,
     }
 
@@ -197,16 +197,16 @@ WxFailCode WX_RS422I_Master_CreateTask(VOID)
     }
 
     /* 该二进制信号量用于表达RS422是否把ADU消息全部发送完毕 */
-    this->aduTxFinishSemaphore = xSemaphoreCreateBinary();
-    if (this->aduTxFinishSemaphore == NULL) {
+    this->valueTxFinishSemaphore = xSemaphoreCreateBinary();
+    if (this->valueTxFinishSemaphore == NULL) {
         /* There was insufficient FreeRTOS heap available for the semaphore to
            be created successfully. */
         return WX_RS422I_Master_CREATE_TASK_FAIL_TXSEMAPHORE_NULL;
     }
 
     /* 该二进制信号量用于表达RS422是否把ADU消息全部发送完毕 */
-    this->aduRxFinishSemaphore = xSemaphoreCreateBinary();
-    if (this->aduRxFinishSemaphore == NULL) {
+    this->valueRxFinishSemaphore = xSemaphoreCreateBinary();
+    if (this->valueRxFinishSemaphore == NULL) {
         /* There was insufficient FreeRTOS heap available for the semaphore to
            be created successfully. */
         return WX_RS422I_Master_CREATE_TASK_FAIL_RXSEMAPHORE_NULL;

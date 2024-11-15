@@ -77,10 +77,10 @@ typedef struct {
 uint16_t WX_Modbus_Crc16(uint8_t *pFrame, uint16_t len);
 WxFailCode WX_Modbus_AduCrcCheck(WxModbusAdu *adu);
 UINT16 WX_Modbug_GetAduCrcValue(WxModbusAdu *adu);
-WxFailCode WX_Modbus_AduEncodeBasic(WxModbusAdu *adu, const VOID* const valuePtr, UINT32 valueSize);
+WxFailCode WX_Modbus_AduEncodeBasic(WxModbusAdu *adu, intptr_t value, UINT32 valueSize);
 WxFailCode WX_Modbus_AduEncodeBlock(WxModbusAdu *adu, UINT8 block, UINT32 blockSize);
 WxFailCode WX_Modbus_AduDecodeBasic(WxModbusAdu *adu, UINT32 *startPtr, UINT32 len, VOID *buff);
 WxFailCode WX_Modbus_AduDecodeBlock(WxModbusAdu *adu, UINT32 *startPtr, UINT32 len, UINT8 *buff, UINT32 buffSize);
-#define WX_MODBUS_ADU_ENCODE_BASIC(adu, valuePtr) WX_Modbus_AduEncodeBasic(adu, (const VOID* const)valuePtr, sizeof(*valuePtr))
-#define WX_MODBUS_ADU_DECODE_BASIC(adu, startPtr, valuePtr) WX_Modbus_AduDecodeBasic(adu, startPtr, sizeof(*valuePtr), (VOID *)valuePtr)
+#define WX_MODBUS_ADU_ENCODE_BASIC(adu, v) WX_Modbus_AduEncodeBasic(adu, (intptr_t)v, sizeof(v))
+#define WX_MODBUS_ADU_DECODE_BASIC(adu, sp, vp) WX_Modbus_AduDecodeBasic(adu, sp, sizeof(*vp), (VOID *)vp)
 #endif

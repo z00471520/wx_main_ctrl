@@ -34,7 +34,7 @@ WxFailCode WX_RS422I_Master_EncodeAduReadDataReq(WxRs422IMasterMsg *txMsg, WxRs4
     txAdu->value[txAdu->valueLen++] = (UINT8)(encodeInfo->dataAddr & 0xff); /* data address lo */
     txAdu->value[txAdu->valueLen++] = encodeInfo->dataLen; /* data len */
     /* to calc the crc value */
-    UINT16 crcValue = WX_Modbus_Crc16(txAdu->adu, txAdu->valueLen);
+    UINT16 crcValue = WX_Modbus_Crc16(txAdu->value, txAdu->valueLen);
     txAdu->value[txAdu->valueLen++] = (UINT8)((crcValue >> 8) & 0xff);   
     txAdu->value[txAdu->valueLen++] = (UINT8)(crcValue & 0xff); 
     /* 从站：1byte + 功能码：1byte + 数据长度：1byte + 数据： N byte + CRC: 2BYTE */

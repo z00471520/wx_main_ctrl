@@ -6,8 +6,6 @@
 
 #define WX_RS422I_MASTER_MSG_ITERM_MAX_NUM     10  /* 发送消息队列支持的最大支持缓存的消息数 */
 #define WX_RS422_ADU_MSX_SIZE           256 /* ADU的最大长度 */
-#define WX_RS422I_MASTER_WAIT_TX_FINISH_TIME  portMAX_DELAY /* 等待发送完成的定时器 portMAX_DELAY: 死等 */
-#define WX_RS422I_MASTER_WAIT_RX_FINISH_TIME  portMAX_DELAY/* 等待接收完成的定时器 portMAX_DELAY: 死等， 实际不需要设置有效的等地时间防止任务挂死 TODO */
 
 /* 设备异常描述 */
 typedef struct
