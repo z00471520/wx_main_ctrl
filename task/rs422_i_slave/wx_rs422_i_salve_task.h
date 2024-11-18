@@ -51,7 +51,7 @@ typedef struct {
     XUartNs550 rs422Inst; /* RS422实例 */
     SemaphoreHandle_t aduTxFinishSemaphore; /* 二进制信号，用于表征ADU是否发送完毕 */
     SemaphoreHandle_t aduRxFinishSemaphore; /* 二进制信号，用于表征ADU是否接收完毕 */
-    UINT64 excpCnt[WX_RS422I_Master_MB_OPR_BUTT][WX_MODBUS_MAX_EXCP_CODE_NUM]; /* 用于记录不同操作不同从机返回的异常码 */
+    UINT64 excpCnt[WX_RS422I_MASTER_MB_OPR_BUTT][WX_MODBUS_MAX_EXCP_CODE_NUM]; /* 用于记录不同操作不同从机返回的异常码 */
 } WxRs422ISlaveTask;
 
 /******************************************************************************

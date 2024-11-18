@@ -16,7 +16,7 @@ WxRs422ISlaveTaskCfgInfo g_wxRs422ISlaveCfgInfo = {
     .rs422Format.DataBits = XUN_FORMAT_8_BITS,
     .rs422Format.Parity = XUN_FORMAT_NO_PARITY,
     .rs422Format.StopBits = XUN_FORMAT_1_STOP_BIT,
-    .rs422IntrCfg.handle = WX_RS422I_Master_IntrHandler,
+    .rs422IntrCfg.handle = WX_RS422I_MASTER_IntrHandler,
     .rs422IntrCfg.callBackRef = &g_wxRs422ISlaveCfgInfo,
     .rs422IntrCfg.intrId = , /* 中断ID */
 };
@@ -238,7 +238,7 @@ UINT32 WX_RS422I_Slave_CreateTask(VOID)
         this->msgQueHandle = xQueueCreate(WX_RS422I_MASTER_MSG_ITERM_MAX_NUM, sizeof(WxRs422IMasterMsg));
         if (this->msgQueHandle == 0) {
             wx_log(WX_CRITICAL, "Error Exit: xQueueCreate fail");
-            return WX_RS422I_Master_CREATE_MSG_QUE_FAIL;
+            return WX_RS422I_MASTER_CREATE_MSG_QUE_FAIL;
         }
     }
 

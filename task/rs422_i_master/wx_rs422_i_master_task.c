@@ -13,13 +13,13 @@ WxRs422IMasterTaskCfgInfo g_wxRs422IMasterCfgInfo = {
     .rs422Format.DataBits = XUN_FORMAT_8_BITS,
     .rs422Format.Parity = XUN_FORMAT_NO_PARITY,
     .rs422Format.StopBits = XUN_FORMAT_1_STOP_BIT,
-    .rs422IntrCfg.handle = WX_RS422I_Master_IntrHandler,
+    .rs422IntrCfg.handle = WX_RS422I_MASTER_IntrHandler,
     .rs422IntrCfg.callBackRef = &g_wxRs422IMasterCfgInfo,
     .rs422IntrCfg.intrId = , /* 中断ID */
 };
 
 /* RS422I中断处理函数 */
-void WX_RS422I_Master_IntrHandler(void *CallBackRef, u32 Event, unsigned int EventData)
+void WX_RS422I_MASTER_IntrHandler(void *CallBackRef, u32 Event, unsigned int EventData)
 {
     WxRs422IMasterTask *this = CallBackRef;
     /*
@@ -49,24 +49,24 @@ void WX_RS422I_Master_IntrHandler(void *CallBackRef, u32 Event, unsigned int Eve
 	}
 }
 
-UINT32 WX_RS422I_Master_EncodeAdu(WxRs422IMasterMsg *txMsg, WxRs422IAdu *txAdu)
+UINT32 WX_RS422I_MASTER_EncodeAdu(WxRs422IMasterMsg *txMsg, WxRs422IAdu *txAdu)
 {
     switch (txMsg->msgType) {
-        case WX_RS422I_Master_MSG_READ_DATA:
-            return WX_RS422I_Master_EncodeAduReadDataReq(txMsg, txAdu);
-        case WX_RS422I_Master_MSG_WRITE_DATA: {
-            return WX_RS422I_Master_EncodeAduWriteDataReq(txMsg, txAdu);
+        case WX_RS422I_MASTER_MSG_READ_DATA:
+            return WX_RS422I_MASTER_EncodeAduReadDataReq(txMsg, txAdu);
+        case WX_RS422I_MASTER_MSG_WRITE_DATA: {
+            return WX_RS422I_MASTER_EncodeAduWriteDataReq(txMsg, txAdu);
         }
         /* if more pleace add here */
         default: {
-            return WX_RS422I_Master_UNSPT_TX_MSGTYPE;
+            return WX_RS422I_MASTER_UNSPT_TX_MSGTYPE;
         }
     }
 }
 
 
 /* 这个函数会阻塞直到发送完成或者异常 */
-UINT32 WX_RS422I_Master_TxAdu(WxRs422IMasterTask *this, WxModbusAdu *txAdu)
+UINT32 WX_RS422I_MASTER_TxAdu(WxRs422IMasterTask *this, WxModbusAdu *txAdu)
 {
     /* 清空并预设预期接收的报文大小，防止任务被抢占来不及缓存导致串口消息丢失 */
     UINT32 recvCount; 
@@ -78,12 +78,12 @@ UINT32 WX_RS422I_Master_TxAdu(WxRs422IMasterTask *this, WxModbusAdu *txAdu)
     unsigned int sendCount = XUartNs550_Send(&this->rs422Inst, txAdu->value, (unsigned int)txAdu->valueLen);
     if (sendCount == 0) {
         /* 是不可能出现发送0情况，这里算是异常了 */
-        return WX_RS422I_Master_SNED_ADU_BUFFER_FAIL;
+        return WX_RS422I_MASTER_SNED_ADU_BUFFER_FAIL;
     }
 
     /* 这里会阻塞等待发送完成，如果长时间不完成则认为是异常 */
     if (xSemaphoreTake(this->valueTxFinishSemaphore, (TickType_t)WX_RS422I_MASTER_WAIT_TX_FINISH_TIME) == FALSE) {
-        return WX_RS422I_Master_SEND_ADU_TIMEOUT,
+        return WX_RS422I_MASTER_SEND_ADU_TIMEOUT,
     }
 
     return WX_SUCCESS;
@@ -91,30 +91,30 @@ UINT32 WX_RS422I_Master_TxAdu(WxRs422IMasterTask *this, WxModbusAdu *txAdu)
 
 
 /* 接收报文 */
-UINT32 WX_RS422I_Master_RxAdu(WxRs422IMasterTask *this)
+UINT32 WX_RS422I_MASTER_RxAdu(WxRs422IMasterTask *this)
 {
     /* 这里会阻塞等待接收完成，如果长时间不完成则认为是异常 */
     if (xSemaphoreTake(this->valueRxFinishSemaphore, (TickType_t)WX_RS422I_MASTER_WAIT_RX_FINISH_TIME) == pdFALSE) {
-        return WX_RS422I_Master_SEND_ADU_TIMEOUT,
+        return WX_RS422I_MASTER_SEND_ADU_TIMEOUT,
     }
 
     return WX_SUCCESS;    
 }
 
-WxMsgType WX_RS422I_Master_GetRspMsgType(WxMsgType reqMsgType)
+WxMsgType WX_RS422I_MASTER_GetRspMsgType(WxMsgType reqMsgType)
 {
     switch (reqMsgType) {
-        case WX_RS422I_Master_MSG_READ_DATA: {
-            return WX_RS422I_Master_MSG_READ_DATA_RSP;
+        case WX_RS422I_MASTER_MSG_READ_DATA: {
+            return WX_RS422I_MASTER_MSG_READ_DATA_RSP;
         }
-        case WX_RS422I_Master_MSG_WRITE_DATA: {
-            return WX_RS422I_Master_MSG_WRITE_DATA_RSP;
+        case WX_RS422I_MASTER_MSG_WRITE_DATA: {
+            return WX_RS422I_MASTER_MSG_WRITE_DATA_RSP;
         }
-        case WX_RS422I_Master_MSG_READ_FILE: {
-            return WX_RS422I_Master_MSG_READ_FILE_RSP;
+        case WX_RS422I_MASTER_MSG_READ_FILE: {
+            return WX_RS422I_MASTER_MSG_READ_FILE_RSP;
         }
-        case WX_RS422I_Master_MSG_WRITE_FILE: {
-            return WX_RS422I_Master_MSG_WRITE_FILE_RSP;
+        case WX_RS422I_MASTER_MSG_WRITE_FILE: {
+            return WX_RS422I_MASTER_MSG_WRITE_FILE_RSP;
         }
         default:
             wx_excp_cnt(WX_EXCP_UNEXPECT_MSG_TYPE); 
@@ -122,30 +122,30 @@ WxMsgType WX_RS422I_Master_GetRspMsgType(WxMsgType reqMsgType)
     }
 }
 
-UINT32 WX_RS422I_Master_ProcMsg(WxRs422IMasterTask *this, WxRs422IMasterMsg *msg)
+UINT32 WX_RS422I_MASTER_ProcMsg(WxRs422IMasterTask *this, WxRs422IMasterMsg *msg)
 {
-    UINT32 rc = WX_RS422I_Master_EncodeAdu(&this->rs422Msg, &this->txAdu);
+    UINT32 rc = WX_RS422I_MASTER_EncodeAdu(&this->rs422Msg, &this->txAdu);
     if (rc != WX_SUCCESS) {
         return rc;
     }
     /*
      * send the adu by RS422 buf
      */
-    rc = WX_RS422I_Master_TxAdu(this, &this->txAdu);
+    rc = WX_RS422I_MASTER_TxAdu(this, &this->txAdu);
     if (rc != WX_SUCCESS) {
         return rc;
     }
     /* 请求和相应是一条消息，只需要把消息类型反转一下即可，没有必须新建一个消息 */
-    this->rs422Msg.msgType = WX_RS422I_Master_GetRspMsgType(his->rs422Msg.msgType);
+    this->rs422Msg.msgType = WX_RS422I_MASTER_GetRspMsgType(his->rs422Msg.msgType);
     
     /* wait to recieve the resbonse */
-    rc = WX_RS422I_Master_RxAdu(this);
+    rc = WX_RS422I_MASTER_RxAdu(this);
     if (rc != WX_SUCCESS) {
         return rc;
     }
     
     /* decode the rx ADU into msg */
-    rc = WX_RS422I_Master_DecodeAdu(this, this->rxAdu, &this->rs422Msg);
+    rc = WX_RS422I_MASTER_DecodeAdu(this, this->rxAdu, &this->rs422Msg);
     if (rc != WX_SUCCESS) {
         return rc;
     }
@@ -154,20 +154,20 @@ UINT32 WX_RS422I_Master_ProcMsg(WxRs422IMasterTask *this, WxRs422IMasterMsg *msg
 }
 
 /* 用于消息收发 */
-VOID WX_RS422I_Master_MainTask(VOID *pvParameters)
+VOID WX_RS422I_MASTER_MainTask(VOID *pvParameters)
 {
     WxRs422IMasterTask *this = &g_wxRs422IMasterTask;
     while(1) {
         /* block to receive the msg util the msg arrive */
         if (xQueueReceive(this->msgQueHandle, &this->rs422Msg, (TickType_t)portMAX_DELAY) == pdTRUE) {
-            this->rs422Msg.failCode = WX_RS422I_Master_ProcMsg(this, &this->rs422Msg);
+            this->rs422Msg.failCode = WX_RS422I_MASTER_ProcMsg(this, &this->rs422Msg);
             
         }
     }
 }
 
 /* 创建RS422I主机任务 */
-UINT32 WX_RS422I_Master_CreateTask(VOID)
+UINT32 WX_RS422I_MASTER_CreateTask(VOID)
 {
     UINT32 rc;
     WxRs422IMasterTaskCfgInfo *cfg = &g_wxRs422IMasterCfgInfo;
@@ -177,7 +177,7 @@ UINT32 WX_RS422I_Master_CreateTask(VOID)
         this->msgQueHandle = xQueueCreate(WX_RS422I_MASTER_MSG_ITERM_MAX_NUM, sizeof(WxRs422IMasterMsg));
         if (this->msgQueHandle == 0) {
             wx_log(WX_CRITICAL, "Error Exit: xQueueCreate fail");
-            return WX_RS422I_Master_CREATE_MSG_QUE_FAIL;
+            return WX_RS422I_MASTER_CREATE_MSG_QUE_FAIL;
         }
     }
     rc = WX_RegMsgQue(WX_MODULE_RS422_I_MASTER, this->msgQueHandle, sizeof(WxRs422IMasterMsg));
@@ -201,7 +201,7 @@ UINT32 WX_RS422I_Master_CreateTask(VOID)
     if (this->valueTxFinishSemaphore == NULL) {
         /* There was insufficient FreeRTOS heap available for the semaphore to
            be created successfully. */
-        return WX_RS422I_Master_CREATE_TASK_FAIL_TXSEMAPHORE_NULL;
+        return WX_RS422I_MASTER_CREATE_TASK_FAIL_TXSEMAPHORE_NULL;
     }
 
     /* 该二进制信号量用于表达RS422是否把ADU消息全部发送完毕 */
@@ -209,7 +209,7 @@ UINT32 WX_RS422I_Master_CreateTask(VOID)
     if (this->valueRxFinishSemaphore == NULL) {
         /* There was insufficient FreeRTOS heap available for the semaphore to
            be created successfully. */
-        return WX_RS422I_Master_CREATE_TASK_FAIL_RXSEMAPHORE_NULL;
+        return WX_RS422I_MASTER_CREATE_TASK_FAIL_RXSEMAPHORE_NULL;
     }
 
     

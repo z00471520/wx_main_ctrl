@@ -13,19 +13,19 @@ UINT32 WxRs422I_EncodeDataMMM(UINT8 buf[], UINT8 bufSize, VOID *data)
 /* 不同读操作的编码信息 */
 WxRs422IWriteDataEncodeInfo g_wxRs422IReadDataHandles[WX_RS422_I_MSG_READ_DATA_BUTT] = {
     /* sub msg type                     slave address       encode func */
-    [WX_RS422_I_MSG_WRITE_DATA_MMM] = {WX_RS422I_Master_SLAVE_XXX, WX_RS422I_Master_EncodeDataMMM},
-    [WX_RS422_I_MSG_WRITE_DATA_NNN] = {WX_RS422I_Master_SLAVE_YYY, WX_RS422I_Master_EncodeDataNNN},
+    [WX_RS422_I_MSG_WRITE_DATA_MMM] = {WX_RS422I_MASTER_SLAVE_XXX, WX_RS422I_MASTER_EncodeDataMMM},
+    [WX_RS422_I_MSG_WRITE_DATA_NNN] = {WX_RS422I_MASTER_SLAVE_YYY, WX_RS422I_MASTER_EncodeDataNNN},
 };
 
 /* |salve address: 1byte| func code: 1byte| data addr: 2byte | data len：1byte | data: N | */
-UINT32 WX_RS422I_Master_EncodeAduWriteDataReq(WxRs422IMasterMsg *txMsg, WxRs422IAdu *txAdu)
+UINT32 WX_RS422I_MASTER_EncodeAduWriteDataReq(WxRs422IMasterMsg *txMsg, WxRs422IAdu *txAdu)
 {
     if (txMsg->msgSubType >= WX_RS422_I_MSG_WRITE_DATA_BUTT) {
-        return WX_RS422I_Master_INVALID_SUB_OPR_TYPE;
+        return WX_RS422I_MASTER_INVALID_SUB_OPR_TYPE;
     }
     WxRs422IWriteDataEncodeInfo *encodeInfo = &g_wxRs422IReadDataHandles[txMsg->msgSubType];
     if (encodeInfo->dataStrucEncodeFunc == NULL) {
-        return WX_RS422I_Master_WR_REQ_ENCODE_FUNC_UNDEF;
+        return WX_RS422I_MASTER_WR_REQ_ENCODE_FUNC_UNDEF;
     }
     txAdu->value[0] = encodeInfo->slaveDevice; /* slave address */
     txAdu->value[1] = WX_MODBUS_FUNC_CODE_WRITE_DATA; /* func code */

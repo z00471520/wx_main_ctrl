@@ -14,14 +14,14 @@ typedef enum {
 
 /* 消息大类 */
 typedef enum {
-    WX_RS422I_Master_MSG_READ_DATA,        /* 读数据请求, 子类型：WxRs422IReadDataType,  消息体为：NA */
-    WX_RS422I_Master_MSG_READ_DATA_RSP,    /* 读数据响应, 子类型：WxRs422IReadDataType,  消息体为：WxRs422IReadDataRsp */
-    WX_RS422I_Master_MSG_WRITE_DATA,       /* 写数据请求, 子类型：WxRs422IWriteDataType, 消息体为: WxRs422IWriteData */
-    WX_RS422I_Master_MSG_WRITE_DATA_RSP,   /* 写数据响应, 子类型: WxRs422IWriteDataType, NA */
-    WX_RS422I_Master_MSG_READ_FILE,
-    WX_RS422I_Master_MSG_READ_FILE_RSP,
-    WX_RS422I_Master_MSG_WRITE_FILE,
-    WX_RS422I_Master_MSG_WRITE_FILE_RSP,
+    WX_RS422I_MASTER_MSG_READ_DATA,        /* 读数据请求, 子类型：WxRs422IReadDataType,  消息体为：NA */
+    WX_RS422I_MASTER_MSG_READ_DATA_RSP,    /* 读数据响应, 子类型：WxRs422IReadDataType,  消息体为：WxRs422IReadDataRsp */
+    WX_RS422I_MASTER_MSG_WRITE_DATA,       /* 写数据请求, 子类型：WxRs422IWriteDataType, 消息体为: WxRs422IWriteData */
+    WX_RS422I_MASTER_MSG_WRITE_DATA_RSP,   /* 写数据响应, 子类型: WxRs422IWriteDataType, NA */
+    WX_RS422I_MASTER_MSG_READ_FILE,
+    WX_RS422I_MASTER_MSG_READ_FILE_RSP,
+    WX_RS422I_MASTER_MSG_WRITE_FILE,
+    WX_RS422I_MASTER_MSG_WRITE_FILE_RSP,
     /* if more please add here */
 } WxMsgType;
 
