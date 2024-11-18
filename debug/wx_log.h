@@ -22,4 +22,5 @@ typedef enum {
 	WX_CRITICAL = 5, /* he device is severely abnormal and immediate measures need to be taken */
 } WxLogLelevDef;
 #define wx_log(lev,...)
+#define wx_show(...)
 #endif
