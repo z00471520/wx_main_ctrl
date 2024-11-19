@@ -5,7 +5,7 @@
 #include "xil_printf.h"
 
 /* 设置CAN中断 */
-UINT32 WX_CAN_SetupCanInterrupt(XCanPs *canInstPtr, WxCanIntrCfgInfo *intrCfg)
+UINT32 WX_CAN_SetupCanInterrupt(XCanPs *canInstPtr, WxCanIntrCfgInfo *cfg)
 {
 	/* 中断控制器 */
 	INTC *intcInst = WX_GetIntrCtrlInst();
@@ -19,7 +19,7 @@ UINT32 WX_CAN_SetupCanInterrupt(XCanPs *canInstPtr, WxCanIntrCfgInfo *intrCfg)
 	 * interrupt for the device occurs, the handler defined above performs
 	 * the specific interrupt processing for the device.
 	 */
-	int status = XScuGic_Connect(intcInst, intrCfg->intrId,
+	int status = XScuGic_Connect(intcInst, cfg->intrId,
 				 (Xil_ExceptionHandler)XCanPs_IntrHandler, canInstPtr);
 	if (status != XST_SUCCESS) {
 		wx_log(WX_CRITICAL, "Error Exit: XScuGic_Connect RS422(%u) fail(%u)", status);
@@ -29,7 +29,7 @@ UINT32 WX_CAN_SetupCanInterrupt(XCanPs *canInstPtr, WxCanIntrCfgInfo *intrCfg)
 	/*
 	 * Enable the interrupt for the Timer device.
 	 */
-	XScuGic_Enable(intcInst, intrCfg->intrId);
+	XScuGic_Enable(intcInst, cfg->intrId);
 	
 	/*
 	 * Enable all interrupts in CAN device.
@@ -73,7 +73,6 @@ UINT32 WX_CAN_SendFrame(XCanPs *canInstPtr, WxCanFrame *frame)
 		*dataPtr++ = (u8)frame->data[i];
 	}
 
-	
 	/*
 	 * if TX FIFO is full send will fail.
 	 */

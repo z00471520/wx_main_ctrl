@@ -1,19 +1,18 @@
-#ifndef WX_CAN_SLAVE_TASK_H
-#define WX_CAN_SLAVE_TASK_H
+#ifndef __WX_CAN_SLAVE_TASK_H__
+#define __WX_CAN_SLAVE_TASK_H__
 #include "wx_can.h"
-typedef enum {
-    WX_CAN_TYPE_A,
-    WX_CAN_TYPE_B,
-    WX_CAN_TYPE_BUTT,
-} WxCanTypeDef;
+#include "wx_msg_remote_ctrl_intf.h"
+/* 卫星遥控的指令码-需要根据卫星通信规范确定 */
+typedef enum{
+    WX_RMT_CTRL_CODE_RESET = 0, /* 复位请求 */
+    WX_RMT_CTRL_CODE_DEVICE_SELF_CHECK = 1, /* 设备自检 */
+    WX_RMT_CTRL_CODE_BUTT,
+} WxRmtCtrlCodeDef;
 
 typedef struct {
-    WxCanDeviceCfgInfo deviceCfgInfo; /* CAN设备配置信息 */ 
-    WxCanIntrCfgInfo intrCfgInfo; /* 中断配置信息 */
-} WxCanSlaveCfgInfo;
+    UINT16 rmtCtrlCode; /* 遥控指令码 */
+} WxRmtCtrlPdu;
 
-/* CAN从机任务信息 */
-typedef struct {
-    ;
-} WxCanSlaveTask;
+VOID WX_CAN_SlaveTask(VOID *param);
+UINT32 WX_CAN_SLAVE_DecodeRemoteCtrlMsg(WxCanSlaveTask *this, WxCanFrame *canFrame, WxRemoteCtrlMsg **ppRemoteCtrlMsg);
 #endif
