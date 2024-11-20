@@ -1,4 +1,4 @@
-#include "wx_can_slave_task.h"
+#include "wx_can_slave.h"
 typedef UINT32 (*WxCmdCodeDecHandle)(VOID);
 
 

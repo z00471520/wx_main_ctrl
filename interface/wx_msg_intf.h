@@ -8,6 +8,7 @@ typedef enum {
     WX_MODULE_CAN_A,
     WX_MODULE_CAN_B,
     WX_MODULE_RS422_I_MASTER, /* 内部外设通信使用的RS422 */
+    WX_MODULE_ZJ_SPI_DRIVER,
     /* if more please add here */
     WX_MODULE_BUTT,
 } WxMsgReceiver, WxMsgSender;

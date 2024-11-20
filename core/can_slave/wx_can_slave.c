@@ -1,5 +1,5 @@
 #include "wx_include.h"
-#include "wx_can_slave_task.h"
+#include "wx_can_slave.h"
 #include "wx_can.h"
 #include "task.h"
 #include "wx_task.h"

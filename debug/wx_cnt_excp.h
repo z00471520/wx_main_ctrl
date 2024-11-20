@@ -10,6 +10,13 @@ typedef enum {
 	WX_EXCP_RS422_SLAVE_WR_SEND_ADU_FAIL,
 	WX_EXCP_RS422_SLAVE_SEND_ERR_ADU_FAIL,
 
+	/* module A  */
+
+
+
+	/* MODULE B */
+
+	
 	/* if more please add here */
 	WX_EXCP_CNT_BUTT,
 } WxExcpCntDef;

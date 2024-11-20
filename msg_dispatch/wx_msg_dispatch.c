@@ -22,7 +22,7 @@ UINT32 WX_RegMsgQue(WxMsgReceiver receiver, QueueHandle_t queHandle, UINT32 iter
     return WX_SUCCESS;
 }
 /* 用于发送消息到指定的模块，消息头中的sender和receiver会发生变化 */
-UINT32 WX_MSG_Dispatch(WxMsgSender sender, WxMsgReceiver receiver, WxMsgHeader *msgHead)
+UINT32 WX_MSG_Dispatch(WxMsgSender sender, WxMsgReceiver receiver, UINT8 *msg, UINT32 msgSize)
 {
     if (msgHead == NULL) {
         return WX_MSG_DISPATCH_INVALID_MSG_HEADER;
