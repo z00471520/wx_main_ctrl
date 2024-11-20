@@ -14,9 +14,9 @@ typedef enum {
 
 
 
-	/* MODULE B */
+	/* module B */
 
-	
+
 	/* if more please add here */
 	WX_EXCP_CNT_BUTT,
 } WxExcpCntDef;
