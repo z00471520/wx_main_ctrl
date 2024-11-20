@@ -1,5 +1,5 @@
-#ifndef __WX_CAN_DRIVER_SLAVE_H__
-#define __WX_CAN_DRIVER_SLAVE_H__
+#ifndef __WX_CAN_SLAVE_H__
+#define __WX_CAN_SLAVE_H__
 #include "wx_can_driver.h"
 #include "wx_msg_remote_ctrl_intf.h"
 #include "wx_can_slave_rmt_ctrl_req_msg.h"
@@ -10,11 +10,11 @@ typedef enum{
     WX_RMT_CTRL_CODE_BUTT,
 } WxRmtCtrlCodeDef;
 
-#define WX_CAN_DRIVER_SLAVE_PDU_DATA_SIZE 1500
+#define WX_CAN_SLAVE_PDU_DATA_SIZE 1500
 typedef struct {
     UINT16 rmtCtrlCode; /* PDU对应遥控指令码 */
     UINT16 dataLen;     /* 遥控指令码对应的PDU数据长度 */
-    UINT8 data[WX_CAN_DRIVER_SLAVE_PDU_DATA_SIZE]; /* 遥控指令码对应的PDU数据 */
+    UINT8 data[WX_CAN_SLAVE_PDU_DATA_SIZE]; /* 遥控指令码对应的PDU数据 */
 } WxRmtCtrlPdu;
 
 /* 解码PDU的函数 */
@@ -23,7 +23,7 @@ typedef UINT32 (*WxRmtCtrlReqMsgHandle)(WxCanSlave *this, WxRmtCtrlReqMsg *msg);
 typedef struct {
     WxRmtCtrlReqMsgType msgType; /* 消息类型 */
     WxRmtCtrlPduDecHandle decHandle; /* 遥控指令码的对应的PDU解码函数，解析出消息 */
-    WxRmtCtrlReqMsgHandle msgHandle; /* 消息处理Handle */
+    WxRmtCtrlReqMsgHandle msgQueHandle; /* 消息处理Handle */
 } WxRmtCtrlReqHandle;
 
 /* CAN类型的定义 */
@@ -72,6 +72,6 @@ typedef struct {
 
 WxRmtCtrlReqHandle g_wxRmtCtrlReqHandles[WX_RMT_CTRL_CODE_BUTT];
 VOID WX_CAN_DRIVER_SlaveTask(VOID *param);
-UINT32 WX_CAN_DRIVER_SLAVE_DecodeRemoteCtrlMsg(WxCanSlave *this, WxCanFrame *canFrame, WxRmtCtrlReqMsg **ppRemoteCtrlMsg);
-UINT32 WX_CAN_DRIVER_SLAVE_SendPdu2CanIf(WxCanSlave *this, WxRmtCtrlPdu *pdu);
+UINT32 WX_CAN_SLAVE_DecodeRemoteCtrlMsg(WxCanSlave *this, WxCanFrame *canFrame, WxRmtCtrlReqMsg **ppRemoteCtrlMsg);
+UINT32 WX_CAN_SLAVE_SendPdu2CanIf(WxCanSlave *this, WxRmtCtrlPdu *pdu);
 #endif

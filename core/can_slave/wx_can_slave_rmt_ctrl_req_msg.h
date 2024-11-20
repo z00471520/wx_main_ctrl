@@ -1,5 +1,5 @@
-#ifndef __WX_CAN_DRIVER_SLAVE_PROC_RMT_REQ_MSG_H__
-#define __WX_CAN_DRIVER_SLAVE_PROC_RMT_REQ_MSG_H__
+#ifndef __WX_CAN_SLAVE_PROC_RMT_REQ_MSG_H__
+#define __WX_CAN_SLAVE_PROC_RMT_REQ_MSG_H__
 #include "wx_can_slave.h"
 
 /*
@@ -20,5 +20,5 @@ typedef struct {
 } WxRmtCtrlReqMsg;
 
 
-UINT32 WX_CAN_DRIVER_SLAVE_ProcRmtCtrlReqMsgReset(WxCanSlave *this, WxRmtCtrlReqMsg *msg);
+UINT32 WX_CAN_SLAVE_ProcRmtCtrlReqMsgReset(WxCanSlave *this, WxRmtCtrlReqMsg *msg);
 #endif

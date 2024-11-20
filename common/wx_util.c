@@ -1,9 +1,7 @@
-
-
-#include "wx_task.h"
-#include "task.h"
+#include "wx_util.h"
+#include "wx_include.h"
 /* 参数合法性由调用者保证 */
-UINT32 WX_TASK_Create(TaskHandle_t *taskHandlePtr, WxTaskCfgInfo *taskCfg)
+UINT32 WX_CreateTask(TaskHandle_t *taskHandlePtr, WxTaskCfgInfo *taskCfg)
 {
         /* Create the task, storing the handle. */
     BaseType_t xReturned = xTaskCreate(taskCfg->taskCode, taskCfg->name, taskCfg->stackDepth, 
@@ -16,3 +14,4 @@ UINT32 WX_TASK_Create(TaskHandle_t *taskHandlePtr, WxTaskCfgInfo *taskCfg)
     wx_log(WX_NOTICE, "task(%s) create success!", taskCfg->name);
     return WX_SUCCESS;   
 }
+

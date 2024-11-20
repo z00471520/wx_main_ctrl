@@ -1,41 +1,41 @@
 #include "wx_can_slave_rmt_ctrl_rsp_msg.h"
 
-UINT32 WX_CAN_DRIVER_SLAVE_EncodeRspPduReset(WxCanSlave *this, WxRmtCtrlRspMsg *rspMsg, WxRmtCtrlPdu *pdu)
+UINT32 WX_CAN_SLAVE_EncodeRspPduReset(WxCanSlave *this, WxRmtCtrlRspMsg *rspMsg, WxRmtCtrlPdu *pdu)
 {
     return;
 }
 
 /* 响应消息的编码为PDU */
 WxRmtCtrlMsg2PduHandle g_wxRmtCtrlRspMsg2PduHandles[WX_RMT_CTRL_RSP_MSG_TYPE_BUTT] = {
-    [WX_RMT_CTRL_RSP_MSG_TYPE_RESET] = WX_CAN_DRIVER_SLAVE_EncodeRspPduReset,
+    [WX_RMT_CTRL_RSP_MSG_TYPE_RESET] = WX_CAN_SLAVE_EncodeRspPduReset,
 };
 
 /* 把遥控消息编码成PDU */
-UINT32 WX_CAN_DRIVER_SLAVE_EncodeRspPdu(WxCanSlave *this, WxRmtCtrlRspMsg *rspMsg, WxRmtCtrlPdu *pdu)
+UINT32 WX_CAN_SLAVE_EncodeRspPdu(WxCanSlave *this, WxRmtCtrlRspMsg *rspMsg, WxRmtCtrlPdu *pdu)
 {
     if (rspMsg->type >= WX_RMT_CTRL_RSP_MSG_TYPE_BUTT) {
-        return WX_CAN_DRIVER_SLAVE_ENC_RSP_PDU_TYPE_ERR;
+        return WX_CAN_SLAVE_ENC_RSP_PDU_TYPE_ERR;
     }
 
     WxRmtCtrlMsg2PduHandle encHandle = g_wxRmtCtrlRspMsg2PduHandles[rspMsg->type];
     if (encHandle == NULL) {
-        return WX_CAN_DRIVER_SLAVE_UNDEFINE_RSP_PDU_ENC_HANDLE;
+        return WX_CAN_SLAVE_UNDEFINE_RSP_PDU_ENC_HANDLE;
     }
 
     return encHandle(this, rspMsg, pdu);
 }
 
 /* 发送遥控消息到CAN接口 */
-UINT32 WX_CAN_DRIVER_SLAVE_SendRspMsg2CanIf(WxCanSlave *this, WxRmtCtrlRspMsg *rspMsg)
+UINT32 WX_CAN_SLAVE_SendRspMsg2CanIf(WxCanSlave *this, WxRmtCtrlRspMsg *rspMsg)
 {
     /* 消息编码为PDU */
-    UINT32 ret = WX_CAN_DRIVER_SLAVE_EncodeRspPdu(this, rspMsg, this->rspPdu);
+    UINT32 ret = WX_CAN_SLAVE_EncodeRspPdu(this, rspMsg, this->rspPdu);
     if (ret != WX_SUCCESS) {
         return ret;
     }
     
     /* 发送PDU到CANIF */
-    ret = WX_CAN_DRIVER_SLAVE_SendPdu2CanIf(this, &this->rspPdu);
+    ret = WX_CAN_SLAVE_SendPdu2CanIf(this, &this->rspPdu);
     if (ret != WX_SUCCESS) {
         return ret;
     }

@@ -6,14 +6,14 @@
 #include "wx_msg_can_frame_intf.h"
 #include "wx_can_slave_rmt_ctrl_pdu.h"
 #include "wx_can_slave_rmt_ctrl_msg.h"
-#define WX_CAN_DRIVER_SLAVE_BUFF_FRAME_NUM 1024
+#define WX_CAN_SLAVE_BUFF_FRAME_NUM 1024
 
 WxCanSlave g_wxCanSlave[WX_CAN_DRIVER_TYPE_BUTT] = {0};
 WxCanSlaveCfgInfo g_wxCanSlaveTaskCfg[WX_CAN_DRIVER_TYPE_BUTT] = {
 
     [WX_CAN_DRIVER_TYPE_A] = {
         /* 自定义配置 */
-        .selfDefCfg.maxMsgNum = WX_CAN_DRIVER_SLAVE_BUFF_FRAME_NUM,
+        .selfDefCfg.maxMsgNum = WX_CAN_SLAVE_BUFF_FRAME_NUM,
         /* 任务配置 */
         .taskCfg.name = "CAN-A",
         .taskCfg.param = &g_wxCanSlave[WX_CAN_DRIVER_TYPE_A],
@@ -26,7 +26,7 @@ WxCanSlaveCfgInfo g_wxCanSlaveTaskCfg[WX_CAN_DRIVER_TYPE_BUTT] = {
     },
     [WX_CAN_DRIVER_TYPE_B] = {
          /* 自定义配置 */
-        .selfDefCfg.maxMsgNum = WX_CAN_DRIVER_SLAVE_BUFF_FRAME_NUM,
+        .selfDefCfg.maxMsgNum = WX_CAN_SLAVE_BUFF_FRAME_NUM,
         /* 任务配置 */
         .taskCfg.name = "CAN-B",
         .taskCfg.param = &g_wxCanSlave[WX_CAN_DRIVER_TYPE_B],
@@ -42,11 +42,11 @@ WxCanSlaveCfgInfo g_wxCanSlaveTaskCfg[WX_CAN_DRIVER_TYPE_BUTT] = {
 /* 不同指令码对应的Handle */
 WxRmtCtrlReqHandle g_wxRmtCtrlReqHandles[WX_RMT_CTRL_CODE_BUTT] = {
     /* [指令码] = {内部消息类型，指令码PDU解码函数, 消息处理函数} */
-    [WX_RMT_CTRL_CODE_RESET] = {WX_RMT_CTRL_REQ_MSG_TYPE_RESET, WX_CAN_DRIVER_SLAVE_DecRmtCtrlPduReset, WX_CAN_DRIVER_SLAVE_ProcRmtCtrlReqMsgReset},
+    [WX_RMT_CTRL_CODE_RESET] = {WX_RMT_CTRL_REQ_MSG_TYPE_RESET, WX_CAN_SLAVE_DecRmtCtrlPduReset, WX_CAN_SLAVE_ProcRmtCtrlReqMsgReset},
 };
 
 
-UINT32 WX_CAN_DRIVER_SLAVE_CheckCanFrameMsg(WxCanFrameMsg *msg)
+UINT32 WX_CAN_SLAVE_CheckCanFrameMsg(WxCanFrameMsg *msg)
 {
     if (msg->msgHead.msgBodyLen != sizeof(WxCanFrame)) {
         wx_critical(WX_EXCP_INVALID_MSG_BODY_LEN, "Error Exit: Invalid msgLen(%u)", msg->msgHead.msgBodyLen);
@@ -55,7 +55,7 @@ UINT32 WX_CAN_DRIVER_SLAVE_CheckCanFrameMsg(WxCanFrameMsg *msg)
 
     if (msg->canFrame.dataLengCode == 0) {
         wx_excp_cnt(WX_EXCP_CAN_FRAME_DATA_LEN_ERR);
-        return WX_CAN_DRIVER_SLAVE_CAN_FRAME_DATA_LEN_ERR;
+        return WX_CAN_SLAVE_CAN_FRAME_DATA_LEN_ERR;
     }
 
     return WX_SUCCESS;
@@ -69,9 +69,9 @@ UINT32 WX_CAN_DRIVER_SLAVE_CheckCanFrameMsg(WxCanFrameMsg *msg)
  * 其他：解封装异常
  * 备注：该模块需要根据最终的卫星协议来确定
  **/
-UINT32 WX_CAN_DRIVER_SLAVE_DecapCanFrame(WxCanSlave *this, WxCanFrame *canFrame, WxRmtCtrlPdu *canPdu)
+UINT32 WX_CAN_SLAVE_DecapCanFrame(WxCanSlave *this, WxCanFrame *canFrame, WxRmtCtrlPdu *canPdu)
 {
-    UINT32 ret = WX_CAN_DRIVER_SLAVE_CheckCanFrameMsg(canFrame);
+    UINT32 ret = WX_CAN_SLAVE_CheckCanFrameMsg(canFrame);
     if (ret != WX_SUCCESS) {
         return ret;
     }
@@ -81,14 +81,11 @@ UINT32 WX_CAN_DRIVER_SLAVE_DecapCanFrame(WxCanSlave *this, WxCanFrame *canFrame,
 }
 
 
-
-
-
 /* 处理中断发送的CAN FRAME */
-UINT32 WX_CAN_DRIVER_SLAVE_ProcCanFramMsg(WxCanSlave *this, WxCanFrameMsg *canFrameMsg)
+UINT32 WX_CAN_SLAVE_ProcCanFramMsg(WxCanSlave *this, WxCanFrameMsg *canFrameMsg)
 {
     /* 解封装CAN Frame */
-    UINT32 ret = WX_CAN_DRIVER_SLAVE_DecapCanFrame(this, &canFrameMsg->canFrame, &this->reqPdu);
+    UINT32 ret = WX_CAN_SLAVE_DecapCanFrame(this, &canFrameMsg->canFrame, &this->reqPdu);
     if (ret != WX_SUCCESS) {
         /* 当前CAN Frame不足以解析出PDU */
         if (ret == WX_TO_BE_CONTINUE) {
@@ -99,7 +96,7 @@ UINT32 WX_CAN_DRIVER_SLAVE_ProcCanFramMsg(WxCanSlave *this, WxCanFrameMsg *canFr
     
     /* 解封装出PDU后，进行解码 */
     WxRmtCtrlReqMsg *rmtCtrlmsg = &this->rmtCtrlmsg;
-    ret = WX_CAN_DRIVER_SLAVE_DecRmtCtrlPdu(this, &this->reqPdu, rmtCtrlmsg);
+    ret = WX_CAN_SLAVE_DecRmtCtrlPdu(this, &this->reqPdu, rmtCtrlmsg);
     if (ret != WX_SUCCESS) {
         return ret;
     }
@@ -109,17 +106,17 @@ UINT32 WX_CAN_DRIVER_SLAVE_ProcCanFramMsg(WxCanSlave *this, WxCanFrameMsg *canFr
 }
 
 /* 处理收到消息 */
-VOID WX_CAN_DRIVER_SLAVE_ProcMsg(WxCanSlave *this, WxCanFrameMsg *msg)
+VOID WX_CAN_SLAVE_ProcMsg(WxCanSlave *this, WxCanFrameMsg *msg)
 {
     switch (msg->msgHead.msgType) {
         /* 收到CAN消息 */
         case WX_MSG_TYPE_CAN_FRAME: {
-            WX_CAN_DRIVER_SLAVE_ProcCanFramMsg(this, msg);
+            WX_CAN_SLAVE_ProcCanFramMsg(this, msg);
         }
         /* if more please add here */
         default: {
             wx_log(WX_CRITICAL, "Error Exit: unknown msgtype(%u)", msg->msgHead.msgType);
-            return WX_CAN_DRIVER_SLAVE_UNSPT_MSG_TYPE;
+            return WX_CAN_SLAVE_UNSPT_MSG_TYPE;
         }
     }
 }
@@ -132,7 +129,7 @@ VOID WX_CAN_DRIVER_SlaveTask(VOID *param)
     while(TRUE) {
         /* 死等收消息 */
         if (xQueueReceive(this->msgQue, (VOID *)&msg, portMAX_DELAY)) {
-            WX_CAN_DRIVER_SLAVE_ProcMsg(this, msg);
+            WX_CAN_SLAVE_ProcMsg(this, msg);
 
         }
     }
@@ -146,7 +143,7 @@ UINT32 WX_CAN_DRIVER_SALVE_CreateTask(WxCanSlave *this, WxCanSlaveCfgInfo *cfg)
         this->msgQue = xQueueCreate(cfg->maxMsgNum, sizeof(WxCanFrame));
         if (this->msgQue == 0) {
             wx_log(WX_CRITICAL, "Error Exit: xQueueCreate fail");
-            return WX_CAN_DRIVER_SLAVE_CREATE_MSG_QUE_FAIL;
+            return WX_CAN_SLAVE_CREATE_MSG_QUE_FAIL;
         }
     }
 
@@ -163,6 +160,6 @@ UINT32 WX_CAN_DRIVER_SALVE_CreateTask(WxCanSlave *this, WxCanSlaveCfgInfo *cfg)
     }
 
     /* Create the task, storing the handle. */
-    ret = WX_TASK_Create(&this->taskHandle, &cfg->taskCfg);
+    ret = WX_CreateTask(&this->taskHandle, &cfg->taskCfg);
     return ret;
 }

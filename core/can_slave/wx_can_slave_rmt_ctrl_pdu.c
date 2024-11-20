@@ -1,31 +1,31 @@
 #include "wx_can_slave.h"
 
 
-UINT32 WX_CAN_DRIVER_SLAVE_DecRmtCtrlPduReset(WxCanSlave *this, WxRmtCtrlPdu *pdu, WxRmtCtrlReqMsg *msg)
+UINT32 WX_CAN_SLAVE_DecRmtCtrlPduReset(WxCanSlave *this, WxRmtCtrlPdu *pdu, WxRmtCtrlReqMsg *msg)
 {
     return WX_SUCCESS;
 }
 
 
 /* 根据PDU解析出消息的内容，涉及到大小端转换 */
-UINT32 WX_CAN_DRIVER_SLAVE_DecRmtCtrlPdu(WxCanSlave *this, WxRmtCtrlPdu *pdu, WxRmtCtrlReqMsg *msg)
+UINT32 WX_CAN_SLAVE_DecRmtCtrlPdu(WxCanSlave *this, WxRmtCtrlPdu *pdu, WxRmtCtrlReqMsg *msg)
 {
     UINT16 rmtCtrlCode = (UINT16)pdu->rmtCtrlCode; /* 遥控指令码 */
     if (rmtCtrlCode >= WX_RMT_CTRL_CODE_BUTT) {
         wx_critical(WX_EXCP_CAN_SLAVE_INVALID_CTRL_CODE, "Error Exit: unknown rmtCtrlCode(%u)", rmtCtrlCode);
-        return WX_CAN_DRIVER_SLAVE_INVALID_RMT_CTRL_CODE;
+        return WX_CAN_SLAVE_INVALID_RMT_CTRL_CODE;
     }
     /* 获取PDU解码函数 */
     WxRmtCtrlPduDecHandle handle = g_wxRmtCtrlReqHandles[rmtCtrlCode];
     if (handle == NULL) {
-        return WX_CAN_DRIVER_SLAVE_CTRL_CODE_DEC_UNSPT;
+        return WX_CAN_SLAVE_CTRL_CODE_DEC_UNSPT;
     }
     return handle(this, pdu, msg);
 }
 
 
 /* 把PDU封装成CAN Frames, 以便后续发送 */
-UINT32 WX_CAN_DRIVER_SLAVE_EncapPdu2CanFrames(WxCanSlave *this, WxRmtCtrlPdu *pdu, WxCanFrameList *canFrameList)
+UINT32 WX_CAN_SLAVE_EncapPdu2CanFrames(WxCanSlave *this, WxRmtCtrlPdu *pdu, WxCanFrameList *canFrameList)
 {
     canFrameList->canFrameNum = 0;
     WxCanSlaveCfgInfo *cfgInfo = this->cfgInfo;
@@ -85,11 +85,11 @@ UINT32 WX_CAN_SLAVE_SendCanFrameList2CanIf(WxCanSlave *this, WxCanFrameList *can
 }
 
 /* 把PDU发送到CAN IF */
-UINT32 WX_CAN_DRIVER_SLAVE_SendPdu2CanIf(WxCanSlave *this, WxRmtCtrlPdu *pdu)
+UINT32 WX_CAN_SLAVE_SendPdu2CanIf(WxCanSlave *this, WxRmtCtrlPdu *pdu)
 {
     /* PDU封装为CAN FRAME */
     WxCanFrameList *canFrameList = &this->canFrameList;
-    UINT32 ret = WX_CAN_DRIVER_SLAVE_EncapPdu2CanFrames(this, pdu, canFrameList);
+    UINT32 ret = WX_CAN_SLAVE_EncapPdu2CanFrames(this, pdu, canFrameList);
     if (ret != WX_SUCCESS) {
         return ret;
     }
