@@ -1,11 +1,11 @@
 #include "wx_include.h"
-#include "wx_can.h"
+#include "wx_can_driver.h"
 #include "xcanps.h"
 #include "xparameters.h"
 #include "xil_printf.h"
 
 /* 设置CAN中断 */
-UINT32 WX_CAN_SetupCanInterrupt(XCanPs *canInstPtr, WxCanIntrCfgInfo *cfg)
+UINT32 WX_CAN_DRIVER_SetupCanInterrupt(XCanPs *canInstPtr, WxCanIntrCfgInfo *cfg)
 {
 	/* 中断控制器 */
 	INTC *intcInst = WX_GetIntrCtrlInst();
@@ -46,17 +46,17 @@ UINT32 WX_CAN_SetupCanInterrupt(XCanPs *canInstPtr, WxCanIntrCfgInfo *cfg)
 }
 
 /* CAN发送数据帧, 该函数发送失败就会返回对应的原因值 */
-UINT32 WX_CAN_SendFrame(XCanPs *canInstPtr, WxCanFrame *frame)
+UINT32 WX_CAN_DRIVER_SendFrame(XCanPs *canInstPtr, WxCanFrame *frame)
 {
 	if (canInstPtr == NULL) {
-		return WX_CAN_CONFIG_INVALID_CAN_INST_PRT;
+		return WX_CAN_DRIVER_CONFIG_INVALID_CAN_INST_PRT;
 	}
 	/*
 	* Buffers to hold frames to send and receive. These are declared as global so
 	* that they are not on the stack.
 	* These buffers need to be 32-bit aligned
 	*/
-	UINT32 txFrame[WX_CAN_FRAME_U32_NUM] = {0};
+	UINT32 txFrame[WX_CAN_DRIVER_FRAME_U32_LEN] = {0};
 	/*
 	 * Create correct values for Identifier and Data Length Code Register.
 	 */
@@ -77,7 +77,7 @@ UINT32 WX_CAN_SendFrame(XCanPs *canInstPtr, WxCanFrame *frame)
 	 * if TX FIFO is full send will fail.
 	 */
 	if (XCanPs_IsTxFifoFull(canInstPtr) == TRUE) {
-		return WX_CAN_CONFIG_TX_BUFF_FULL;
+		return WX_CAN_DRIVER_CONFIG_TX_BUFF_FULL;
 	}
 
 	/*
@@ -89,28 +89,28 @@ UINT32 WX_CAN_SendFrame(XCanPs *canInstPtr, WxCanFrame *frame)
 	 */
 	UINT32 status = XCanPs_Send(canInstPtr, txFrame);
 	if (status != XST_SUCCESS) {
-		return WX_CAN_CONFIG_TX_FAIL_FULL;
+		return WX_CAN_DRIVER_CONFIG_TX_FAIL_FULL;
 	}
 
 	return WX_SUCCESS;
 }
 
 /* CAN设备初始化 */
-UINT32 WX_CAN_InitialDevice(XCanPs *canInstPtr, WxCanDeviceCfgInfo *cfg)
+UINT32 WX_CAN_DRIVER_InitialDevice(XCanPs *canInstPtr, WxCanDeviceCfgInfo *cfg)
 {
 	if (canInstPtr == NULL) {
-		return WX_CAN_CONFIG_INVALID_CAN_INST_PRT;
+		return WX_CAN_DRIVER_CONFIG_INVALID_CAN_INST_PRT;
 	}
 	/*
 	 * Initialize the Can device.
 	 */
 	XCanPs_Config *configPtr = XCanPs_LookupConfig(cfg->deviceId);
 	if (canInstPtr == NULL) {
-		return WX_CAN_LOOKUP_CONFIG_FAIL;
+		return WX_CAN_DRIVER_LOOKUP_CONFIG_FAIL;
 	}
 	int status = XCanPs_CfgInitialize(canInstPtr, configPtr, configPtr->BaseAddr);
 	if (status != XST_SUCCESS) {
-		return WX_CAN_CONFIG_INIT_FAIL;
+		return WX_CAN_DRIVER_CONFIG_INIT_FAIL;
 	}
 
 	/*
@@ -119,7 +119,7 @@ UINT32 WX_CAN_InitialDevice(XCanPs *canInstPtr, WxCanDeviceCfgInfo *cfg)
 	 */
 	status = XCanPs_SelfTest(canInstPtr);
 	if (status != XST_SUCCESS) {
-		return WX_CAN_CONFIG_SELF_TEST_FAIL;
+		return WX_CAN_DRIVER_CONFIG_SELF_TEST_FAIL;
 	}
 
 	/*

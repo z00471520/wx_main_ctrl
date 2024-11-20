@@ -1,8 +1,8 @@
-#ifndef WX_CAN_H
-#define WX_CAN_H
+#ifndef __WX_CAN_DRIVER_DRIVER_H__
+#define __WX_CAN_DRIVER_DRIVER_H__
 #include "wx_include.h"
-#define WX_CAN_MAX_DATA_LEN 8 /* 支持的最大数据长度，BYTE */
-#define WX_CAN_FRAME_U32_NUM ((XCANPS_MAX_FRAME_SIZE) / (sizeof(u32)))
+#define WX_CAN_DRIVER_MAX_DATA_LEN 8 /* 支持的最大数据长度，BYTE */
+#define WX_CAN_DRIVER_FRAME_U32_LEN ((XCANPS_MAX_FRAME_SIZE) / (sizeof(u32))) /* FRAM U32长度 */
 typedef struct {
     UINT32 deviceId; /* 设备ID */
     UINT8 baudPrescalar; /* 需要结合输入时钟的频率进行设置，用于确定最终的波特率 */
@@ -19,7 +19,7 @@ typedef struct {
     XCanPs_ErrorHandler errHandle;      /* 错误Handle */
     XCanPs_EventHandler eventHandle;    /* 事件Handle */
     VOID *callBackRef;                  /* 中断Handle处理函数 */
-}WxCanIntrCfgInfo;
+} WxCanIntrCfgInfo;
 
 typedef struct {
     UINT32 standardMessID;      /* 11:bit, Standard Message ID
@@ -56,9 +56,10 @@ typedef struct {
                                     This is the data length portion of the control field of the 
                                     CAN frame. This indicates the number valid data bytes in 
                                     Data Word 1 and Data Word 2 registers. */
-    UINT8 data[WX_CAN_MAX_DATA_LEN]; /* Data Byte 0~8 */
+    UINT8 data[WX_CAN_DRIVER_MAX_DATA_LEN]; /* Data Byte 0~8 */
 } WxCanFrame;
 
-UINT32 WX_CAN_InitialDevice(XCanPs *canInstPtr, WxCanDeviceCfgInfo *cfg);
-UINT32 WX_CAN_SetupCanInterrupt(XCanPs *canInstPtr, WxCanIntrCfgInfo *cfg);
+UINT32 WX_CAN_DRIVER_InitialDevice(XCanPs *canInstPtr, WxCanDeviceCfgInfo *cfg);
+UINT32 WX_CAN_DRIVER_SetupCanInterrupt(XCanPs *canInstPtr, WxCanIntrCfgInfo *cfg);
+UINT32 WX_CAN_DRIVER_SendFrame(XCanPs *canInstPtr, WxCanFrame *frame);
 #endif
