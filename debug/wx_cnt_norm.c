@@ -7,7 +7,7 @@ CHAR * g_wxCntNormDesp[] = {
 UINT63 g_wxNormCnt[WX_NORM_CNT_BUTT] = {0};
 
 
-VOID WX_CNT_DbgShow(char *argv[], UINT32 argc))
+VOID WX_CNT_DbgShow(char *argv[], UINT32 argc)
 {
 	/*
 	Normal CNT INFOS

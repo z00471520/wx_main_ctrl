@@ -1,7 +1,7 @@
 #include "wx_util.h"
-#include "wx_include.h"
+
 /* 参数合法性由调用者保证 */
-UINT32 WX_CreateTask(TaskHandle_t *taskHandlePtr, WxTaskCfgInfo *taskCfg)
+UINT32 WX_CreateTask(TaskHandle_t *taskHandlePtr, WxTaskDeploy *taskCfg)
 {
         /* Create the task, storing the handle. */
     BaseType_t xReturned = xTaskCreate(taskCfg->taskCode, taskCfg->name, taskCfg->stackDepth, 

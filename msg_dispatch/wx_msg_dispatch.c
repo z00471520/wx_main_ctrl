@@ -6,7 +6,7 @@ typedef struct {
     QueueHandle_t queHandle; /* 消息队列的handle */
     UINT32 itermSize;        /* 消息队列项尺寸（Byte） */
     UINT64 queFullCnt;       /* 消息队列满计数器 */
-} WxMsgQueInfo;
+} WxTaskMsgQueInfo;
 
 /* 不同模块的消息队列信息， 由各模块自行注册，如果模块想要和其他模块通信则需要注册其消息接收队列 */
 QueueHandle_t g_wxMsgQueHandles[WX_MODULE_BUTT] = {0};
@@ -33,7 +33,7 @@ UINT32 WX_MSG_Dispatch(WxMsgSender sender, WxMsgReceiver receiver, UINT8 *msg, U
         return WX_MSG_DISPATCH_INVALID_RECVER;
     }
     /* 获取接收模块的消息队列信息 */
-    WxMsgQueInfo *msgQueInfo = &g_wxMsgQueHandles[receiver];
+    WxTaskMsgQueInfo *msgQueInfo = &g_wxMsgQueHandles[receiver];
     if (msgQueInfo->queHandle == NULL) {
         return WX_MSG_DISPATCH_RECVER_UNREG_MSG_QUE;
     }

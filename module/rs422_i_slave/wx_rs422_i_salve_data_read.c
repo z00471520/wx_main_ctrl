@@ -1,4 +1,4 @@
-#include "wx_rs422_i_salve_task.h"
+#include "wx_rs422_i_salve.h"
 
 /* 不同地址由自己的对应的读和编码操作 */
 WxRs422ISlaveDataReadHandle g_wxRs422ISlaveDataReadHandles[WX_RS422_I_SLAVE_DATA_ADDR_BUTT] = {

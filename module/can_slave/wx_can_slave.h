@@ -3,6 +3,7 @@
 #include "wx_can_driver.h"
 #include "wx_msg_remote_ctrl_intf.h"
 #include "wx_can_slave_rmt_ctrl_req_msg.h"
+#define WX_CAN_SLAVE_PDU_DATA_SIZE 1500
 /* 卫星遥控的指令码-需要根据卫星通信规范确定 */
 typedef enum{
     WX_RMT_CTRL_CODE_RESET = 0, /* 复位请求 */
@@ -10,7 +11,7 @@ typedef enum{
     WX_RMT_CTRL_CODE_BUTT,
 } WxRmtCtrlCodeDef;
 
-#define WX_CAN_SLAVE_PDU_DATA_SIZE 1500
+
 typedef struct {
     UINT16 rmtCtrlCode; /* PDU对应遥控指令码 */
     UINT16 dataLen;     /* 遥控指令码对应的PDU数据长度 */
@@ -38,14 +39,12 @@ typedef struct
 {
     UINT8 canFrameDataLen; /* CAN帧数据固定长度 */
     UINT32 messId;    /* CAN消息ID */
-    UINT32 maxMsgNum; /* 任务缓存CAN帧的个数 */
+    UINT32 canFrameMsgQueItemNum; /* 任务缓存CAN帧的个数 */
     /* if more please add here */
 } WxCanSlaveSelfDefCfg;
 
-
 typedef struct {
     WxCanSlaveSelfDefCfg selfDefCfg;
-    WxTaskCfgInfo taskCfg;
     WxCanDeviceCfgInfo deviceCfgInfo; /* CAN设备配置信息 */ 
     WxCanIntrCfgInfo intrCfgInfo; /* 中断配置信息 */
 } WxCanSlaveCfgInfo;
@@ -61,7 +60,6 @@ typedef struct
 typedef struct {
     QueueHandle_t msgQue;       /* 消息队列 */
     XCanPs canInst;             /* 当前任务处理的Can实例 */
-    TaskHandle_t taskHandle;    /* 任务Handle */
     UINT8 canDataBuff;          /* CAN  */
     WxRmtCtrlReqMsg rmtCtrlmsg; /* CAN MSG */
     WxRmtCtrlPdu reqPdu;        /* CAN Req PDU */
@@ -71,7 +69,6 @@ typedef struct {
 } WxCanSlave;
 
 WxRmtCtrlReqHandle g_wxRmtCtrlReqHandles[WX_RMT_CTRL_CODE_BUTT];
-VOID WX_CAN_DRIVER_SlaveTask(VOID *param);
 UINT32 WX_CAN_SLAVE_DecodeRemoteCtrlMsg(WxCanSlave *this, WxCanFrame *canFrame, WxRmtCtrlReqMsg **ppRemoteCtrlMsg);
 UINT32 WX_CAN_SLAVE_SendPdu2CanIf(WxCanSlave *this, WxRmtCtrlPdu *pdu);
 #endif

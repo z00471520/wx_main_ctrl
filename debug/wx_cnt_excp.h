@@ -4,6 +4,7 @@
 typedef enum {
 	WX_EXCP_CNT_START = 10000, // keep this first
 	WX_EXCP_UNEXPECT_MSG_TYPE,
+	WX_EXCP_UNDEFINE,
 	WX_EXCP_INVALID_MSG_BODY_LEN,
 	/* CAN */
 	WX_EXCP_CAN_FRAME_DATA_LEN_ERR,
@@ -14,6 +15,7 @@ typedef enum {
 	WX_EXCP_RS422_SLAVE_SEND_ERR_ADU_FAIL,
 	/* CORE_TASK */
 	WX_EXCP_CORE_TASK_ENTRY_UNFOUND,
+	
 	/* module A */
 
 

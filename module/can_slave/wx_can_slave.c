@@ -6,17 +6,14 @@
 #include "wx_msg_can_frame_intf.h"
 #include "wx_can_slave_rmt_ctrl_pdu.h"
 #include "wx_can_slave_rmt_ctrl_msg.h"
+#include "wx_task_deploy.h"
 #define WX_CAN_SLAVE_BUFF_FRAME_NUM 1024
 
 WxCanSlave g_wxCanSlave[WX_CAN_DRIVER_TYPE_BUTT] = {0};
-WxCanSlaveCfgInfo g_wxCanSlaveTaskCfg[WX_CAN_DRIVER_TYPE_BUTT] = {
-
+WxCanSlaveCfgInfo g_wxCanSlaveCfg[WX_CAN_DRIVER_TYPE_BUTT] = {
     [WX_CAN_DRIVER_TYPE_A] = {
         /* 自定义配置 */
-        .selfDefCfg.maxMsgNum = WX_CAN_SLAVE_BUFF_FRAME_NUM,
-        /* 任务配置 */
-        .taskCfg.name = "CAN-A",
-        .taskCfg.param = &g_wxCanSlave[WX_CAN_DRIVER_TYPE_A],
+        .selfDefCfg.canFrameMsgQueItemNum = WX_CAN_SLAVE_BUFF_FRAME_NUM,
         /* 设备配置 */
         .deviceCfgInfo.isEnable = FALSE, /* 是否使能 */
         .deviceCfgInfo.baudPrescalar = 0,
@@ -26,10 +23,7 @@ WxCanSlaveCfgInfo g_wxCanSlaveTaskCfg[WX_CAN_DRIVER_TYPE_BUTT] = {
     },
     [WX_CAN_DRIVER_TYPE_B] = {
          /* 自定义配置 */
-        .selfDefCfg.maxMsgNum = WX_CAN_SLAVE_BUFF_FRAME_NUM,
-        /* 任务配置 */
-        .taskCfg.name = "CAN-B",
-        .taskCfg.param = &g_wxCanSlave[WX_CAN_DRIVER_TYPE_B],
+        .selfDefCfg.canFrameMsgQueItemNum = WX_CAN_SLAVE_BUFF_FRAME_NUM,
         /* 设备配置 */
         .deviceCfgInfo.isEnable = FALSE, /* 是否使能 */
         .deviceCfgInfo.baudPrescalar = 0,
@@ -82,8 +76,10 @@ UINT32 WX_CAN_SLAVE_DecapCanFrame(WxCanSlave *this, WxCanFrame *canFrame, WxRmtC
 
 
 /* 处理中断发送的CAN FRAME */
-UINT32 WX_CAN_SLAVE_ProcCanFramMsg(WxCanSlave *this, WxCanFrameMsg *canFrameMsg)
+UINT32 WX_CAN_SLAVE_ProcCanFrameMsg(VOID *param, VOID *msg)
 {
+    WxCanSlave *this = param;
+    WxCanFrameMsg *canFrameMsg = msg;
     /* 解封装CAN Frame */
     UINT32 ret = WX_CAN_SLAVE_DecapCanFrame(this, &canFrameMsg->canFrame, &this->reqPdu);
     if (ret != WX_SUCCESS) {
@@ -105,42 +101,12 @@ UINT32 WX_CAN_SLAVE_ProcCanFramMsg(WxCanSlave *this, WxCanFrameMsg *canFrameMsg)
 
 }
 
-/* 处理收到消息 */
-VOID WX_CAN_SLAVE_ProcMsg(WxCanSlave *this, WxCanFrameMsg *msg)
-{
-    switch (msg->msgHead.msgType) {
-        /* 收到CAN消息 */
-        case WX_MSG_TYPE_CAN_FRAME: {
-            WX_CAN_SLAVE_ProcCanFramMsg(this, msg);
-        }
-        /* if more please add here */
-        default: {
-            wx_log(WX_CRITICAL, "Error Exit: unknown msgtype(%u)", msg->msgHead.msgType);
-            return WX_CAN_SLAVE_UNSPT_MSG_TYPE;
-        }
-    }
-}
-
-/* WX_CAN从机收发消息任务 */
-VOID WX_CAN_DRIVER_SlaveTask(VOID *param)
-{
-    WxCanSlave *this = param;
-    WxMsg msg;
-    while(TRUE) {
-        /* 死等收消息 */
-        if (xQueueReceive(this->msgQue, (VOID *)&msg, portMAX_DELAY)) {
-            WX_CAN_SLAVE_ProcMsg(this, msg);
-
-        }
-    }
-}
-
 /* 创建RS422I主机任务, 参数合法性由调用者保证 */
 UINT32 WX_CAN_DRIVER_SALVE_CreateTask(WxCanSlave *this, WxCanSlaveCfgInfo *cfg)
 {
     /* create the msg que to buff the recv can frame */
     if (this->msgQue == 0) {
-        this->msgQue = xQueueCreate(cfg->maxMsgNum, sizeof(WxCanFrame));
+        this->msgQue = xQueueCreate(cfg->canFrameMsgQueItemNum, sizeof(WxCanFrame));
         if (this->msgQue == 0) {
             wx_log(WX_CRITICAL, "Error Exit: xQueueCreate fail");
             return WX_CAN_SLAVE_CREATE_MSG_QUE_FAIL;
@@ -160,6 +126,50 @@ UINT32 WX_CAN_DRIVER_SALVE_CreateTask(WxCanSlave *this, WxCanSlaveCfgInfo *cfg)
     }
 
     /* Create the task, storing the handle. */
-    ret = WX_CreateTask(&this->taskHandle, &cfg->taskCfg);
+    ret = WX_CreateTask(&this->handle, &cfg->taskCfg);
     return ret;
+}
+
+
+UINT32 WX_CAN_SLAVE_Constuct(WxModuleInfo *module, WxCanSlaveCfgInfo *cfg, WxCanSlave *this)
+{
+    /* 初始化设备 */
+    UINT32 ret = WX_CAN_DRIVER_InitialDevice(&this->canInst, &cfg->deviceCfgInfo);
+    if (ret != WX_SUCCESS) {
+        return ret;
+    }
+
+    /* 设置中断 */
+    ret = WX_CAN_DRIVER_SetupCanInterrupt(&this->canInst, &cfg->intrCfgInfo);
+    if (ret != WX_SUCCESS) {
+        return ret;
+    }
+
+    WxMsgQueRegReq canFrameMsgQueRegReq = {
+        .desc = "msg_que_can_frame_msg", 
+        .itemNum = cfg->selfDefCfg.canFrameMsgQueItemNum,
+        .itemSize = sizeof(WxCanFrameMsg),
+        .msgHandle = WX_CAN_SLAVE_ProcCanFrameMsg,
+        .param = this,
+    };
+
+    ret = WX_RegMsgQue2Module(module, &canFrameMsgQueRegReq);
+    if (ret != WX_SUCCESS) {
+        return ret;
+    }
+
+    return ret;
+}
+
+
+UINT32 WX_CAN_SLAVE_A_Constuct(WxModuleInfo *module)
+{
+    WxCanTypeDef type = WX_CAN_DRIVER_TYPE_A;
+    return WX_CAN_SLAVE_Constuct(module, g_wxCanSlaveCfg[type], &g_wxCanSlave[type]);
+}
+
+UINT32 WX_CAN_SLAVE_B_Constuct(WxModuleInfo *module)
+{
+    WxCanTypeDef type = WX_CAN_DRIVER_TYPE_B;
+    return WX_CAN_SLAVE_Constuct(module, g_wxCanSlaveCfg[type], &g_wxCanSlave[type]);
 }

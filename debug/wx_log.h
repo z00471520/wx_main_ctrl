@@ -23,5 +23,6 @@ typedef enum {
 } WxLogLelevDef;
 #define wx_log(lev,...)
 #define wx_critical(excpCnt, ...)
+#define wx_warning(excpCnt, ...)
 #define wx_show(...) WX_UartPrint(...)
 #endif

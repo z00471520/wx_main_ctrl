@@ -1,5 +1,5 @@
 #include "wx_include.h"
-#include "wx_rs422_i_salve_task.h"
+#include "wx_rs422_i_salve.h"
 
 WxRs422ISlaveTask g_wxRs422ISlaveTask = {0};
 
