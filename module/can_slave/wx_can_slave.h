@@ -68,6 +68,11 @@ typedef struct {
     WxCanSlaveCfgInfo *cfgInfo; /* 配置信息的指针 */
 } WxCanSlave;
 
+typedef struct tagWxCanSlaveModule {
+    WxCanSlave canSlave[WX_CAN_DRIVER_TYPE_BUTT];
+} WxCanSlaveModule;
+
+
 WxRmtCtrlReqHandle g_wxRmtCtrlReqHandles[WX_RMT_CTRL_CODE_BUTT];
 UINT32 WX_CAN_SLAVE_DecodeRemoteCtrlMsg(WxCanSlave *this, WxCanFrame *canFrame, WxRmtCtrlReqMsg **ppRemoteCtrlMsg);
 UINT32 WX_CAN_SLAVE_SendPdu2CanIf(WxCanSlave *this, WxRmtCtrlPdu *pdu);

@@ -7,9 +7,7 @@
 #include "wx_can_slave_rmt_ctrl_pdu.h"
 #include "wx_can_slave_rmt_ctrl_msg.h"
 #include "wx_task_deploy.h"
-#define WX_CAN_SLAVE_BUFF_FRAME_NUM 1024
 
-WxCanSlave g_wxCanSlave[WX_CAN_DRIVER_TYPE_BUTT] = {0};
 WxCanSlaveCfgInfo g_wxCanSlaveCfg[WX_CAN_DRIVER_TYPE_BUTT] = {
     [WX_CAN_DRIVER_TYPE_A] = {
         /* 自定义配置 */
@@ -131,7 +129,7 @@ UINT32 WX_CAN_DRIVER_SALVE_CreateTask(WxCanSlave *this, WxCanSlaveCfgInfo *cfg)
 }
 
 
-UINT32 WX_CAN_SLAVE_ConstuctOneCan(WxModuleInfo *module, WxCanSlaveCfgInfo *cfg, WxCanSlave *this)
+UINT32 WX_CAN_SLAVE_ConstuctOneCan(WxCanSlaveCfgInfo *cfg, WxCanSlave *this)
 {
     /* 初始化设备 */
     UINT32 ret = WX_CAN_DRIVER_InitialDevice(&this->canInst, &cfg->deviceCfgInfo);
@@ -148,15 +146,23 @@ UINT32 WX_CAN_SLAVE_ConstuctOneCan(WxModuleInfo *module, WxCanSlaveCfgInfo *cfg,
     return ret;
 }
 
-
-UINT32 WX_CAN_SLAVE_Constuct(WxModuleInfo *module)
+/* 模块构建函数 */
+UINT32 WX_CAN_SLAVE_Constuct(VOID *module)
 {
     UINT32 ret;
+    WxCanSlaveModule *this = WX_Mem_Alloc(WX_GetModuleName(module), 1, sizeof(WxCanSlaveModule));
+    if (this == NULL) {
+        return WX_ERR;
+    }
+
     for (UINT32 type = WX_CAN_DRIVER_TYPE_A; type < WX_CAN_DRIVER_TYPE_BUTT; type++) {
-        ret = WX_CAN_SLAVE_ConstuctOneCan(module, g_wxCanSlaveCfg[type], &g_wxCanSlave[type]);
+        ret = WX_CAN_SLAVE_ConstuctOneCan(module, this->canSlave[type], &g_wxCanSlave[type]);
         if (ret != WX_SUCCESS) {
+            WX_Mem_Free(this);
             return ret;
         }
     }
+    /* 设置上Module */
+    WX_SetModuleInfo(module, this);
 }
 

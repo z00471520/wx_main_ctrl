@@ -37,16 +37,16 @@ typedef enum {
 /* 模块构建函数 */
 typedef UINT32 (*WxModuleConstructFunc)(VOID *module);
 typedef UINT32 (*WxModuleDestructFunc)(VOID *module);
-typedef UINT32 (*WxModuleEntryFunc)(WxEvtMsg *evtMsg);
+typedef UINT32 (*WxModuleEntryFunc)(VOID *module, WxEvtMsg *evtMsg);
 
 /* 模块部署信息 */
 typedef struct {
-    const CHAR *moduleName;  /* 模块名 */
+    const CHAR *moduleName;   /* 模块名 */
     UINT8 coreIdMask;         /* 模块部署的核ID， 使用 WX_CORE定义 */
     const CHAR *taskName;     /* 模块运行的任务ID */
     WxModuleConstructFunc   constructFunc; /* 模块构建函数 */
     WxModuleDestructFunc    destructFunc;  /* 模块的析构函数 */
-    WxModuleEntryFunc       entryFunc;        /* 模块消息处理函数 */
+    WxModuleEntryFunc       entryFunc;     /* 模块消息处理函数 */
     WxMsgType moduleSptMsgType[WX_SPT_PROC_MSG_TYPE_MAX_NUM] /* 模块支持处理的消息类型 */
 } WxModuleDeploy;
 
@@ -93,6 +93,10 @@ typedef struct {
     WxModuleDestructFunc    destructFunc;  /* 模块的析构函数 */
     WxModuleEntryFunc       entryFunc;     /* 模块消息处理函数 */
 } WxModuleInfo;
+#define WX_GetModuleName(m)         (((WxModuleInfo *)m)->moduleName)
+#define WX_GetModuleInfo(m)         (((WxModuleInfo *)m)->moduleInfo)
+#define WX_SetModuleInfo(m, v)      (((WxModuleInfo *)m)->moduleInfo = (v))
+#define WX_GetModuleCoreId(m)       (((WxModuleInfo *)m)->coreId)
 
 VOID WX_TaskFuncCode(VOID *param);
 UINT32 WX_DeployTasks(WxCoreId coreId);
