@@ -13,7 +13,6 @@ typedef enum {
     WX_MODULE_BUTT,
 } WxMsgReceiver, WxMsgSender;
 
-
 #define WX_IsValidMsgType(t) ((t) > WX_MSG_TYPE_INVALID && (t) < WX_MSG_TYPE_BUTT)
 
 /* 消息大类 */
@@ -44,10 +43,6 @@ typedef struct {
     UINT16 outEvent;   /* 消息处理的出事件， WX_SUCCESS - 表示成功 */
     UINT8  msgBody[0];
 } WxEvtMsgHeader;
-
-typedef union {
-
-} WxMsgBody;
 
 typedef struct {
     WxEvtMsgHeader msgHead;
