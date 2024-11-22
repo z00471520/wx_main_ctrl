@@ -6,21 +6,26 @@
 #include "wx_evt_msg_res_pool.h"
 #include "wx_can_slave_a.h"
 #include "wx_can_slave_b.h"
-/* 主控板模块定义 */
-WxModuleDef g_wxModuleInfo[] = {
-    /* 模块名(小写)   模块ID */
-    {"module_can_slave",        WX_MODULE_ID_CAN_SLAVE},
-};
+
 /* 模块部署信息 */
 WxModuleDeploy g_wxModuleDepolyInfos[] = {
     {
-        "module_can_slave",     /* 模块名 g_wxModuleInfo */
+        "module_can_slave_a",     /* 模块名 */
+        WX_MODULE_CAN_SLAVE_A,  /* 模块ID */
         WX_CORE_0,              /* 模块运行的核  */
         "task_main",            /* 模块运行的核内任务名 */
-        WX_CAN_SLAVE_Construct, /* 模块构建函数-必选 */
-        WX_CAN_SLAVE_Destruct,   /* 模块析构函数 */
-        WX_CAN_SLAVE_Entry,     /* 模块消息 */
-        {WX_MSG_TYPE_CAN_FRAME}, /* 支持的消息类型 */
+        WX_CAN_SLAVE_A_Construct, /* 模块构建函数-必选 */
+        WX_CAN_SLAVE_A_Destruct,  /* 模块析构函数 */
+        WX_CAN_SLAVE_A_Entry,     /* 模块消息 */
+    },
+    {
+        "module_can_slave_a",       /* 模块名 */
+        WX_MODULE_CAN_SLAVE_B,      /* 模块ID */
+        WX_CORE_0,                  /* 模块运行的核 */
+        "task_main",                /* 模块运行的核内任务名, 需要保证核内有改函数 */
+        WX_CAN_SLAVE_B_Construct,   /* 模块构建函数-必选 */
+        WX_CAN_SLAVE_B_Destruct,    /* 模块析构函数 */
+        WX_CAN_SLAVE_B_Entry,       /* 模块消息 */
     },
 };
 
@@ -57,6 +62,7 @@ UINT32 WX_DeployOneModule2Task(WxTaskInfo *task, WxModule *module, WxModuleDeplo
 {
     module->moduleName = moduleDeploy->moduleName;
     module->coreId = task->coreId;
+    module->moduleId = moduleDeploy->moduleId;
     module->constructFunc    = moduleDeploy->constructFunc;
     module->destructFunc     = moduleDeploy->destructFunc;
     module->entryFunc        = moduleDeploy->entryFunc;
@@ -70,16 +76,6 @@ UINT32 WX_DeployOneModule2Task(WxTaskInfo *task, WxModule *module, WxModuleDeplo
     UINT32 ret = moduleDeploy->constructFunc(module);
     if (ret != WX_SUCCESS) {
         return ret;
-    }
-    /* 如果模块消息处理入口函数有效则把映射消息类型到模块. 需要在构建完毕后执行 */
-    if (moduleDeploy->entryFunc) {
-        WxMsgType msgType;
-        for (UINT32 i = 0; i < WX_SPT_PROC_MSG_TYPE_MAX_NUM; i++) {
-            msgType = moduleDeploy->moduleSptMsgType[i];
-            if (WX_IsValidMsgType(msgType)) {
-                task->msgType2Module[msgType] = module;
-            }
-        }
     }
 
     return WX_SUCCESS;
@@ -104,11 +100,10 @@ UINT32 WX_DeployModules2Task(WxTaskInfo *task)
         if ((moduleDeploy->coreIdMask & task->coreId) == 0) {
             continue;
         }
-        /* 如果任务部署的模块超过了最大值则属于异常，修改宏取值即可 */
-        if (task->moduleNum >= WX_TASK_SPT_MODULE_NUM) {
-            return WX_ERR;
+        if (!WX_IsValidModuleId(moduleDeploy->moduleId)) {
+            continue;
         }
-        module = &task->modules[task->moduleNum];
+        module = &task->modules[moduleDeploy->moduleId];
         UINT32 ret = WX_DeployOneModule2Task(task, module, moduleDeploy);
         if (ret != WX_SUCCESS) {
             wx_critical(X, "Error Exit: WX_DeployOneModule2Task(%u) fail(%u)", moduleDeploy->moduleName, ret);
@@ -141,7 +136,7 @@ UINT32 WX_DeployOneTask(WxTaskDeploy *taskDeploy, UINT8 coreId)
         return WX_ERR;
     }
 
-    ret = WX_DeployModules2Task();
+    ret = WX_DeployModules2Task(task);
     if (ret != WX_SUCCESS) {
         return ret;
     }
@@ -180,20 +175,18 @@ UINT32 WX_DeployTasks(WxCoreId coreId)
 }
 
 /* 任务处理消息 */
-VOID WX_TaskProcEvtMsg(WxTaskInfo *task,  WxEvtMsg *evtMsg)
+UINT32 WX_TaskProcEvtMsg(WxTaskInfo *task, WxEvtMsg *evtMsg)
 {
-    /* 检查消息类型 */
-    if (!WX_IsValidMsgType(evtMsg->msgHead.msgType)) {
-        /* 异常计数 */
-        continue;
+    UINT32 reciver = evtMsg->msgHead.receiver;
+    if (!WX_IsValidModuleId(reciver)) {
+        return WX_ERR;
     }
-    WxModule *module = task->msgType2Module[evtMsg->msgHead.msgType];
-    /* 当前消息类型没有模块处理，属于异常 */
-    if (module == NULL) {
-        /* 异常计数 */
-        continue;
+    
+    if (task->modules[reciver].entryFunc == NULL) {
+        return WX_ERR;
     }
-    return module->entryFunc(module, evtMsg);
+
+    return task->modules[reciver].entryFunc(&task->modules[reciver], evtMsg);
 }
 
 /* 所有任务均运行该函数 */
@@ -206,10 +199,10 @@ VOID WX_TaskFuncCode(VOID *param)
         /* 当前任务等待外界发送的消息 */
         if (xQueueReceive(task->msgQueHandle, &evtMsg, portMAX_DELAY) == pdPASS) {
             ret = WX_TaskProcEvtMsg(task, evtMsg);
-            WX_FreeEvtMsg(&evtMsg);
             if (ret != WX_SUCCESS) {
                 wx_fail_code_cnt(ret);
-            } 
+            }
+            WX_FreeEvtMsg(&evtMsg);
         }
     }
 }

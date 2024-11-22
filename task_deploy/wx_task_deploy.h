@@ -4,7 +4,6 @@
 /* 用于定义启动哪些core，重复的按照一个，最多支持4个， 取值使用 WxCoreId */
 #define WX_SPT_PROC_MSG_TYPE_MAX_NUM 8 /* 可以根据需求拓展 */
 #define WX_TASK_SPT_MSG_TYPE_NUM     128
-#define WX_TASK_SPT_MODULE_NUM       128
 
 /* 核ID定义 */
 typedef enum {
@@ -23,12 +22,12 @@ typedef UINT32 (*WxModuleEntryFunc)(VOID *module, WxEvtMsg *evtMsg);
 /* 模块部署信息 */
 typedef struct {
     const CHAR *moduleName;   /* 模块名 */
-    UINT8 coreIdMask;         /* 模块部署的核ID， 使用 WX_CORE定义 */
+    WxModuleId moduleId;      /* 模块ID */
+    UINT32 coreIdMask;        /* 模块部署的核ID， 使用 WX_CORE定义 */
     const CHAR *taskName;     /* 模块运行的任务ID */
     WxModuleConstructFunc   constructFunc; /* 模块构建函数 */
     WxModuleDestructFunc    destructFunc;  /* 模块的析构函数 */
     WxModuleEntryFunc       entryFunc;     /* 模块消息处理函数 */
-    WxMsgType moduleSptMsgType[WX_SPT_PROC_MSG_TYPE_MAX_NUM] /* 模块支持处理的消息类型 */
 } WxModuleDeploy;
 
 typedef struct {
@@ -40,12 +39,10 @@ typedef struct tagWxTaskInfo {
     CHAR *taskName; /* 任务名字 */
     UINT8 coreId; /* 任务所属的核ID */
     UINT8 resv;
-    UINT16 moduleNum;
     UINT32 reserv;
     TaskHandle_t handle; /* 任务Handle */
     QueueHandle_t msgQueHandle; /* 消息队列的handle WxEvtMsg */
-    WxModule modules[WX_TASK_SPT_MODULE_NUM]; /* 该任务部署的模块信息 */
-    WxModule *msgType2Module[WX_MSG_TYPE_BUTT]; /* 当前任务类型到处理模块的映射 */
+    WxModule modules[WX_MODULE_BUTT]; /* 该任务部署的模块信息 */
 } WxTaskInfo;
 
 /* 任务配置信息 */

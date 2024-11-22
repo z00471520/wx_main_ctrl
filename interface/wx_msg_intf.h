@@ -5,15 +5,16 @@
 #define WX_EVT_MSG_BODY_SIZE 1500 /* 默认的消息长度 */
 /* 当前内核支持的消息处理模块定义 */
 typedef enum {
-    WX_MODULE_CAN_A,
-    WX_MODULE_CAN_B,
+    WX_MODULE_INVALID, /* 无效ID */
+    WX_MODULE_CAN_SLAVE_A,
+    WX_MODULE_CAN_SLAVE_B,
     WX_MODULE_RS422_I_MASTER, /* 内部外设通信使用的RS422 */
     WX_MODULE_ZJ_SPI_DRIVER,
     /* if more please add here */
     WX_MODULE_BUTT,
 } WxModuleId;
 
-#define WX_IsValidMsgType(t) ((t) > WX_MSG_TYPE_INVALID && (t) < WX_MSG_TYPE_BUTT)
+#define WX_IsValidModuleId(i) ((i) > WX_MODULE_INVALID && (i) < WX_MODULE_BUTT)
 
 /* 消息大类 */
 typedef enum {
@@ -31,12 +32,12 @@ typedef enum {
     /* if more please add here */
     WX_MSG_TYPE_BUTT,
 } WxMsgType;
-
+#define WX_IsValidMsgType(t) ((t) > WX_MSG_TYPE_INVALID && (t) < WX_MSG_TYPE_BUTT)
 /* 卫星内部传递的模块均需要以此方式进行 */
 typedef struct {
     UINT32 transID;    /* 消息对应的事务ID */
-    UINT8 sender;   /* 消息发送者, 详见: WxModuleId */
-    UINT8 receiver; /* 消息接收者, 详见: WxModuleId */
+    UINT8 sender;   /* 消息发送模块ID, 详见: WxModuleId */
+    UINT8 receiver; /* 消息接收模块ID, 详见: WxModuleId */
    	UINT16 msgType;    /* 消息类型, 详见枚举 WxMsgType 定义 */
     UINT16 msgSubType; /* 消息子类型, 由大类确定 */
     UINT16 msgBodyLen; /* 消息体实际长度 --- msgBody的长度, 必选：不能超过，WX_MSG_DEFAULT_BODY_SIZE */
