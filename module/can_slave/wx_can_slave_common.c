@@ -8,6 +8,7 @@
 #include "wx_can_slave_rmt_ctrl_msg.h"
 #include "wx_task_deploy.h"
 #include "wx_msg_intf.h"
+#include "wx_can_slave_common.h"
 WxCanSlaveCfgInfo g_wxCanSlaveCfg[WX_CAN_DRIVER_TYPE_BUTT] = {
     [WX_CAN_DRIVER_TYPE_A] = {
         /* 自定义配置 */
@@ -72,18 +73,11 @@ UINT32 WX_CAN_SLAVE_DecapCanFrame(WxCanSlaveModule *this, WxCanFrame *canFrame, 
     return WX_SUCCESS;
 }
 
-UINT32 WX_CAN_SLAVE_GetSlaveByReceiver(UINT8 receiver)
+/* 处理CAN驱动发送过来的CAN FRAME */
+UINT32 WX_CAN_SLAVE_ProcCanFrameMsg(WxCanSlaveModule *this, WxEvtMsg *evtMsg)
 {
-    
-}
-
-/* 处理中断发送的CAN FRAME */
-UINT32 WX_CAN_SLAVE_ProcCanFrameMsg(WxCanSlaveModule *this, WxEvtMsg *msg)
-{
-
-    WxCanSlaveModule *this = msg->msgHead;
-    WxCanFrameMsg *canFrameMsg = msg;
-    /* 解封装CAN Frame */
+    WxCanFrameMsg *canFrameMsg = (WxCanFrameMsg *)evtMsg;
+    /* 解封装CAN Frame, 把CAN Frame组合出CAN PDU */
     UINT32 ret = WX_CAN_SLAVE_DecapCanFrame(this, &canFrameMsg->canFrame, &this->reqPdu);
     if (ret != WX_SUCCESS) {
         /* 当前CAN Frame不足以解析出PDU */
@@ -93,28 +87,25 @@ UINT32 WX_CAN_SLAVE_ProcCanFrameMsg(WxCanSlaveModule *this, WxEvtMsg *msg)
         return ret;
     }
     
-    /* 解封装出PDU后，进行解码 */
-    WxRmtCtrlReqMsg *rmtCtrlmsg = &this->rmtCtrlmsg;
-    ret = WX_CAN_SLAVE_DecRmtCtrlPdu(this, &this->reqPdu, rmtCtrlmsg);
+    /* 对PDU进行解码获取最终的遥控请求消息 */
+    WxRmtCtrlReqMsg *reqMsg = &this->reqMsg;
+    ret = WX_CAN_SLAVE_DecRmtCtrlPdu(this, &this->reqPdu, reqMsg);
     if (ret != WX_SUCCESS) {
         return ret;
     }
 
     /* 处理解码后的消息 */
+    ret = WX_CAN_SLAVE_ProcRmtCtrlReqMsg(this, reqMsg);
+    if (ret != WX_SUCCESS) {
+        return ret;
+    }
+
+    return WX_SUCCESS;
 }
 
 /* 创建RS422I主机任务, 参数合法性由调用者保证 */
 UINT32 WX_CAN_DRIVER_SALVE_CreateTask(WxCanSlaveModule *this, WxCanSlaveCfgInfo *cfg)
 {
-    /* create the msg que to buff the recv can frame */
-    if (this->msgQue == 0) {
-        this->msgQue = xQueueCreate(cfg->canFrameMsgQueItemNum, sizeof(WxCanFrame));
-        if (this->msgQue == 0) {
-            wx_log(WX_CRITICAL, "Error Exit: xQueueCreate fail");
-            return WX_CAN_SLAVE_CREATE_MSG_QUE_FAIL;
-        }
-    }
-
     /* 初始化设备 */
     UINT32 ret = WX_CAN_DRIVER_InitialDevice(&this->canInst, &cfg->deviceCfgInfo);
     if (ret != WX_SUCCESS) {
@@ -131,7 +122,6 @@ UINT32 WX_CAN_DRIVER_SALVE_CreateTask(WxCanSlaveModule *this, WxCanSlaveCfgInfo 
     ret = WX_CreateTask(&this->handle, &cfg->taskCfg);
     return ret;
 }
-
 
 UINT32 WX_CAN_SLAVE_Constuct(WxCanSlaveModule *this, WxCanSlaveCfgInfo *cfg)
 {

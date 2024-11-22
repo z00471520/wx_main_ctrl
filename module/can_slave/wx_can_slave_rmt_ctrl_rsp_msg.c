@@ -1,12 +1,12 @@
 #include "wx_can_slave_rmt_ctrl_rsp_msg.h"
-
+#include "wx_can_slave_common.h"
 UINT32 WX_CAN_SLAVE_EncodeRspPduReset(WxCanSlaveModule *this, WxRmtCtrlRspMsg *rspMsg, WxRmtCtrlPdu *pdu)
 {
     return;
 }
 
 /* 响应消息的编码为PDU */
-WxRmtCtrlMsg2PduHandle g_wxRmtCtrlRspMsg2PduHandles[WX_RMT_CTRL_RSP_MSG_TYPE_BUTT] = {
+WxRmtCtrlRspMsgEncPduHandle g_wxRmtCtrlRspMsgEncPduHandle[WX_RMT_CTRL_RSP_MSG_TYPE_BUTT] = {
     [WX_RMT_CTRL_RSP_MSG_TYPE_RESET] = WX_CAN_SLAVE_EncodeRspPduReset,
 };
 
@@ -17,7 +17,7 @@ UINT32 WX_CAN_SLAVE_EncodeRspPdu(WxCanSlaveModule *this, WxRmtCtrlRspMsg *rspMsg
         return WX_CAN_SLAVE_ENC_RSP_PDU_TYPE_ERR;
     }
 
-    WxRmtCtrlMsg2PduHandle encHandle = g_wxRmtCtrlRspMsg2PduHandles[rspMsg->type];
+    WxRmtCtrlRspMsgEncPduHandle encHandle = g_wxRmtCtrlRspMsgEncPduHandle[rspMsg->type];
     if (encHandle == NULL) {
         return WX_CAN_SLAVE_UNDEFINE_RSP_PDU_ENC_HANDLE;
     }

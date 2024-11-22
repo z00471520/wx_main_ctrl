@@ -19,6 +19,6 @@ typedef struct {
     };
 } WxRmtCtrlRspMsg;
 
-typedef UINT32 (*WxRmtCtrlMsg2PduHandle)(WxCanSlaveModule *this, WxRmtCtrlRspMsg *msg, WxRmtCtrlPdu *pdu);
+typedef UINT32 (*WxRmtCtrlRspMsgEncPduHandle)(WxCanSlaveModule *this, WxRmtCtrlRspMsg *rspMsg, WxRmtCtrlPdu *pdu);
 UINT32 WX_CAN_SLAVE_SendRspMsg2CanIf(WxCanSlaveModule *this, WxRmtCtrlRspMsg *rspMsg);
 #endif

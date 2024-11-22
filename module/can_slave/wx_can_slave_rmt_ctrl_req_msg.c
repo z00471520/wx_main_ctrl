@@ -1,4 +1,5 @@
 #include "wx_can_slave_rmt_ctrl_req_msg.h"
+#include "wx_can_slave_common.h"
 UINT32 WX_CAN_SLAVE_ProcRmtCtrlReqMsgReset(WxCanSlaveModule *this, WxRmtCtrlReqMsg *reqMsg)
 {
     /* DO reset */
@@ -21,7 +22,7 @@ UINT32 WX_CAN_SLAVE_ProcRmtCtrlReqMsg(WxCanSlaveModule *this, WxRmtCtrlReqMsg *r
         wx_critical(WX_EXCP_CAN_SLAVE_INVALID_REQ_MSG_TYPE, "Error Exit: unknown reqMsg->type(%u)", reqMsg->type);
         return WX_CAN_SLAVE_INVALID_REQ_MSG_TYPE;
     }
-    /* 获取PDU解码函数 */
+    /* 获取请求消息的处理Handle */
     WxRmtCtrlReqMsgHandle handle = g_wxRmtCtrlReqMsgHandle[msg->type].msgQueHandle;
     if (handle == NULL) {
         return WX_CAN_SLAVE_UNDEFINE_REQ_MSG_HANDLE;

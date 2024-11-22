@@ -57,18 +57,19 @@ typedef struct
 
 /* CAN从机任务信息 */
 typedef struct {
-    QueueHandle_t msgQue;       /* 消息队列 */
-    XCanPs canInst;             /* 当前任务处理的Can实例 */
-    UINT8 canDataBuff;          /* CAN  */
-    WxRmtCtrlReqMsg rmtCtrlmsg; /* CAN MSG */
-    WxRmtCtrlPdu reqPdu;        /* CAN Req PDU */
-    WxRmtCtrlPdu rspPdu;        /* CAN RSP PDU */
-    WxCanFrameList canFrameList; /* 待发送canFrameList */
-    WxCanSlaveCfgInfo *cfgInfo; /* 配置信息的指针 */
+    XCanPs canInst;                 /* 当前任务处理的Can实例 */
+    WxRmtCtrlReqMsg reqMsg;         /* CAN 遥控请求请求 */
+    WxRmtCtrlPdu reqPdu;            /* CAN Req PDU */
+    WxRmtCtrlPdu rspPdu;            /* CAN RSP PDU */
+    WxCanFrameList canFrameList;    /* 待发送canFrameList */
+    WxCanSlaveCfgInfo *cfgInfo;     /* 配置信息的指针 */
+    QueueHandle_t txBuffQue;        /* 发送CANframe的缓冲队列 */
 } WxCanSlaveModule;
 
 WxRmtCtrlReqHandle g_wxRmtCtrlReqHandles[WX_RMT_CTRL_CODE_BUTT];
 UINT32 WX_CAN_SLAVE_DecodeRemoteCtrlMsg(WxCanSlaveModule *this, WxCanFrame *canFrame, WxRmtCtrlReqMsg **ppRemoteCtrlMsg);
 UINT32 WX_CAN_SLAVE_SendPdu2CanIf(WxCanSlaveModule *this, WxRmtCtrlPdu *pdu);
 UINT32 WX_CAN_SLAVE_Constuct(WxCanSlaveModule *this, WxCanSlaveCfgInfo *cfg);
+UINT32 WX_CAN_SLAVE_ProcCanFrameMsg(WxCanSlaveModule *this, WxEvtMsg *evtMsg);
+UINT32 WX_CAN_SLAVE_ProcRmtCtrlReqMsg(WxCanSlaveModule *this, WxRmtCtrlReqMsg *reqMsg);
 #endif
