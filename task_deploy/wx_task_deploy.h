@@ -1,6 +1,19 @@
 #ifndef __WX_TASK_DEPLOY_H__
 #define __WX_TASK_DEPLOY_H__
 
+/* 消息队列ID */
+typedef enum {
+    WX_MSG_QUE_ID_CAN_A_FRAME, /* CAN A接收CAN Frame消息队列的ID  */
+    WX_MSG_QUE_ID_CAN_B_FRAME, /* CAN B接收CAN Frame消息队列的ID */
+    /* if more please add here */
+} WxMsgQueId;
+
+/* 消息队列定义 */
+typedef struct {
+    CHAR *msgQueName;
+    WxMsgQueId msgQueId;   
+} WxMsgQueDef;
+
 typedef enum {
     /* 主控板上的模块ID */
     WX_MODULE_ID_RS422_I_SLAVE = 1,
@@ -76,7 +89,7 @@ typedef UINT32 (*WxModuleProcMsgFunc)(VOID *param, VOID *msg);
 
 /* 卫星消息队列 */
 typedef struct {
-    CHAR *desc;     /* 消息队列描述 */
+    CHAR *msgQueName;     /* 消息队列描述 */
     QueueHandle_t handle; /* 模块某消息队列的handle */
     UINT32 itemNum;  /* 消息队列中Item的个数，用于队列集的创建 */
     UINT32 itemSize; /* 消息队列中Item的尺寸，Byte */

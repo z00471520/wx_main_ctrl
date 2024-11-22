@@ -2,7 +2,7 @@
 #ifndef WX_MSG_INTF_H
 #define WX_MSG_INTF_H
 #include "wx_typedef.h"
-#define WX_MSG_DEFAULT_BODY_SIZE 1500 /* 默认的消息长度 */
+#define WX_EVTMSG_DATA_SIZE 1500 /* 默认的消息长度 */
 /* 当前内核支持的消息处理模块定义 */
 typedef enum {
     WX_MODULE_CAN_A,
@@ -28,21 +28,17 @@ typedef enum {
     /* if more please add here */
 } WxMsgType;
 
-/* 卫星内部传递的模块均需要以此方式进行 */
 typedef struct {
-    UINT32 transID;    /* 消息对应的事务ID */
-    UINT8 sender;   /* 消息发送者 */
-    UINT8 receiver; /* 消息接收者 */
-   	UINT16 msgType;    /* 消息类型, 详见枚举 WxMsgType 定义 */
-    UINT16 msgSubType; /* 消息子类型, 由大类确定 */
-    UINT16 msgBodyLen; /* 消息体实际长度 --- msgBody的长度, 必选：不能超过，WX_MSG_DEFAULT_BODY_SIZE */
-    UINT16 outEvent;   /* 消息处理的出事件， WX_SUCCESS - 表示成功 */
-    UINT8  msgBody[0];
-} WxMsgHeader;
+    ;
+}EvtMsgBody;
 
 typedef struct {
-    WxMsgHeader msgHead;
-    UINT8  msgBody[0];
-} WxMsg;
+    UINT16 msgType; /* 消息类类型（WxMsgType） */
+    UINT16 msgVer;  /* 消息版本号 */
+    UINT32 resv; /* 预留字段 */
+    EvtMsgBody *msgBody;  /* 消息体指针，具体结构体由消息类型自定义 */
+} WxEvtMsg;
+
+
 
 #endif

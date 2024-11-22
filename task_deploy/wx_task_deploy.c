@@ -2,6 +2,12 @@
 #include "wx_task.h"
 #include "wx_include.h"
 #include "wx_task_deploy.h"
+
+WxMsgQueDef g_WxMsgQueDef[] =
+{
+    {"que_xxx", WX_MSG_QUE_ID_CAN_A_FRAME},
+}
+
 /* 主控板模块定义 */
 WxModuleDef g_wxModuleInfo[] = {
     /* 模块名(小写)   模块ID */
@@ -11,8 +17,8 @@ WxModuleDef g_wxModuleInfo[] = {
 /* 模块部署信息 */
 WxModuleDeploy g_wxModuleDepolyInfos[] = {
     /* 模块名        模块运行的核                                                    模块运行的任务名，     模块构建函数 */
-    {"module_can_slave_a", WX_CORE(WX_CORE_0, WX_CORE_NA, WX_CORE_NA, WX_CORE_NA), "task_main", WX_CAN_SLAVE_ProcCanFrameMsg},
-    {"module_can_slave_b", WX_CORE(WX_CORE_0, WX_CORE_NA, WX_CORE_NA, WX_CORE_NA), "task_main", WX_CAN_SLAVE_ProcCanFrameMsg},
+    {"module_can_slave_a", WX_CORE(WX_CORE_0, WX_CORE_NA, WX_CORE_NA, WX_CORE_NA), "task_main", WX_CAN_SLAVE_A_Constuct},
+    {"module_can_slave_b", WX_CORE(WX_CORE_0, WX_CORE_NA, WX_CORE_NA, WX_CORE_NA), "task_main", WX_CAN_SLAVE_B_Constuct},
 };
 
 /* 任务配置信息, 规定各核运行的任务 */
