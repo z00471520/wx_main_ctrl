@@ -131,7 +131,7 @@ UINT32 WX_CAN_DRIVER_SALVE_CreateTask(WxCanSlave *this, WxCanSlaveCfgInfo *cfg)
 }
 
 
-UINT32 WX_CAN_SLAVE_Constuct(WxModuleInfo *module, WxCanSlaveCfgInfo *cfg, WxCanSlave *this)
+UINT32 WX_CAN_SLAVE_ConstuctOneCan(WxModuleInfo *module, WxCanSlaveCfgInfo *cfg, WxCanSlave *this)
 {
     /* 初始化设备 */
     UINT32 ret = WX_CAN_DRIVER_InitialDevice(&this->canInst, &cfg->deviceCfgInfo);
@@ -145,31 +145,18 @@ UINT32 WX_CAN_SLAVE_Constuct(WxModuleInfo *module, WxCanSlaveCfgInfo *cfg, WxCan
         return ret;
     }
 
-    WxMsgQueRegReq canFrameMsgQueRegReq = {
-        .desc = "msg_que_can_frame_msg", 
-        .itemNum = cfg->selfDefCfg.canFrameMsgQueItemNum,
-        .itemSize = sizeof(WxCanFrameMsg),
-        .msgHandle = WX_CAN_SLAVE_ProcCanFrameMsg,
-        .param = this,
-    };
-
-    ret = WX_RegMsgQue2Module(module, &canFrameMsgQueRegReq);
-    if (ret != WX_SUCCESS) {
-        return ret;
-    }
-
     return ret;
 }
 
 
-UINT32 WX_CAN_SLAVE_A_Constuct(WxModuleInfo *module)
+UINT32 WX_CAN_SLAVE_Constuct(WxModuleInfo *module)
 {
-    WxCanTypeDef type = WX_CAN_DRIVER_TYPE_A;
-    return WX_CAN_SLAVE_Constuct(module, g_wxCanSlaveCfg[type], &g_wxCanSlave[type]);
+    UINT32 ret;
+    for (UINT32 type = WX_CAN_DRIVER_TYPE_A; type < WX_CAN_DRIVER_TYPE_BUTT; type++) {
+        ret = WX_CAN_SLAVE_ConstuctOneCan(module, g_wxCanSlaveCfg[type], &g_wxCanSlave[type]);
+        if (ret != WX_SUCCESS) {
+            return ret;
+        }
+    }
 }
 
-UINT32 WX_CAN_SLAVE_B_Constuct(WxModuleInfo *module)
-{
-    WxCanTypeDef type = WX_CAN_DRIVER_TYPE_B;
-    return WX_CAN_SLAVE_Constuct(module, g_wxCanSlaveCfg[type], &g_wxCanSlave[type]);
-}

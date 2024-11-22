@@ -3,5 +3,5 @@
 #include "wx_include.h"
 #include "wx_msg_intf.h"
 UINT32 WX_RegMsgQue(WxMsgReceiver receiver, QueueHandle_t queHandle, UINT32 itermSize);
-UINT32 WX_MSG_Dispatch(WxMsgSender sender, WxMsgReceiver receiver, WxMsgHeader *msgHead);
+UINT32 WX_MSG_Dispatch(WxMsgSender sender, WxMsgReceiver receiver, WxEvtMsgHeader *msgHead);
 #endif

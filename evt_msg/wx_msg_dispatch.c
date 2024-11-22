@@ -39,7 +39,7 @@ UINT32 WX_MSG_Dispatch(WxMsgSender sender, WxMsgReceiver receiver, UINT8 *msg, U
     }
 
     /* 判断消息队列是否可以容纳该消息大小，如果不能容纳则返回错误 */
-    if (msgQueInfo->itermSize > sizeof(WxMsgHeader) + msgHead->msgBodyLen) {
+    if (msgQueInfo->itermSize > sizeof(WxEvtMsgHeader) + msgHead->msgBodyLen) {
         return WX_MSG_DISPATCH_MSG_LEN_ERR;
     }
 

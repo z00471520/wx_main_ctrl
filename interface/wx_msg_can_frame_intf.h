@@ -7,7 +7,7 @@
  *****************************************************************************/
 // 消息内容为： WxCanFrame
 typedef struct {
-    WxMsgHeader msgHead;
+    WxEvtMsgHeader msgHead;
     /* 联合体由MSG header中的类型和子类型确定 */
     typedef union {
         WxCanFrame canFrame; /* WX_CAN_SLAVE_MSG_CAN_FRAME_REQ:NA */

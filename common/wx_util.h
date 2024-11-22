@@ -20,4 +20,6 @@ do {/
         (p) = NULL;/
     }/
 } while(FALSE)
+
+#define WX_8BYTE_ALIGN_SIZE(size) (((size) + 7 / 8) * 8)
 #endif
