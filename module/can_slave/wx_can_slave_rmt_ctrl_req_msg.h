@@ -20,5 +20,5 @@ typedef struct {
 } WxRmtCtrlReqMsg;
 
 
-UINT32 WX_CAN_SLAVE_ProcRmtCtrlReqMsgReset(WxCanSlave *this, WxRmtCtrlReqMsg *msg);
+UINT32 WX_CAN_SLAVE_ProcRmtCtrlReqMsgReset(WxCanSlaveModule *this, WxRmtCtrlReqMsg *msg);
 #endif

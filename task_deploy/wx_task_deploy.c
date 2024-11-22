@@ -4,7 +4,8 @@
 #include "wx_task_deploy.h"
 #include "wx_msg_intf.h"
 #include "wx_evt_msg_res_pool.h"
-
+#include "wx_can_slave_a.h"
+#include "wx_can_slave_b.h"
 /* 主控板模块定义 */
 WxModuleDef g_wxModuleInfo[] = {
     /* 模块名(小写)   模块ID */
@@ -16,7 +17,7 @@ WxModuleDeploy g_wxModuleDepolyInfos[] = {
         "module_can_slave",     /* 模块名 g_wxModuleInfo */
         WX_CORE_0,              /* 模块运行的核  */
         "task_main",            /* 模块运行的核内任务名 */
-        WX_CAN_SLAVE_Constuct, /* 模块构建函数-必选 */
+        WX_CAN_SLAVE_Construct, /* 模块构建函数-必选 */
         WX_CAN_SLAVE_Destruct,   /* 模块析构函数 */
         WX_CAN_SLAVE_Entry,     /* 模块消息 */
         {WX_MSG_TYPE_CAN_FRAME}, /* 支持的消息类型 */
@@ -52,7 +53,7 @@ WxTaskDeploy *WX_GetTaskDeploy(UINT32 i)
 }
 
 /* 把一个任务部署到模块 */
-UINT32 WX_DeployOneModule2Task(WxTaskInfo *task, WxModuleInfo *module, WxModuleDeploy *moduleDeploy)
+UINT32 WX_DeployOneModule2Task(WxTaskInfo *task, WxModule *module, WxModuleDeploy *moduleDeploy)
 {
     module->moduleName = moduleDeploy->moduleName;
     module->coreId = task->coreId;
@@ -89,7 +90,7 @@ UINT32 WX_DeployModules2Task(WxTaskInfo *task)
 {
     /* 初始化所有的模块 */
     task->moduleNum = 0;
-    WxModuleInfo *module = NULL;
+    WxModule *module = NULL;
     /* 根据模块部署 */
     WxModuleDeploy *moduleDeploy = NULL;
     /* 遍历模块部署信息 */
@@ -186,7 +187,7 @@ VOID WX_TaskProcEvtMsg(WxTaskInfo *task,  WxEvtMsg *evtMsg)
         /* 异常计数 */
         continue;
     }
-    WxModuleInfo *module = task->msgType2Module[evtMsg->msgHead.msgType];
+    WxModule *module = task->msgType2Module[evtMsg->msgHead.msgType];
     /* 当前消息类型没有模块处理，属于异常 */
     if (module == NULL) {
         /* 异常计数 */

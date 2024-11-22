@@ -1,6 +1,6 @@
 #include "wx_can_slave_rmt_ctrl_rsp_msg.h"
 
-UINT32 WX_CAN_SLAVE_EncodeRspPduReset(WxCanSlave *this, WxRmtCtrlRspMsg *rspMsg, WxRmtCtrlPdu *pdu)
+UINT32 WX_CAN_SLAVE_EncodeRspPduReset(WxCanSlaveModule *this, WxRmtCtrlRspMsg *rspMsg, WxRmtCtrlPdu *pdu)
 {
     return;
 }
@@ -11,7 +11,7 @@ WxRmtCtrlMsg2PduHandle g_wxRmtCtrlRspMsg2PduHandles[WX_RMT_CTRL_RSP_MSG_TYPE_BUT
 };
 
 /* 把遥控消息编码成PDU */
-UINT32 WX_CAN_SLAVE_EncodeRspPdu(WxCanSlave *this, WxRmtCtrlRspMsg *rspMsg, WxRmtCtrlPdu *pdu)
+UINT32 WX_CAN_SLAVE_EncodeRspPdu(WxCanSlaveModule *this, WxRmtCtrlRspMsg *rspMsg, WxRmtCtrlPdu *pdu)
 {
     if (rspMsg->type >= WX_RMT_CTRL_RSP_MSG_TYPE_BUTT) {
         return WX_CAN_SLAVE_ENC_RSP_PDU_TYPE_ERR;
@@ -26,7 +26,7 @@ UINT32 WX_CAN_SLAVE_EncodeRspPdu(WxCanSlave *this, WxRmtCtrlRspMsg *rspMsg, WxRm
 }
 
 /* 发送遥控消息到CAN接口 */
-UINT32 WX_CAN_SLAVE_SendRspMsg2CanIf(WxCanSlave *this, WxRmtCtrlRspMsg *rspMsg)
+UINT32 WX_CAN_SLAVE_SendRspMsg2CanIf(WxCanSlaveModule *this, WxRmtCtrlRspMsg *rspMsg)
 {
     /* 消息编码为PDU */
     UINT32 ret = WX_CAN_SLAVE_EncodeRspPdu(this, rspMsg, this->rspPdu);

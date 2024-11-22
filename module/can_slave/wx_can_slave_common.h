@@ -19,8 +19,8 @@ typedef struct {
 } WxRmtCtrlPdu;
 
 /* 解码PDU的函数 */
-typedef UINT32 (*WxRmtCtrlPduDecHandle)(WxCanSlave *this, WxRmtCtrlPdu *pdu, WxRmtCtrlReqMsg *msg);
-typedef UINT32 (*WxRmtCtrlReqMsgHandle)(WxCanSlave *this, WxRmtCtrlReqMsg *msg);
+typedef UINT32 (*WxRmtCtrlPduDecHandle)(WxCanSlaveModule *this, WxRmtCtrlPdu *pdu, WxRmtCtrlReqMsg *msg);
+typedef UINT32 (*WxRmtCtrlReqMsgHandle)(WxCanSlaveModule *this, WxRmtCtrlReqMsg *msg);
 typedef struct {
     WxRmtCtrlReqMsgType msgType; /* 消息类型 */
     WxRmtCtrlPduDecHandle decHandle; /* 遥控指令码的对应的PDU解码函数，解析出消息 */
@@ -39,7 +39,6 @@ typedef struct
 {
     UINT8 canFrameDataLen; /* CAN帧数据固定长度 */
     UINT32 messId;    /* CAN消息ID */
-    UINT32 canFrameMsgQueItemNum; /* 任务缓存CAN帧的个数 */
     /* if more please add here */
 } WxCanSlaveSelfDefCfg;
 
@@ -66,14 +65,10 @@ typedef struct {
     WxRmtCtrlPdu rspPdu;        /* CAN RSP PDU */
     WxCanFrameList canFrameList; /* 待发送canFrameList */
     WxCanSlaveCfgInfo *cfgInfo; /* 配置信息的指针 */
-} WxCanSlave;
-
-typedef struct tagWxCanSlaveModule {
-    WxCanSlave canSlave[WX_CAN_DRIVER_TYPE_BUTT];
 } WxCanSlaveModule;
 
-
 WxRmtCtrlReqHandle g_wxRmtCtrlReqHandles[WX_RMT_CTRL_CODE_BUTT];
-UINT32 WX_CAN_SLAVE_DecodeRemoteCtrlMsg(WxCanSlave *this, WxCanFrame *canFrame, WxRmtCtrlReqMsg **ppRemoteCtrlMsg);
-UINT32 WX_CAN_SLAVE_SendPdu2CanIf(WxCanSlave *this, WxRmtCtrlPdu *pdu);
+UINT32 WX_CAN_SLAVE_DecodeRemoteCtrlMsg(WxCanSlaveModule *this, WxCanFrame *canFrame, WxRmtCtrlReqMsg **ppRemoteCtrlMsg);
+UINT32 WX_CAN_SLAVE_SendPdu2CanIf(WxCanSlaveModule *this, WxRmtCtrlPdu *pdu);
+UINT32 WX_CAN_SLAVE_Constuct(WxCanSlaveModule *this, WxCanSlaveCfgInfo *cfg);
 #endif

@@ -11,7 +11,7 @@ typedef enum {
     WX_MODULE_ZJ_SPI_DRIVER,
     /* if more please add here */
     WX_MODULE_BUTT,
-} WxMsgReceiver, WxMsgSender;
+} WxModuleId;
 
 #define WX_IsValidMsgType(t) ((t) > WX_MSG_TYPE_INVALID && (t) < WX_MSG_TYPE_BUTT)
 
@@ -35,8 +35,8 @@ typedef enum {
 /* 卫星内部传递的模块均需要以此方式进行 */
 typedef struct {
     UINT32 transID;    /* 消息对应的事务ID */
-    UINT8 sender;   /* 消息发送者 */
-    UINT8 receiver; /* 消息接收者 */
+    UINT8 sender;   /* 消息发送者, 详见: WxModuleId */
+    UINT8 receiver; /* 消息接收者, 详见: WxModuleId */
    	UINT16 msgType;    /* 消息类型, 详见枚举 WxMsgType 定义 */
     UINT16 msgSubType; /* 消息子类型, 由大类确定 */
     UINT16 msgBodyLen; /* 消息体实际长度 --- msgBody的长度, 必选：不能超过，WX_MSG_DEFAULT_BODY_SIZE */

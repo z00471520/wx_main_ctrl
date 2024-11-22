@@ -1,25 +1,10 @@
 #ifndef __WX_TASK_DEPLOY_H__
 #define __WX_TASK_DEPLOY_H__
-#define TASK_EVT_MSG_NODE_NUM 8096
-/* 消息队列ID */
-typedef enum {
-    WX_MSG_QUE_ID_CAN_A_FRAME, /* CAN A接收CAN Frame消息队列的ID  */
-    WX_MSG_QUE_ID_CAN_B_FRAME, /* CAN B接收CAN Frame消息队列的ID */
-    /* if more please add here */
-} WxMsgQueId;
-
-/* 消息队列定义 */
-typedef struct {
-    CHAR *msgQueName;
-    WxMsgQueId msgQueId;   
-} WxMsgQueDef;
-
-typedef enum {
-    /* 主控板上的模块ID */
-    WX_MODULE_ID_RS422_I_SLAVE = 1,
-    WX_MODULE_ID_RS422_I_MASTER = 2,
-    WX_MODULE_ID_CAN_SLAVE = 3,
-} WxModuleId;
+#define TASK_EVT_MSG_NODE_NUM       8196 /* 一个任务的消息队列支持的消息节点数 */
+/* 用于定义启动哪些core，重复的按照一个，最多支持4个， 取值使用 WxCoreId */
+#define WX_SPT_PROC_MSG_TYPE_MAX_NUM 8 /* 可以根据需求拓展 */
+#define WX_TASK_SPT_MSG_TYPE_NUM     128
+#define WX_TASK_SPT_MODULE_NUM       128
 
 /* 核ID定义 */
 typedef enum {
@@ -30,10 +15,6 @@ typedef enum {
     WX_CORE_3 = 0x8,
 } WxCoreId;
 
-/* 用于定义启动哪些core，重复的按照一个，最多支持4个， 取值使用 WxCoreId */
-#define WX_SPT_PROC_MSG_TYPE_MAX_NUM 8 /* 可以根据需求拓展 */
-#define WX_TASK_SPT_MSG_TYPE_NUM     128
-#define WX_TASK_SPT_MODULE_NUM       128
 /* 模块构建函数 */
 typedef UINT32 (*WxModuleConstructFunc)(VOID *module);
 typedef UINT32 (*WxModuleDestructFunc)(VOID *module);
@@ -63,8 +44,8 @@ typedef struct tagWxTaskInfo {
     UINT32 reserv;
     TaskHandle_t handle; /* 任务Handle */
     QueueHandle_t msgQueHandle; /* 消息队列的handle WxEvtMsg */
-    WxModuleInfo modules[WX_TASK_SPT_MODULE_NUM]; /* 该任务部署的模块信息 */
-    WxModuleInfo *msgType2Module[WX_MSG_TYPE_BUTT]; /* 当前任务类型到处理模块的映射 */
+    WxModule modules[WX_TASK_SPT_MODULE_NUM]; /* 该任务部署的模块信息 */
+    WxModule *msgType2Module[WX_MSG_TYPE_BUTT]; /* 当前任务类型到处理模块的映射 */
 } WxTaskInfo;
 
 /* 任务配置信息 */
@@ -80,9 +61,7 @@ typedef struct tagWxTaskDeployInfo{
     UINT16 coreIdMask;  /* 任务部署的CoreId 掩码，指定Bit置位表示部署到该核*/
 } WxTaskDeploy;
 
-/* 消息处理函数 */
-typedef UINT32 (*WxMsgProcFunc)(WxEvtMsg *evtMsg);
-
+/* 卫星模块信息 */
 typedef struct {
     CHAR *moduleName;                   /* 模块名 */
     UINT8 coreId;                       /* module所属当前核ID, 取值详见： WxCoreId */
@@ -92,11 +71,12 @@ typedef struct {
     WxModuleConstructFunc   constructFunc; /* 模块构建函数 */
     WxModuleDestructFunc    destructFunc;  /* 模块的析构函数 */
     WxModuleEntryFunc       entryFunc;     /* 模块消息处理函数 */
-} WxModuleInfo;
-#define WX_GetModuleName(m)         (((WxModuleInfo *)m)->moduleName)
-#define WX_GetModuleInfo(m)         (((WxModuleInfo *)m)->moduleInfo)
-#define WX_SetModuleInfo(m, v)      (((WxModuleInfo *)m)->moduleInfo = (v))
-#define WX_GetModuleCoreId(m)       (((WxModuleInfo *)m)->coreId)
+} WxModule;
+
+#define WX_GetModuleName(m)         (((WxModule *)m)->moduleName)
+#define WX_GetModuleInfo(m)         (((WxModule *)m)->moduleInfo)
+#define WX_SetModuleInfo(m, v)      (((WxModule *)m)->moduleInfo = (v))
+#define WX_GetModuleCoreId(m)       (((WxModule *)m)->coreId)
 
 VOID WX_TaskFuncCode(VOID *param);
 UINT32 WX_DeployTasks(WxCoreId coreId);

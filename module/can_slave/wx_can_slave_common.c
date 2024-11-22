@@ -7,7 +7,7 @@
 #include "wx_can_slave_rmt_ctrl_pdu.h"
 #include "wx_can_slave_rmt_ctrl_msg.h"
 #include "wx_task_deploy.h"
-
+#include "wx_msg_intf.h"
 WxCanSlaveCfgInfo g_wxCanSlaveCfg[WX_CAN_DRIVER_TYPE_BUTT] = {
     [WX_CAN_DRIVER_TYPE_A] = {
         /* 自定义配置 */
@@ -61,7 +61,7 @@ UINT32 WX_CAN_SLAVE_CheckCanFrameMsg(WxCanFrameMsg *msg)
  * 其他：解封装异常
  * 备注：该模块需要根据最终的卫星协议来确定
  **/
-UINT32 WX_CAN_SLAVE_DecapCanFrame(WxCanSlave *this, WxCanFrame *canFrame, WxRmtCtrlPdu *canPdu)
+UINT32 WX_CAN_SLAVE_DecapCanFrame(WxCanSlaveModule *this, WxCanFrame *canFrame, WxRmtCtrlPdu *canPdu)
 {
     UINT32 ret = WX_CAN_SLAVE_CheckCanFrameMsg(canFrame);
     if (ret != WX_SUCCESS) {
@@ -72,11 +72,16 @@ UINT32 WX_CAN_SLAVE_DecapCanFrame(WxCanSlave *this, WxCanFrame *canFrame, WxRmtC
     return WX_SUCCESS;
 }
 
+UINT32 WX_CAN_SLAVE_GetSlaveByReceiver(UINT8 receiver)
+{
+    
+}
 
 /* 处理中断发送的CAN FRAME */
-UINT32 WX_CAN_SLAVE_ProcCanFrameMsg(VOID *param, VOID *msg)
+UINT32 WX_CAN_SLAVE_ProcCanFrameMsg(WxCanSlaveModule *this, WxEvtMsg *msg)
 {
-    WxCanSlave *this = param;
+
+    WxCanSlaveModule *this = msg->msgHead;
     WxCanFrameMsg *canFrameMsg = msg;
     /* 解封装CAN Frame */
     UINT32 ret = WX_CAN_SLAVE_DecapCanFrame(this, &canFrameMsg->canFrame, &this->reqPdu);
@@ -96,11 +101,10 @@ UINT32 WX_CAN_SLAVE_ProcCanFrameMsg(VOID *param, VOID *msg)
     }
 
     /* 处理解码后的消息 */
-
 }
 
 /* 创建RS422I主机任务, 参数合法性由调用者保证 */
-UINT32 WX_CAN_DRIVER_SALVE_CreateTask(WxCanSlave *this, WxCanSlaveCfgInfo *cfg)
+UINT32 WX_CAN_DRIVER_SALVE_CreateTask(WxCanSlaveModule *this, WxCanSlaveCfgInfo *cfg)
 {
     /* create the msg que to buff the recv can frame */
     if (this->msgQue == 0) {
@@ -129,7 +133,7 @@ UINT32 WX_CAN_DRIVER_SALVE_CreateTask(WxCanSlave *this, WxCanSlaveCfgInfo *cfg)
 }
 
 
-UINT32 WX_CAN_SLAVE_ConstuctOneCan(WxCanSlaveCfgInfo *cfg, WxCanSlave *this)
+UINT32 WX_CAN_SLAVE_Constuct(WxCanSlaveModule *this, WxCanSlaveCfgInfo *cfg)
 {
     /* 初始化设备 */
     UINT32 ret = WX_CAN_DRIVER_InitialDevice(&this->canInst, &cfg->deviceCfgInfo);
@@ -145,24 +149,3 @@ UINT32 WX_CAN_SLAVE_ConstuctOneCan(WxCanSlaveCfgInfo *cfg, WxCanSlave *this)
 
     return ret;
 }
-
-/* 模块构建函数 */
-UINT32 WX_CAN_SLAVE_Constuct(VOID *module)
-{
-    UINT32 ret;
-    WxCanSlaveModule *this = WX_Mem_Alloc(WX_GetModuleName(module), 1, sizeof(WxCanSlaveModule));
-    if (this == NULL) {
-        return WX_ERR;
-    }
-
-    for (UINT32 type = WX_CAN_DRIVER_TYPE_A; type < WX_CAN_DRIVER_TYPE_BUTT; type++) {
-        ret = WX_CAN_SLAVE_ConstuctOneCan(module, this->canSlave[type], &g_wxCanSlave[type]);
-        if (ret != WX_SUCCESS) {
-            WX_Mem_Free(this);
-            return ret;
-        }
-    }
-    /* 设置上Module */
-    WX_SetModuleInfo(module, this);
-}
-
