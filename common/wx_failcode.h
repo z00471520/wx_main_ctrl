@@ -5,6 +5,7 @@ typedef enum {
     WX_OK = 0,
     WX_SUCCESS = WX_OK,
     WX_ERR = 1,
+    WX_FAILURE,
     WX_TO_BE_CONTINUE, /* 未完待续 */
     WX_INIT_UARTNS550_FAIL,
     WX_UARTNS550_SELF_TEST_FAIL,

@@ -11,5 +11,5 @@ VOID WX_FreeEvtMsg(WxEvtMsg **ppEvtMsg);
 /* 中断程序 */
 VOID WX_FreeEvtMsgFromISR(WxEvtMsg **ppEvtMsg);
 /* 创建消息资源池 */
-UINT32 WX_CreateEvtMsgResPool(UINT32 itemNum);
+UINT32 WX_CreateMsgResPool(UINT32 itemNum);
 #endif

@@ -3,13 +3,49 @@
 #define WX_MSG_INTF_H
 #include "wx_typedef.h"
 #define WX_EVT_MSG_BODY_SIZE 1500 /* 默认的消息长度 */
+
+/* 核ID定义 */
+typedef enum {
+    WX_CORE_ID_NA = 0,
+    WX_CORE_ID_0 = 0x1,
+    WX_CORE_ID_1 = 0x2,
+    WX_CORE_ID_2 = 0x4,
+    WX_CORE_ID_3 = 0x8,
+} WxCoreId;
+#define WX_CORE_ID_ALL 0xF
+#define WX_CORE_NUM     4
+#define WX_CORE_IDX_2_ID(coreIdx) ((UINT32)1 << (coreIdx))
+inline UINT32 WX_CORE_ID_2_IDX(WxCoreId coreId)
+{
+    switch (coreId) {
+        case WX_CORE_ID_0:
+            return 0;
+        case WX_CORE_ID_1:
+            return 1;
+        case WX_CORE_ID_2:
+            return 2;
+        case WX_CORE_ID_3:
+            return 3;
+        default:
+            return ;
+    }
+}
+#define WX_IS_VALID_CORE_ID(coreId) (((coreId) != WX_CORE_ID_NA) && ((coreId) & WX_CORE_ID_ALL == (coreId)))
+
 /* 当前内核支持的消息处理模块定义 */
 typedef enum {
+    /**************************************************************************
+     * Task's module ID
+     *************************************************************************/
     WX_MODULE_INVALID, /* 无效ID */
-    WX_MODULE_CAN_SLAVE_A,
-    WX_MODULE_CAN_SLAVE_B,
-    WX_MODULE_RS422_I_MASTER, /* 内部外设通信使用的RS422 */
-    WX_MODULE_ZJ_SPI_DRIVER,
+    WX_TASK_MODULE_CAN_SLAVE_A,
+    WX_TASK_MODULE_CAN_SLAVE_B,
+    WX_TASK_MODULE_RS422_I_MASTER, /* 内部外设通信使用的RS422 */
+    WX_TASK_MODULE_ZJ_SPI_DRIVER,
+    WX_DRIVER_MODULE_CAN_SLAVE_A,
+    WX_DRIVER_MODULE_CAN_SLAVE_B,
+    WX_DRIVER_MODULE_RS422_MASTER,
+    WX_DRIVER_MODULE_RS422_SLAVE,
     /* if more please add here */
     WX_MODULE_BUTT,
 } WxModuleId;

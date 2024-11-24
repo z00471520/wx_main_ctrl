@@ -1,24 +1,20 @@
 #include "wx_include.h"
 #include "wx_msg_intf.h"
-
+#define TASK_EVT_MSG_NODE_NUM           8196 /* 一个任务的消息队列支持的消息节点数 */
 typedef struct {
     QueueHandle_t evtMsgQue;
-    WxEvtMsg evtMsgArray[0];
+    WxEvtMsg evtMsgArray[TASK_EVT_MSG_NODE_NUM];
 } WxEvtMsgPool;
 
 WxEvtMsgPool *g_wxEvtMsgPool = NULL;
 /* 创建EvtMsg的资源池 */
-UINT32 WX_CreateEvtMsgResPool(UINT32 itemNum)
+UINT32 WX_CreateMsgResPool(VOID)
 {
-    if (itemNum == 0) {
-        return WX_ERR;
-    }
-
     if (g_wxEvtMsgPool != NULL) {
         return WX_SUCCESS;
     }
     /* 申请内存 */
-    WxEvtMsgPool *evtMsgPool = WX_Mem_Alloc("EVTMSGPool", 1, sizeof(WxEvtMsgPool) + itemNum * sizeof(WxEvtMsg));
+    WxEvtMsgPool *evtMsgPool = WX_Mem_Alloc("WxEvtMsgPool", 1, sizeof(WxEvtMsgPool));
     /* 创建一个队列用于装消息的指针 */
     evtMsgPool->evtMsgQue = xQueueCreate((UBaseType_t)itemNum, (UBaseType_t)sizeof(WxEvtMsg *));
     if (evtMsgPool->evtMsgQue == NULL) {

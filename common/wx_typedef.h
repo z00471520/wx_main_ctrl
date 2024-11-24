@@ -5,16 +5,9 @@
 /*
  * basic data type typedef for better compatibility
  */
-typedef unsigned char UINT8;
-typedef unsigned short UINT16;
-typedef short SINT16;
-typedef unsigned int UINT32;
-typedef int UINT32;
-typedef char CHAR;
-
 typedef uint8_t		UINT8;		/**< unsigned 8-bit */
 typedef char		INT8;		/**< signed 8-bit */
-typedef uint16_t	UNIT16;	    /**< unsigned 16-bit */
+typedef uint16_t	UINT16;	    /**< unsigned 16-bit */
 typedef short		INT16;		/**< signed 16-bit */
 typedef uint32_t	UINT32;	    /**< unsigned 32-bit */
 typedef long		INT32;		/**< signed 32-bit */
@@ -23,6 +16,7 @@ typedef double		FLOAT64;	/**< 64-bit double precision FP */
 typedef unsigned char	BOOL;	/**< boolean (XTRUE or XFALSE) */
 typedef unsigned long long UINT64;
 typedef void VOID;
+typedef inline INLINE;
 /*
  * basic macro define
  */
