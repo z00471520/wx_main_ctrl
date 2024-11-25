@@ -18,7 +18,7 @@ typedef struct tagWxTaskDeployInfo{
 typedef struct tagWxTask {
     CHAR *taskName; /* 任务名字 */
     TaskHandle_t handle; /* 任务Handle */
-    QueueHandle_t msgQueHandle; /* 消息队列的handle WxEvtMsg */
+    QueueHandle_t msgQueHandle; /* 消息队列的handle WxMsgType */
     UINT32 msgQueFullCnt; /* 消息队列满次数 */
     UINT32 resv; /* 保留 */
     WxModule modules[WX_MODULE_BUTT]; /* 该任务部署的模块信息 */

@@ -77,7 +77,7 @@ typedef struct {
  * RS422消息
  *****************************************************************************/
 typedef struct {
-    WxEvtMsg header; /* 消息头 */
+    WxMsgType header; /* 消息头 */
     UINT8 msgData[WX_RS422I_MASTER_MSG_BODY_SIZE];  /* Msg body 由msgType和msgSubType确定，由通信双方自行约束 */
 } WxRs422IMasterMsg;
 

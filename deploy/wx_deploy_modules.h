@@ -3,7 +3,7 @@
 /* 模块构建函数 */
 typedef UINT32 (*WxModuleConstructFunc)(VOID *module);
 typedef UINT32 (*WxModuleDestructFunc)(VOID *module);
-typedef UINT32 (*WxModuleEntryFunc)(VOID *module, WxEvtMsg *evtMsg);
+typedef UINT32 (*WxModuleEntryFunc)(VOID *module, WxMsgType *evtMsg);
 
 /* 模块部署信息 */
 typedef struct {

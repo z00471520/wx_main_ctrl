@@ -3,17 +3,17 @@
 #include "wx_msg_intf.h"
 #include "wx_task_deploy.h"
 #include "wx_include.h"
-WxMsgRouterList *g_wxMsgRouterList = NULL;
+WxMsgTypeRouterList *g_wxMsgRouterList = NULL;
 
 /* 创建消息调度的路由表 */
 UINT32 WX_MsgShedule_CreateMsgRouterList(void)
 {
     if (g_wxMsgRouterList == NULL) {
-        g_wxMsgRouterList = (WxMsgRouterList *)WX_Mem_Alloc(WxMsgRouterList, 1, sizeof(WxMsgRouterList));
+        g_wxMsgRouterList = (WxMsgTypeRouterList *)WX_Mem_Alloc(WxMsgTypeRouterList, 1, sizeof(WxMsgTypeRouterList));
         if (g_wxMsgRouterList == NULL) {
             return WX_FAIL_MEM_ALLOC;
         }
-        memset(g_wxMsgRouterList, 0, sizeof(WxMsgRouterList));
+        memset(g_wxMsgRouterList, 0, sizeof(WxMsgTypeRouterList));
     }
     g_wxMsgRouterList->coreId = WX_GetCurCoreId();
     return WX_SUCCESS;
@@ -39,7 +39,7 @@ UINT32 WX_MsgShedule_RegRouter(WxModuleId receiver, UINT8 coreId,
     if (!WX_IsValidModuleId(receiver)）{
         return WX_MSG_REG_INVALID_MODULE_ID;
     }
-    WxMsgRouter *this = g_wxMsgRouterList->routers[receiver];
+    WxMsgTypeRouter *this = g_wxMsgRouterList->routers[receiver];
     this->coreId = coreId;
     this->belongTask = belongTask;
     this->belongModule = belongModule;
@@ -64,7 +64,7 @@ INLINE UINT32 WX_MsgShedule_CheckInput(UINT8 sender, UINT8 receiver, VOID *msg)
     return WX_SUCCESS;
 }
 /* 计算消息的发送方式 */
-WxMsgSendMethod WX_MsgSchedule_CalcMsgSendMethod(WxMsgRouter *sender, WxMsgRouter *receiver)
+WxMsgTypeSendMethod WX_MsgSchedule_CalcMsgSendMethod(WxMsgTypeRouter *sender, WxMsgTypeRouter *receiver)
 {
     /* 核不同不能直接发送消息 */
     if (receiver->coreId != sender->coreId) {
@@ -75,17 +75,17 @@ WxMsgSendMethod WX_MsgSchedule_CalcMsgSendMethod(WxMsgRouter *sender, WxMsgRoute
 }
 
 /* 发送消息到其他核 TODO*/
-UINT32 WX_MsgShedule_ToCore(WxMsgRouter *receiver, VOID *msg)
+UINT32 WX_MsgShedule_ToCore(WxMsgTypeRouter *receiver, VOID *msg)
 {
     /* TODO */
     return WX_ERR;
 }
 
 /* 发送消息到任务 */
-UINT32 WX_MsgShedule_ToTask(WxMsgRouter *receiver, VOID *msg)
+UINT32 WX_MsgShedule_ToTask(WxMsgTypeRouter *receiver, VOID *msg)
 {
     WxTask *task = receiver->belongTask;
-    WxMsg *msgHead = (WxMsg *)msg;
+    WxMsgType *msgHead = (WxMsgType *)msg;
     UINT32 sendResult;
     if (msgHead->isFromIsr) {
         sendResult = xQueueSendFromISR(task->msgQueHandle, (const void * )&msg, (TickType_t)0);
@@ -114,12 +114,12 @@ UINT32 WX_MsgShedule(UINT8 sender, UINT8 receiver, VOID *msg)
         return ret;
     }
 
-    WxEvtMsg *msgHead = (WxEvtMsg *)msg;
+    WxMsgType *msgHead = (WxMsgType *)msg;
     msgHead->sender = sender;
     msgHead->receiver = receiver;
-    WxMsgRouter *dstRouter = &g_wxMsgRouterList->routers[receiver];
-    WxMsgRouter *srcRouter = &g_wxMsgRouterList->routers[sender];
-    WxMsgSendMethod sendMethod = WX_MsgSchedule_CalcMsgSendMethod(srcRouter, dstRouter);
+    WxMsgTypeRouter *dstRouter = &g_wxMsgRouterList->routers[receiver];
+    WxMsgTypeRouter *srcRouter = &g_wxMsgRouterList->routers[sender];
+    WxMsgTypeSendMethod sendMethod = WX_MsgSchedule_CalcMsgSendMethod(srcRouter, dstRouter);
     switch (sendMethod) {
         case WX_MSG_SEND_TO_CORE: {
             return WX_MsgShedule_ToCore(dstRouter, msg);

@@ -159,7 +159,7 @@ UINT32 WX_CAN_DRIVER_SendCanFrameToSendQue(QueueHandle_t sendQueue, WxCanFrame *
 }
 
 /* CAN发送数据帧, 该函数发送失败就会返回对应的原因值 */
-UINT32 WX_CAN_DRIVER_ProcCanFrameMsg(WxCanDriver *this, WxEvtMsg *evtMsg)
+UINT32 WX_CAN_DRIVER_ProcCanFrameMsg(WxCanDriver *this, WxMsgType *evtMsg)
 {
 	WxCanFrame *frame = (WxCanFrame *)evtMsg->msgData;
 	/* 发送CAN帧 */
@@ -213,7 +213,7 @@ UINT32 WX_CAN_DRIVER_Destruct(VOID *module)
 
 
 /* 消息处理入口 */
-UINT32 WX_CAN_DRIVER_Entry(WxCanDriver *this, WxEvtMsg *evtMsg)
+UINT32 WX_CAN_DRIVER_Entry(WxCanDriver *this, WxMsgType *evtMsg)
 {
 	switch (evtMsg->msgType) {
 		case WX_MSG_TYPE_CAN_FRAME: {

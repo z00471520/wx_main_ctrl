@@ -74,7 +74,7 @@ UINT32 WX_CAN_SLAVE_DecapCanFrame(WxCanSlaveModule *this, WxCanFrame *canFrame, 
 }
 
 /* 处理CAN驱动发送过来的CAN FRAME */
-UINT32 WX_CAN_SLAVE_ProcCanFrameMsg(WxCanSlaveModule *this, WxEvtMsg *evtMsg)
+UINT32 WX_CAN_SLAVE_ProcCanFrameMsg(WxCanSlaveModule *this, WxMsgType *evtMsg)
 {
     WxCanFrameMsg *canFrameMsg = (WxCanFrameMsg *)evtMsg;
     /* 解封装CAN Frame, 把CAN Frame组合出CAN PDU */

@@ -67,7 +67,7 @@ typedef struct {
     WxModuleId moduleId;
     UINT32 resv;
 } WxCanDriver;
-UINT32 WX_CAN_DRIVER_Entry(WxCanDriver *this, WxEvtMsg *evtMsg);
+UINT32 WX_CAN_DRIVER_Entry(WxCanDriver *this, WxMsgType *evtMsg);
 UINT32 WX_CAN_DRIVER_Destruct(VOID *module);
 UINT32 WX_CAN_DRIVER_Constuct(WxCanDriver *this, WxCanDriverCfg *cfg, WxCanDriverIntrCfg *intrCfg);
 #endif

@@ -4,12 +4,12 @@
 #include "wx_evt_msg.h"
 #include "wx_msg_intf.h"
 /* 中断程序申请消息 */
-WxEvtMsg *WX_ApplyEvtMsgFromISR(WxMsgType msgType);
-WxEvtMsg *WX_ApplyEvtMsg(WxMsgType msgType);
+WxMsgType *WX_ApplyEvtMsgFromISR(WxMsgType msgType);
+WxMsgType *WX_ApplyEvtMsg(WxMsgType msgType);
 /* 释放消息, msg释放后会设置为空 */
-VOID WX_FreeEvtMsg(WxEvtMsg **ppEvtMsg);
+VOID WX_FreeEvtMsg(WxMsgType **ppEvtMsg);
 /* 中断程序 */
-VOID WX_FreeEvtMsgFromISR(WxEvtMsg **ppEvtMsg);
+VOID WX_FreeEvtMsgFromISR(WxMsgType **ppEvtMsg);
 /* 创建消息资源池 */
 UINT32 WX_CreateMsgResPool(UINT32 itemNum);
 #endif

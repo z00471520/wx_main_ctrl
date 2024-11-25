@@ -7,23 +7,23 @@
 typedef enum {
     WX_MSG_SEND_TO_CORE,    /* 消息发送到其他核 */
     WX_MSG_SEND_TO_TASK,    /* 消息发送到本核任务 */
-} WxMsgSendMethod;
+} WxMsgTypeSendMethod;
 
 /* 路由项 */
-typedef struct tagWxMsgRouterListInfo {
+typedef struct tagWxMsgTypeRouterListInfo {
     UINT8 coreId; /* 所属的核ID */
     UINT8 resv;
     UINT16 res16;
     UINT32 resv32;
     WxTask *belongTask; /* 所属的任务, WxTask */
     WxModule *belongModule; /* 所属的模块, 作为入参 */
-} WxMsgRouter;
+} WxMsgTypeRouter;
 
 /* 消息路由表 */
-typedef struct tagWxMsgRouterListInfo {
+typedef struct tagWxMsgTypeRouterListInfo {
     UINT8 coreId;                       /* 当前路由表所属的核ID */
-    WxMsgRouter routers[WX_MODULE_BUTT]; /* 各模块消息的路由 */
-} WxMsgRouterList;
+    WxMsgTypeRouter routers[WX_MODULE_BUTT]; /* 各模块消息的路由 */
+} WxMsgTypeRouterList;
 
 UINT32 WX_MsgShedule_RegRouter(WxModuleId receiver, UINT8 coreId, 
     WxTask *belongTask, WxModule *belongModule, WxModuleEntryFunc entryFunc);

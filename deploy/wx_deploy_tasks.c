@@ -94,7 +94,7 @@ UINT32 WX_DeployTasks_DeployTask(WxTask *task, WxTaskDeploy *taskDeploy)
 
     /* 创建任务消息队列 */
     if (taskDeploy->msgQueDepth > 0) {
-        task->msgQueHandle = xQueueCreate(taskDeploy->msgQueDepth, sizeof(WxEvtMsg *));
+        task->msgQueHandle = xQueueCreate(taskDeploy->msgQueDepth, sizeof(WxMsgType *));
         if (task->msgQueHandle = NULL) {
             return WX_CREATE_MSG_QUE_FAIL;
         }

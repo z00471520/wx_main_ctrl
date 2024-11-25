@@ -38,7 +38,7 @@ UINT32 WX_CAN_DRIVER_B_Destruct(VOID *module)
     return WX_CAN_DRIVER_Destruct(module);
 }
 
-UINT32 WX_CAN_DRIVER_B_Entry(VOID *module, WxEvtMsg *evtMsg)
+UINT32 WX_CAN_DRIVER_B_Entry(VOID *module, WxMsgType *evtMsg)
 {
     WxCanDriver *this = WX_GetModuleInfo(module);
     if (this == NULL) {

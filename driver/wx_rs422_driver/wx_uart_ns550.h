@@ -1,5 +1,5 @@
-#ifndef WX_UART_NS550_H
-#define WX_UART_NS550_H
+#ifndef __WX_UART_NS550_H__
+#define __WX_UART_NS550_H__
 #include "wx_include.h"
 
 /* UART的中断配置信息 */

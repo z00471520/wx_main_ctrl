@@ -86,5 +86,5 @@ typedef enum {
 typedef struct {
     WX_INHERIT_MSG_HEADER
     UINT8  msgData[0]; /* 最大长度为：WX_EVT_MSG_DATA_SIZE */
-} WxMsg;
+} WxMsgType;
 #endif
