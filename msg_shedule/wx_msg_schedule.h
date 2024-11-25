@@ -1,13 +1,13 @@
-#ifndef WX_MSG_DISPATCH_H
-#define WX_MSG_DISPATCH_H
+#ifndef __WX_MSG_SCHEDULE_H__
+#define __WX_MSG_SCHEDULE_H__
 #include "wx_include.h"
 #include "wx_msg_intf.h"
 #include "wx_task_deploy.h"
 
 typedef enum {
-    WX_MSG_SEND_TO_CORE, /* 发送到其他核 */
-    WX_MSG_SEND_TO_TASK, /* 发送到任务 */
-    WX_MSG_SEND_TO_MODULE,  /* 发送到模块入口函数 */
+    WX_MSG_SEND_TO_CORE,    /* 消息发送到其他核 */
+    WX_MSG_SEND_TO_TASK,    /* 消息发送到任务 */
+    WX_MSG_SEND_TO_MODULE,  /* 消息发送到模块入口函数 */
 } WxMsgSendMethod;
 
 /* 路由项 */
@@ -28,6 +28,6 @@ typedef struct tagWxMsgRouterListInfo {
 
 UINT32 WX_MsgShedule_RegRouter(WxModuleId receiver, UINT8 coreId, 
     WxTask *belongTask, WxModule *belongModule, WxModuleEntryFunc entryFunc);
-
-
+/* 消息调度 */
+UINT32 WX_MsgShedule(UINT8 sender, UINT8 receiver, VOID *msg);
 #endif

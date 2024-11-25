@@ -9,7 +9,6 @@
 UINT8 g_curCoreId = WX_CORE_ID_0; /* 当前运行的核ID */
 
 
-
 /* 部署指定核的任务 */
 UINT32 WX_Deploy(UINT8 coreId)
 {
