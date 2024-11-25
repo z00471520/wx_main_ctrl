@@ -6,8 +6,7 @@
 
 typedef enum {
     WX_MSG_SEND_TO_CORE,    /* 消息发送到其他核 */
-    WX_MSG_SEND_TO_TASK,    /* 消息发送到任务 */
-    WX_MSG_SEND_TO_MODULE,  /* 消息发送到模块入口函数 */
+    WX_MSG_SEND_TO_TASK,    /* 消息发送到本核任务 */
 } WxMsgSendMethod;
 
 /* 路由项 */

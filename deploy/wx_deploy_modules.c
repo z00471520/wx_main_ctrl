@@ -29,7 +29,7 @@ WxModuleDeploy g_wxModuleDepolyInfos[] = {
         "driver_can_b",       /* 模块名 */
         WX_MODULE_DRIVER_CAN_A, /* 模块ID */
         WX_CORE_ID_0,               /* 模块运行的核 */
-        NULL,                       /* 驱动没有任务，不需要核内任务名 */
+        "task_driver",              /* 驱动没有任务，不需要核内任务名 */
         WX_CAN_DRIVER_A_Construct,   /* 模块构建函数-必选 */
         WX_CAN_DRIVER_A_Destruct,    /* 模块析构函数 */
         WX_CAN_DRIVER_A_Entry,       /* 模块消息 */
@@ -37,8 +37,8 @@ WxModuleDeploy g_wxModuleDepolyInfos[] = {
     {
         "driver_can_b",       /* 模块名 */
         WX_MODULE_DRIVER_CAN_B, /* 模块ID */
-        WX_CORE_ID_0,               /* 模块运行的核 */
-        NULL,                       /* 驱动没有任务，不需要核内任务名 */
+        WX_CORE_ID_0,                /* 模块运行的核 */
+        "task_driver",               /* 驱动没有任务，不需要核内任务名 */
         WX_CAN_DRIVER_B_Construct,   /* 模块构建函数-必选 */
         WX_CAN_DRIVER_B_Destruct,    /* 模块析构函数 */
         WX_CAN_DRIVER_B_Entry,       /* 模块消息 */

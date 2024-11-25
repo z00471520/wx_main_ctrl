@@ -22,9 +22,9 @@ WxTaskDeploy g_wxTaskDeployInfo[] = {
     },
     {
          .taskName = "task_driver",    /* 驱动任务 */
-         .msgQueDepth = 0,      /* 任务的消息队列深度为0 */
-         .stackDepth = 0, /* 任务的堆栈大小，详见说明 */
-         .priority = 0, /* 任务优先级 */
+         .msgQueDepth = 8192,      /* 任务的消息队列深度为0 */
+         .stackDepth = 1600, /* 任务的堆栈大小，详见说明 */
+         .priority = 8, /* 任务优先级 */
          .coreIdMask = WX_CORE_ID_0 + WX_CORE_ID_1 + WX_CORE_ID_2 + WX_CORE_ID_3, /* 任务部署到哪些CORE */
     },
     // /* if more please add here */

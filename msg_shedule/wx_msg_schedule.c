@@ -91,25 +91,6 @@ INLINE UINT32 WX_MsgShedule_ToTask(WxMsgRouter *receiver, VOID *msg)
     return WX_SUCCESS;
 }
 
-/* 发送到模块 */
-INLINE UINT32 WX_MsgShedule_ToModule(WxMsgRouter *receiver, VOID *msg)
-{
-    UINT32 ret = WX_SUCCESS;
-    do {
-        WxModule *module = receiver->belongModule;
-        if (module == NULL) {
-            ret = WX_MSG_DISPATCH_RECVER_UNREG_MSG_ROUTER;
-            break;
-        }
-        if (module->entryFunc == NULL) {
-            ret = WX_MSG_DISPATCH_RECVER_UNREG_MSG_ROUTER;
-            break;
-        }
-
-        ret = module->entryFunc(module,msg);
-    } while (0);
-    return ret
-}
 
 /*
  * 函数功能：消息调度，用于发送消息到指定的模块
@@ -139,10 +120,6 @@ UINT32 WX_MsgShedule(UINT8 sender, UINT8 receiver, VOID *msg)
             ret = WX_MsgShedule_ToTask(dstRouter, msg);
             return ret;
         }         
-        case WX_MSG_SEND_TO_MODULE: {
-            ret = WX_MsgShedule_ToModule(dstRouter, msg);
-            return ret;
-        }
         default:
             return WX_MSG_DISPATCH_INVALID_SEND_METHOD;
     }
