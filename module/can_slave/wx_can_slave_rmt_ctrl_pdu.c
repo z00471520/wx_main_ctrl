@@ -76,10 +76,10 @@ UINT32 WX_CAN_SLAVE_SendFrame2CanIf(WxCanSlaveModule *this, WxCanFrame *frame)
     /* 填写消息信息 */
     canFrameMsg->canFrame = *frame;
     canFrameMsg->msgHead.sender = this->moduleId;
-    canFrameMsg->msgHead.receiver = (this->moduleId == WX_TASK_MODULE_CAN_SLAVE_A) ?
-        WX_DRIVER_MODULE_CAN_SLAVE_A : WX_DRIVER_MODULE_CAN_SLAVE_B;
+    canFrameMsg->msgHead.receiver = (this->moduleId == WX_MODULE_CAN_SLAVE_A) ?
+        WX_MODULE_DRIVER_CAN_A : WX_MODULE_DRIVER_CAN_B;
     canFrameMsg->msgHead.msgType = WX_MSG_TYPE_CAN_FRAME;
-    canFrameMsg->msgHead.msgBodyLen = sizeof(WxCanFrame);
+    canFrameMsg->msgHead.msgDataLen = sizeof(WxCanFrame);
     /* 发送消息 */
     UINT32 ret = WX_MsgShedule(his->moduleId, canFrameMsg->msgHead.receiver, canFrameMsg);
     if (ret != WX_SUCCESS) {

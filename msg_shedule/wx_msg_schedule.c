@@ -94,14 +94,21 @@ INLINE UINT32 WX_MsgShedule_ToTask(WxMsgRouter *receiver, VOID *msg)
 /* 发送到模块 */
 INLINE UINT32 WX_MsgShedule_ToModule(WxMsgRouter *receiver, VOID *msg)
 {
-    WxModule *module = receiver->belongModule;
-    if (module == NULL) {
-        return WX_MSG_DISPATCH_RECVER_UNREG_MSG_ROUTER;
-    }
-    if (module->entryFunc == NULL) {
-        return WX_MSG_DISPATCH_RECVER_UNREG_MSG_ROUTER;
-    }
-    return module->entryFunc(module,msg);
+    UINT32 ret = WX_SUCCESS;
+    do {
+        WxModule *module = receiver->belongModule;
+        if (module == NULL) {
+            ret = WX_MSG_DISPATCH_RECVER_UNREG_MSG_ROUTER;
+            break;
+        }
+        if (module->entryFunc == NULL) {
+            ret = WX_MSG_DISPATCH_RECVER_UNREG_MSG_ROUTER;
+            break;
+        }
+
+        ret = module->entryFunc(module,msg);
+    } while (0);
+    return ret
 }
 
 /*
@@ -118,19 +125,24 @@ UINT32 WX_MsgShedule(UINT8 sender, UINT8 receiver, VOID *msg)
         return ret;
     }
 
-    WxEvtMsgHeader *msgHead = (WxEvtMsgHeader *)msg;
+    WxEvtMsg *msgHead = (WxEvtMsg *)msg;
     msgHead->sender = sender;
     msgHead->receiver = receiver;
     WxMsgRouter *dstRouter = &g_wxMsgRouterList->routers[receiver];
     WxMsgRouter *srcRouter = &g_wxMsgRouterList->routers[sender];
     WxMsgSendMethod sendMethod = WX_MsgSchedule_CalcMsgSendMethod(srcRouter, dstRouter);
     switch (sendMethod) {
-        case WX_MSG_SEND_TO_CORE:
+        case WX_MSG_SEND_TO_CORE: {
             return WX_MsgShedule_ToCore(dstRouter, msg);
-        case WX_MSG_SEND_TO_TASK:            
-            return WX_MsgShedule_ToTask(dstRouter, msg);
-        case WX_MSG_SEND_TO_MODULE:
-            return WX_MsgShedule_ToModule(dstRouter, msg);
+        }
+        case WX_MSG_SEND_TO_TASK: {
+            ret = WX_MsgShedule_ToTask(dstRouter, msg);
+            return ret;
+        }         
+        case WX_MSG_SEND_TO_MODULE: {
+            ret = WX_MsgShedule_ToModule(dstRouter, msg);
+            return ret;
+        }
         default:
             return WX_MSG_DISPATCH_INVALID_SEND_METHOD;
     }

@@ -36,7 +36,7 @@ UINT32 WX_RS422I_MASTER_EncodeAduWriteDataReq(WxRs422IMasterMsg *txMsg, WxRs422I
 
     /* the length size can be used to encode */
     UINT16 lelfLen = WX_RS422_ADU_MSX_SIZE - txAdu->valueLen - WX_MODBUS_CRC_LEN; /* the crc and adu len */
-    UINT32 rc = encodeInfo->dataStrucEncodeFunc(txAdu->value[txAdu->valueLen], lelfLen, &txMsg->msgBody[0]);
+    UINT32 rc = encodeInfo->dataStrucEncodeFunc(txAdu->value[txAdu->valueLen], lelfLen, &txMsg->msgData[0]);
     if (rc != WX_SUCCESS) {
         return rc;
     }

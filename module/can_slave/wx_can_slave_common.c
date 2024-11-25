@@ -41,8 +41,8 @@ WxRmtCtrlReqHandle g_wxRmtCtrlReqHandles[WX_RMT_CTRL_CODE_BUTT] = {
 
 UINT32 WX_CAN_SLAVE_CheckCanFrameMsg(WxCanFrameMsg *msg)
 {
-    if (msg->msgHead.msgBodyLen != sizeof(WxCanFrame)) {
-        wx_critical(WX_EXCP_INVALID_MSG_BODY_LEN, "Error Exit: Invalid msgLen(%u)", msg->msgHead.msgBodyLen);
+    if (msg->msgHead.msgDataLen != sizeof(WxCanFrame)) {
+        wx_critical(WX_EXCP_INVALID_MSG_BODY_LEN, "Error Exit: Invalid msgLen(%u)", msg->msgHead.msgDataLen);
         return WX_INVALID_MSG_BODY_LEN;
     }
 
@@ -103,39 +103,8 @@ UINT32 WX_CAN_SLAVE_ProcCanFrameMsg(WxCanSlaveModule *this, WxEvtMsg *evtMsg)
     return WX_SUCCESS;
 }
 
-/* 创建RS422I主机任务, 参数合法性由调用者保证 */
-UINT32 WX_CAN_DRIVER_SALVE_CreateTask(WxCanSlaveModule *this, WxCanSlaveCfgInfo *cfg)
-{
-    /* 初始化设备 */
-    UINT32 ret = WX_CAN_DRIVER_InitialDevice(&this->canInst, &cfg->deviceCfgInfo);
-    if (ret != WX_SUCCESS) {
-        return ret;
-    }
-
-    /* 设置中断 */
-    ret = WX_CAN_DRIVER_SetupCanInterrupt(&this->canInst, &cfg->intrCfgInfo);
-    if (ret != WX_SUCCESS) {
-        return ret;
-    }
-
-    /* Create the task, storing the handle. */
-    ret = WX_CreateTask(&this->handle, &cfg->taskCfg);
-    return ret;
-}
-
 UINT32 WX_CAN_SLAVE_Constuct(WxCanSlaveModule *this, WxCanSlaveCfgInfo *cfg)
 {
-    /* 初始化设备 */
-    UINT32 ret = WX_CAN_DRIVER_InitialDevice(&this->canInst, &cfg->deviceCfgInfo);
-    if (ret != WX_SUCCESS) {
-        return ret;
-    }
 
-    /* 设置中断 */
-    ret = WX_CAN_DRIVER_SetupCanInterrupt(&this->canInst, &cfg->intrCfgInfo);
-    if (ret != WX_SUCCESS) {
-        return ret;
-    }
-
-    return ret;
+    return WX_SUCCESS;
 }

@@ -21,6 +21,6 @@ UINT32 WX_RS422I_MASTER_DecodeAduReadDataResponce(WxRs422IMasterTask *this, WxMo
         return WX_RS422I_MASTER_RECV_RSP_RD_GET_DEC_FUNC_FAIL;
     }
     /* 调用解码函数解码，把数据流解码到结构体  */
-    UINT32 rc = decFunc(&rxAdu->value[WX_MODBUS_ADU_RD_RSP_DATA_START_IDX], rxAdu->valueLen - WX_MODBUS_ADU_RD_RSP_DATA_START_IDX, (WxRs422IReadDataRsp *)rspMsp->msgBody);
+    UINT32 rc = decFunc(&rxAdu->value[WX_MODBUS_ADU_RD_RSP_DATA_START_IDX], rxAdu->valueLen - WX_MODBUS_ADU_RD_RSP_DATA_START_IDX, (WxRs422IReadDataRsp *)rspMsp->msgData);
     return rc;
 }

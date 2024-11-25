@@ -28,4 +28,9 @@ typedef struct {
     WxModuleEntryFunc       entryFunc;     /* 模块消息处理函数 */
 } WxModule;
 
+#define WX_GetModuleName(m)         (((WxModule *)m)->moduleName)
+#define WX_GetModuleInfo(m)         (((WxModule *)m)->moduleInfo)
+#define WX_SetModuleInfo(m, v)      (((WxModule *)m)->moduleInfo = (v))
+#define WX_GetModuleCoreId(m)       (((WxModule *)m)->coreId)
+
 #endif // __WX_DEPLOY_MODULE_H__

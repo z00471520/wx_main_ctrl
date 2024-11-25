@@ -180,7 +180,7 @@ UINT32 WX_RS422I_MASTER_CreateTask(VOID)
             return WX_RS422I_MASTER_CREATE_MSG_QUE_FAIL;
         }
     }
-    rc = WX_RegMsgQue(WX_TASK_MODULE_RS422_I_MASTER, this->msgQueHandle, sizeof(WxRs422IMasterMsg));
+    rc = WX_RegMsgQue(WX_MODULE_RS422_I_MASTER, this->msgQueHandle, sizeof(WxRs422IMasterMsg));
     if (rc != WX_SUCCESS) {
         return rc;
     }

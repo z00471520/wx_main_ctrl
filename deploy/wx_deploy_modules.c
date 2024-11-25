@@ -3,11 +3,13 @@
 #include "wx_deploy_tasks.h"
 #include "wx_include.h"
 #include "wx_msg_schedule.h"
+#include "wx_can_driver_b.h"
+#include "wx_can_driver_a.h"
 /* 模块部署信息 */
 WxModuleDeploy g_wxModuleDepolyInfos[] = {
     {
-        "module_can_slave_a",      /* 模块名 */
-        WX_TASK_MODULE_CAN_SLAVE_A,/* 模块ID */
+        "can_slave_a",      /* 模块名 */
+        WX_MODULE_CAN_SLAVE_A,/* 模块ID */
         WX_CORE_ID_0,              /* 模块运行的核  */
         "task_main",               /* 模块运行的核内任务名 */
         WX_CAN_SLAVE_A_Construct,  /* 模块构建函数-必选 */
@@ -15,13 +17,31 @@ WxModuleDeploy g_wxModuleDepolyInfos[] = {
         WX_CAN_SLAVE_A_Entry,      /* 模块消息 */
     },
     {
-        "module_can_slave_a",       /* 模块名 */
-        WX_TASK_MODULE_CAN_SLAVE_B, /* 模块ID */
+        "can_slave_b",       /* 模块名 */
+        WX_MODULE_CAN_SLAVE_B, /* 模块ID */
         WX_CORE_ID_0,               /* 模块运行的核 */
         "task_main",                /* 模块运行的核内任务名, 需要保证核内有改函数 */
         WX_CAN_SLAVE_B_Construct,   /* 模块构建函数-必选 */
         WX_CAN_SLAVE_B_Destruct,    /* 模块析构函数 */
         WX_CAN_SLAVE_B_Entry,       /* 模块消息 */
+    },
+    {
+        "driver_can_b",       /* 模块名 */
+        WX_MODULE_DRIVER_CAN_A, /* 模块ID */
+        WX_CORE_ID_0,               /* 模块运行的核 */
+        NULL,                       /* 驱动没有任务，不需要核内任务名 */
+        WX_CAN_DRIVER_A_Construct,   /* 模块构建函数-必选 */
+        WX_CAN_DRIVER_A_Destruct,    /* 模块析构函数 */
+        WX_CAN_DRIVER_A_Entry,       /* 模块消息 */
+    },
+    {
+        "driver_can_b",       /* 模块名 */
+        WX_MODULE_DRIVER_CAN_B, /* 模块ID */
+        WX_CORE_ID_0,               /* 模块运行的核 */
+        NULL,                       /* 驱动没有任务，不需要核内任务名 */
+        WX_CAN_DRIVER_B_Construct,   /* 模块构建函数-必选 */
+        WX_CAN_DRIVER_B_Destruct,    /* 模块析构函数 */
+        WX_CAN_DRIVER_B_Entry,       /* 模块消息 */
     },
 };
 

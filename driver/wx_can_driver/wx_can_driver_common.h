@@ -9,8 +9,9 @@ typedef struct {
     UINT8 syncJumpWidth; /* SyncJumpWidth is the Synchronization Jump Width value to set. Valid values are from 0 to 3 */
     UINT8 timeSegment1;  /* TimeSegment1 is the Time Segment 1 value to set. Valid values are from 0 to 15 */
     UINT8 timeSegment2;  /* TimeSegment2 is the Time Segment 2 value to set. Valid values are from 0 to 7 */
+    UINT32 bufferQueLen; /* 缓冲CAN帧数量 */
     /* if more please add here */
-} WxCanDeviceCfgInfo;
+} WxCanDriverCfg;
 
 typedef struct {
     UINT32 intrId;  /* 中断ID */
@@ -19,7 +20,7 @@ typedef struct {
     XCanPs_ErrorHandler errHandle;      /* 错误Handle */
     XCanPs_EventHandler eventHandle;    /* 事件Handle */
     VOID *callBackRef;                  /* 中断Handle处理函数 */
-} WxCanIntrCfgInfo;
+} WxCanDriverIntrCfg;
 
 typedef struct {
     UINT32 standardMessID;      /* 11:bit, Standard Message ID
@@ -59,7 +60,14 @@ typedef struct {
     UINT8 data[WX_CAN_DRIVER_MAX_DATA_LEN]; /* Data Byte 0~8 */
 } WxCanFrame;
 
-UINT32 WX_CAN_DRIVER_InitialDevice(XCanPs *canInstPtr, WxCanDeviceCfgInfo *cfg);
-UINT32 WX_CAN_DRIVER_SetupCanInterrupt(XCanPs *canInstPtr, WxCanIntrCfgInfo *cfg);
-UINT32 WX_CAN_DRIVER_SendFrame(XCanPs *canInstPtr, WxCanFrame *frame);
+
+typedef struct {
+    XCanPs canInst;
+    QueueHandle_t sendQueue;
+    WxModuleId moduleId;
+    UINT32 resv;
+} WxCanDriver;
+UINT32 WX_CAN_DRIVER_Entry(WxCanDriver *this, WxEvtMsg *evtMsg);
+UINT32 WX_CAN_DRIVER_Destruct(VOID *module);
+UINT32 WX_CAN_DRIVER_Constuct(WxCanDriver *this, WxCanDriverCfg *cfg, WxCanDriverIntrCfg *intrCfg);
 #endif

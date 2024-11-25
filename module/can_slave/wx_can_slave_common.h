@@ -44,8 +44,8 @@ typedef struct
 
 typedef struct {
     WxCanSlaveSelfDefCfg selfDefCfg;
-    WxCanDeviceCfgInfo deviceCfgInfo; /* CAN设备配置信息 */ 
-    WxCanIntrCfgInfo intrCfgInfo; /* 中断配置信息 */
+    WxCanDriverCfg deviceCfgInfo; /* CAN设备配置信息 */ 
+    WxCanDriverIntrCfg intrCfgInfo; /* 中断配置信息 */
 } WxCanSlaveCfgInfo;
 
 #define WX_CAN_DRIVER_FRAME_LIST_MAX_ITERM_NUM 200
