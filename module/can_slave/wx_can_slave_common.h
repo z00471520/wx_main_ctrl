@@ -58,6 +58,8 @@ typedef struct
 /* CAN从机任务信息 */
 typedef struct {
     XCanPs canInst;                 /* 当前任务处理的Can实例 */
+    WxModuleId moduleId;            /* 当前模块的ID */
+    UINT32 resv;                    /* 保留字段 */
     WxRmtCtrlReqMsg reqMsg;         /* CAN 遥控请求请求 */
     WxRmtCtrlPdu reqPdu;            /* CAN Req PDU */
     WxRmtCtrlPdu rspPdu;            /* CAN RSP PDU */

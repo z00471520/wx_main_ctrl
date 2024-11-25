@@ -1,7 +1,8 @@
 #include "wx_can_slave_common.h"
 #include "wx_can_slave_rmt_ctrl_pdu.h"
-#include "wx_evt_msg_res_pool.h"
+#include "wx_msg_res_pool.h"
 #include "wx_msg_can_frame_intf.h"
+#include "wx_msg_schedule.h"
 UINT32 WX_CAN_SLAVE_DecRmtCtrlPduReset(WxCanSlaveModule *this, WxRmtCtrlPdu *pdu, WxRmtCtrlReqMsg *msg)
 {
     return WX_SUCCESS;
@@ -62,12 +63,30 @@ UINT32 WX_CAN_SLAVE_EncapPdu2CanFrames(WxCanSlaveModule *this, WxRmtCtrlPdu *pdu
 }
 
 /* 把CAN FRAME发送到软件缓存队列中 */
-UINT32 WX_CAN_SLAVE_SendFrame2TxBuff(WxCanSlaveModule *this, WxCanFrame *frame)
+UINT32 WX_CAN_SLAVE_SendFrame2CanIf(WxCanSlaveModule *this, WxCanFrame *frame)
 {
-    
     UINT32 ret;
+    /* 申请消息 */
     WxCanFrameMsg *canFrameMsg = WX_ApplyEvtMsg(WX_MSG_TYPE_CAN_FRAME);
-    
+    if (canFrameMsg == NULL) {
+        return WX_APPLY_EVT_MSG_ERR;
+    }
+    /* 初始化消息头 */
+    WX_CLEAR_OBJ(&canFrameMsg->msgHead);
+    /* 填写消息信息 */
+    canFrameMsg->canFrame = *frame;
+    canFrameMsg->msgHead.sender = this->moduleId;
+    canFrameMsg->msgHead.receiver = (this->moduleId == WX_TASK_MODULE_CAN_SLAVE_A) ?
+        WX_DRIVER_MODULE_CAN_SLAVE_A : WX_DRIVER_MODULE_CAN_SLAVE_B;
+    canFrameMsg->msgHead.msgType = WX_MSG_TYPE_CAN_FRAME;
+    canFrameMsg->msgHead.msgBodyLen = sizeof(WxCanFrame);
+    /* 发送消息 */
+    UINT32 ret = WX_MsgShedule(his->moduleId, canFrameMsg->msgHead.receiver, canFrameMsg);
+    if (ret != WX_SUCCESS) {
+        WX_FreeEvtMsg(&canFrameMsg);
+    }
+
+    return ret;
 }
 
 /* 把CAM FRAME集合发送给CANIF传输 */
@@ -76,18 +95,8 @@ UINT32 WX_CAN_SLAVE_SendCanFrameList2CanIf(WxCanSlaveModule *this, WxCanFrameLis
     UINT32 ret;
      /* 通知CAN DRIVER发送Frame */
     for (UINT32 i = 0; i < canFrameList->canFrameNum; i++) {
-        /* 首先调用驱动进行发送，如果硬件缓存满了，则把消息发送软件缓存队列中 */
-        ret = WX_CAN_DRIVER_SendFrame(&this->canInst, &canFrameList->canFrames[i]);
-        if (ret == WX_SUCCESS) {
-            continue; /* 能装就继续装 */
-        }
-
-        /* 如果驱动发送失败并且失败原因不是缓存满了，则直接返回错误 */
-        if (ret != WX_CAN_DRIVER_CONFIG_TX_BUFF_FULL) {
-            return ret;
-        }
         /* 缓存满了，则把消息发送软件缓存队列中 */
-        ret = WX_CAN_SLAVE_SendFrame2TxBuff(this, &canFrameList->canFrames[i]);
+        ret = WX_CAN_SLAVE_SendFrame2CanIf(this, &canFrameList->canFrames[i]);
         if (ret != WX_SUCCESS) {
             /* 这里出现问题，需要好好定位下，可能是发送中断写的有问题，或者是缓存太小了 */
             return ret;
@@ -106,6 +115,7 @@ UINT32 WX_CAN_SLAVE_SendPdu2CanIf(WxCanSlaveModule *this, WxRmtCtrlPdu *pdu)
     if (ret != WX_SUCCESS) {
         return ret;
     }
+
     ret = WX_CAN_SLAVE_SendCanFrameList2CanIf(this, canFrameList);
     if (ret != WX_SUCCESS) {
         return ret;
