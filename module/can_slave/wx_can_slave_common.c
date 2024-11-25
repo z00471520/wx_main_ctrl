@@ -7,7 +7,7 @@
 #include "wx_can_slave_rmt_ctrl_pdu.h"
 #include "wx_can_slave_rmt_ctrl_msg.h"
 #include "wx_task_deploy.h"
-#include "wx_msg_intf.h"
+#include "wx_msg_common.h"
 #include "wx_can_slave_common.h"
 WxCanSlaveCfgInfo g_wxCanSlaveCfg[WX_CAN_DRIVER_TYPE_BUTT] = {
     [WX_CAN_DRIVER_TYPE_A] = {

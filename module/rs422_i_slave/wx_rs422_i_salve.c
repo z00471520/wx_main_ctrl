@@ -235,10 +235,10 @@ UINT32 WX_RS422I_Slave_CreateTask(VOID)
     WxRs422ISlaveTask *this = &g_wxRs422ISlaveTask;
     /* create the msg que to buff the msg to tx */
     if (this->msgQueHandle == 0) {
-        this->msgQueHandle = xQueueCreate(WX_RS422I_MASTER_MSG_ITERM_MAX_NUM, sizeof(WxRs422IMasterMsg));
+        this->msgQueHandle = xQueueCreate(WX_RS422_MASTER_MSG_ITERM_MAX_NUM, sizeof(WxRs422IMasterMsg));
         if (this->msgQueHandle == 0) {
             wx_log(WX_CRITICAL, "Error Exit: xQueueCreate fail");
-            return WX_RS422I_MASTER_CREATE_MSG_QUE_FAIL;
+            return WX_RS422_MASTER_CREATE_MSG_QUE_FAIL;
         }
     }
 

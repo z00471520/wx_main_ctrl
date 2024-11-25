@@ -2,7 +2,7 @@
 #include "wx_task.h"
 #include "wx_include.h"
 #include "wx_task_deploy.h"
-#include "wx_msg_intf.h"
+#include "wx_msg_common.h"
 #include "wx_evt_msg_res_pool.h"
 #include "wx_can_slave_a.h"
 #include "wx_can_slave_b.h"

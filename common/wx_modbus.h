@@ -70,6 +70,7 @@
 
 typedef struct {
     UINT16 valueLen;
+    UINT16 expectRspLen; /* 期望的响应长度 */
     UINT8 value[WX_MODBUS_ADU_MAX_SIZE]; /* 数组 */
 } WxModbusAdu;
 

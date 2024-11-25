@@ -1,6 +1,6 @@
 
 #include "wx_include.h"
-#include "wx_msg_intf.h"
+#include "wx_msg_common.h"
 #include "wx_can_driver_common.h"
 
 /* CAN 设备配置 */

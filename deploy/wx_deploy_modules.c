@@ -5,6 +5,7 @@
 #include "wx_msg_schedule.h"
 #include "wx_can_driver_b.h"
 #include "wx_can_driver_a.h"
+#include "wx_rs422_driver_master.h"
 /* 模块部署信息 */
 WxModuleDeploy g_wxModuleDepolyInfos[] = {
     {
@@ -42,6 +43,15 @@ WxModuleDeploy g_wxModuleDepolyInfos[] = {
         WX_CAN_DRIVER_B_Construct,   /* 模块构建函数-必选 */
         WX_CAN_DRIVER_B_Destruct,    /* 模块析构函数 */
         WX_CAN_DRIVER_B_Entry,       /* 模块消息 */
+    },
+     {
+        "driver_rs422_master",       /* 模块名 */
+        WX_MODULE_DRIVER_RS422_MASTER, /* 模块ID */
+        WX_CORE_ID_0,                /* 模块运行的核 */
+        "task_driver",               /* 驱动没有任务，不需要核内任务名 */
+        WX_RS422_DRIVER_MASTER_Construct,   /* 模块构建函数-必选 */
+        WX_RS422_DRIVER_MASTER_Destruct,    /* 模块析构函数 */
+        WX_RS422_DRIVER_MASTER_Entry,       /* 模块消息 */
     },
 };
 

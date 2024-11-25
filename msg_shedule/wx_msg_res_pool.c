@@ -1,5 +1,5 @@
 #include "wx_include.h"
-#include "wx_msg_intf.h"
+#include "wx_msg_common.h"
 #define TASK_EVT_MSG_NODE_NUM           8196 /* 一个任务的消息队列支持的消息节点数 */
 typedef struct {
     QueueHandle_t evtMsgQue;

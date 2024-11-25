@@ -3,7 +3,7 @@
 #include "xcanps.h"
 #include "xparameters.h"
 #include "xil_printf.h"
-#include "wx_msg_intf.h"
+#include "wx_msg_common.h"
 
 /* 设置CAN中断 */
 UINT32 WX_CAN_DRIVER_InitialInterrupt(XCanPs *canInstPtr, WxCanDriverIntrCfg *cfg)
