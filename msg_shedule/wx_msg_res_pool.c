@@ -39,7 +39,7 @@ WxEvtMsg *WX_ApplyEvtMsgFromISR(WxMsgType msgType)
     if (xQueueReceiveFromISR(g_wxEvtMsgPool->evtMsgQue, (void *)&evtMsg, (TickType_t)0) != pdPASS) {
         return NULL;
     }
-    evtMsg->msgHead.msgType = msgType;
+    evtMsg->msgType = msgType;
     return evtMsg;
 }
 

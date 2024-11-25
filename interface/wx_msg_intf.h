@@ -46,6 +46,8 @@ typedef enum {
     WX_MODULE_DRIVER_CAN_B,
     WX_MODULE_DRIVER_RS422_MASTER,
     WX_MODULE_DRIVER_RS422_SLAVE,
+    WX_MODULE_DIRVER_UART
+    WX_MODULE_DEBUG,
     /* if more please add here */
     WX_MODULE_BUTT,
 } WxModuleId;
@@ -57,6 +59,7 @@ typedef enum {
     WX_MSG_TYPE_INVALID,
     WX_MSG_TYPE_REMOTE_CTRL,        /* 遥控消息， see wx_remote_ctrl_msg_def.h for detail */
     WX_MSG_TYPE_CAN_FRAME,          /* CAN FRAME消息，see wx_msg_can_frame_intf.h.h for detail */
+    WX_MSG_TYPE_BEBUG,
     WX_RS422I_MASTER_MSG_READ_DATA,        /* 读数据请求, 子类型：WxRs422IReadDataType,  消息体为：NA */
     WX_RS422I_MASTER_MSG_READ_DATA_RSP,    /* 读数据响应, 子类型：WxRs422IReadDataType,  消息体为：WxRs422IReadDataRsp */
     WX_RS422I_MASTER_MSG_WRITE_DATA,       /* 写数据请求, 子类型：WxRs422IWriteDataType, 消息体为: WxRs422IWriteData */
@@ -70,15 +73,17 @@ typedef enum {
 } WxMsgType;
 #define WX_IsValidMsgType(t) ((t) > WX_MSG_TYPE_INVALID && (t) < WX_MSG_TYPE_BUTT)
 
+#define WX_INHERIT_MSG_HEADER \
+    UINT32 transID;  /* 消息对应的事务ID */ \  
+    UINT8 sender;     /* 消息发送模块ID, 详见: WxModuleId */ \
+    UINT8 receiver; /* 消息接收模块ID, 详见: WxModuleId */ \
+   	UINT16 msgType; /* 消息类型, 详见枚举 WxMsgType 定义 */ \
+    UINT16 msgSubType; /* 消息子类型, 由大类确定 */ \
+    UINT16 msgDataLen; /* 消息体实际长度 --- msgData的长度, 必选：不能超过，WX_MSG_DEFAULT_BODY_SIZE */\
+    UINT16 outEvent  /* 消息处理的出事件， WX_SUCCESS - 表示成功 */
+   
 typedef struct {
-    UINT32 transID;    /* 消息对应的事务ID */
-    UINT8 sender;   /* 消息发送模块ID, 详见: WxModuleId */
-    UINT8 receiver; /* 消息接收模块ID, 详见: WxModuleId */
-   	UINT16 msgType;    /* 消息类型, 详见枚举 WxMsgType 定义 */
-    UINT16 msgSubType; /* 消息子类型, 由大类确定 */
-    UINT16 msgDataLen; /* 消息体实际长度 --- msgData的长度, 必选：不能超过，WX_MSG_DEFAULT_BODY_SIZE */
-    UINT16 outEvent;   /* 消息处理的出事件， WX_SUCCESS - 表示成功 */
+    WX_INHERIT_MSG_HEADER
     UINT8  msgData[0]; /* 最大长度为：WX_EVT_MSG_DATA_SIZE */
-} WxEvtMsg;
-
+} WxMsg;
 #endif
