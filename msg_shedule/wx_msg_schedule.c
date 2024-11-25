@@ -2,6 +2,7 @@
 #include "wx_failcode.h"
 #include "wx_msg_intf.h"
 #include "wx_task_deploy.h"
+#include "wx_include.h"
 WxMsgRouterList *g_wxMsgRouterList = NULL;
 
 /* 创建消息调度的路由表 */
@@ -63,14 +64,14 @@ INLINE UINT32 WX_MsgShedule_CheckInput(UINT8 sender, UINT8 receiver, VOID *msg)
     return WX_SUCCESS;
 }
 /* 计算消息的发送方式 */
-INLINE WxMsgSendMethod WX_MsgSchedule_CalcMsgSendMethod(WxMsgRouter *sender, WxMsgRouter *receiver)
+WxMsgSendMethod WX_MsgSchedule_CalcMsgSendMethod(WxMsgRouter *sender, WxMsgRouter *receiver)
 {
     /* 核不同不能直接发送消息 */
     if (receiver->coreId != sender->coreId) {
         return WX_MSG_SEND_TO_CORE;
+    } else {
+        return WX_MSG_SEND_TO_TASK;
     }
-    /* 如果是驱动任务，驱动任务没有缓存队列（这里的指针不可能为NULL） */
-    return (receiver->belongTask->msgQueHandle) ?  WX_MSG_SEND_TO_TASK : WX_MSG_SEND_TO_MODULE;
 }
 
 /* 发送消息到其他核 TODO*/
@@ -81,10 +82,17 @@ UINT32 WX_MsgShedule_ToCore(WxMsgRouter *receiver, VOID *msg)
 }
 
 /* 发送消息到任务 */
-INLINE UINT32 WX_MsgShedule_ToTask(WxMsgRouter *receiver, VOID *msg)
+UINT32 WX_MsgShedule_ToTask(WxMsgRouter *receiver, VOID *msg)
 {
     WxTask *task = receiver->belongTask;
-    if (xQueueSend(task->msgQueHandle, (const void * )&msg, (TickType_t)0 ) != pdTRUE) {
+    WxMsg *msgHead = (WxMsg *)msg;
+    UINT32 sendResult;
+    if (msgHead->isFromIsr) {
+        sendResult = xQueueSendFromISR(task->msgQueHandle, (const void * )&msg, (TickType_t)0);
+    } else {
+        sendResult = xQueueSend(task->msgQueHandle, (const void * )&msg, (TickType_t)0);
+    }
+    if (sendResult != pdTRUE) {
         task->msgQueFullCnt++;
         return WX_MSG_DISPATCH_MSG_QUE_FULL;
     }

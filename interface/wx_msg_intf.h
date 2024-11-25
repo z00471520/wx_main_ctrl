@@ -73,15 +73,16 @@ typedef enum {
 } WxMsgType;
 #define WX_IsValidMsgType(t) ((t) > WX_MSG_TYPE_INVALID && (t) < WX_MSG_TYPE_BUTT)
 
-#define WX_INHERIT_MSG_HEADER \
-    UINT32 transID;  /* 消息对应的事务ID */ \  
+#define WX_INHERIT_MSG_HEADER                                   \
+    UINT32 transID;  /* 消息对应的事务ID */                     \  
     UINT8 sender;     /* 消息发送模块ID, 详见: WxModuleId */ \
     UINT8 receiver; /* 消息接收模块ID, 详见: WxModuleId */ \
    	UINT16 msgType; /* 消息类型, 详见枚举 WxMsgType 定义 */ \
     UINT16 msgSubType; /* 消息子类型, 由大类确定 */ \
     UINT16 msgDataLen; /* 消息体实际长度 --- msgData的长度, 必选：不能超过，WX_MSG_DEFAULT_BODY_SIZE */\
-    UINT16 outEvent  /* 消息处理的出事件， WX_SUCCESS - 表示成功 */
-   
+    UINT8 outEvent;  /* 消息处理的出事件， WX_SUCCESS - 表示成功 */ \
+    UINT8 isFromIsr: 1; /* 消息是否来自中断，1-来自中断，0-来自任务 */ \
+    UINT8 resv: 7;  /* 保留位 */
 typedef struct {
     WX_INHERIT_MSG_HEADER
     UINT8  msgData[0]; /* 最大长度为：WX_EVT_MSG_DATA_SIZE */

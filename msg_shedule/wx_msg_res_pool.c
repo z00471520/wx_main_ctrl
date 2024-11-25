@@ -39,7 +39,9 @@ WxEvtMsg *WX_ApplyEvtMsgFromISR(WxMsgType msgType)
     if (xQueueReceiveFromISR(g_wxEvtMsgPool->evtMsgQue, (void *)&evtMsg, (TickType_t)0) != pdPASS) {
         return NULL;
     }
+    WX_CLEAR_OBJ(evtMsg);
     evtMsg->msgType = msgType;
+    evtMsg->isFromISR = TRUE;
     return evtMsg;
 }
 
@@ -49,7 +51,8 @@ WxEvtMsg *WX_ApplyEvtMsg(WxMsgType msgType)
     if (xQueueReceive(g_wxEvtMsgPool->evtMsgQue, (void *)&evtMsg, (TickType_t)0) != pdPASS) {
         return NULL;
     }
-
+    WX_CLEAR_OBJ(evtMsg);
+    evtMsg->msgType = msgType;
     return evtMsg;
 }
 /* 释放消息, msg释放后会设置为空 */
