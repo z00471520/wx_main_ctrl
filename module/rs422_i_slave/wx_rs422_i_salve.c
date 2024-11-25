@@ -16,7 +16,7 @@ WxRs422ISlaveTaskCfgInfo g_wxRs422ISlaveCfgInfo = {
     .rs422Format.DataBits = XUN_FORMAT_8_BITS,
     .rs422Format.Parity = XUN_FORMAT_NO_PARITY,
     .rs422Format.StopBits = XUN_FORMAT_1_STOP_BIT,
-    .rs422IntrCfg.handle = WX_RS422I_MASTER_IntrHandler,
+    .rs422IntrCfg.handle = WX_RS422I_DRIVER_MASTER_IntrHandler,
     .rs422IntrCfg.callBackRef = &g_wxRs422ISlaveCfgInfo,
     .rs422IntrCfg.intrId = , /* 中断ID */
 };

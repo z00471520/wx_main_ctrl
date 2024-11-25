@@ -3,5 +3,5 @@
 #include "wx_task_deploy.h"
 UINT32 WX_CAN_SLAVE_A_Construct(VOID *module);
 UINT32 WX_CAN_SLAVE_A_Destruct(VOID *module);
-UINT32 WX_CAN_SLAVE_A_Entry(VOID *module, WxMsgType *evtMsg);
+UINT32 WX_CAN_SLAVE_A_Entry(VOID *module, WxMsg *evtMsg);
 #endif

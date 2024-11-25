@@ -85,7 +85,7 @@ UINT32 WX_MsgShedule_ToCore(WxMsgTypeRouter *receiver, VOID *msg)
 UINT32 WX_MsgShedule_ToTask(WxMsgTypeRouter *receiver, VOID *msg)
 {
     WxTask *task = receiver->belongTask;
-    WxMsgType *msgHead = (WxMsgType *)msg;
+    WxMsg *msgHead = (WxMsg *)msg;
     UINT32 sendResult;
     if (msgHead->isFromIsr) {
         sendResult = xQueueSendFromISR(task->msgQueHandle, (const void * )&msg, (TickType_t)0);
@@ -114,7 +114,7 @@ UINT32 WX_MsgShedule(UINT8 sender, UINT8 receiver, VOID *msg)
         return ret;
     }
 
-    WxMsgType *msgHead = (WxMsgType *)msg;
+    WxMsg *msgHead = (WxMsg *)msg;
     msgHead->sender = sender;
     msgHead->receiver = receiver;
     WxMsgTypeRouter *dstRouter = &g_wxMsgRouterList->routers[receiver];

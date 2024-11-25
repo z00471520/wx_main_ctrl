@@ -83,7 +83,7 @@ typedef struct {
     UINT64 slaveExcpCnt[WX_RS422I_MASTER_MB_OPR_BUTT][WX_RS422I_MASTER_SLAVE_ADDR_BUTT][WX_MODBUS_MAX_EXCP_CODE_NUM]; /* 用于记录不同操作不同从机返回的异常码 */
 } WxRs422IMasterTask;
 
-void WX_RS422I_MASTER_IntrHandler(void *CallBackRef, u32 Event, unsigned int EventData);
+VOID WX_RS422I_DRIVER_MASTER_IntrHandler(void *CallBackRef, u32 Event, unsigned int EventData);
 UINT32 WX_RS422I_MASTER_DecodeAdu(WxModbusAdu *txAdu, WxModbusAdu *rxAdu, WxRs422IMasterMsg *rxMsgBuf);;
 UINT32 WX_RS422I_MASTER_EncodeAdu(WxRs422IMasterMsg *txMsg, WxRs422IAdu *txAdu);
 UINT32 WX_RS422I_MASTER_DecodeAduReadDataResponce(WxRs422IMasterTask *this, WxModbusAdu *txAdu, WxModbusAdu *rxAdu, WxRs422IMasterMsg *rspMsp);

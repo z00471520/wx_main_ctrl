@@ -29,13 +29,8 @@ UINT32 WX_InitUartNs550(XUartNs550 *this, UINT32 deviceId, XUartNs550Format *for
 	return WX_SUCCESS;
 }
 
-/*
- * 使能UARTNS550设备的中断
- * intcInst - 中断控制器
- * uartInstPtr - uart实例指针
- * uartIntrCfg - 中断配置信息
- **/
-UINT32 WX_SetupUartNs550Interrupt(XUartNs550 *uartInstPtr, WxUartNs550IntrCfg *uartIntrCfg)
+
+UINT32 WX_SetupUartNs550Interrupt(XUartNs550 *uartInstPtr, XUartNs550_Handler handler, UINT32 intrId, VOID *callBackRef)
 {
 	INTC *intcInst = WX_GetIntrCtrlInst();
 	if (intcInst == NULL) {
@@ -43,7 +38,7 @@ UINT32 WX_SetupUartNs550Interrupt(XUartNs550 *uartInstPtr, WxUartNs550IntrCfg *u
 
 	}
 	/* 设置优先级 */
-	XScuGic_SetPriorityTriggerType(intcInst, uartIntrCfg->intrId, 0xA0, 0x3);
+	XScuGic_SetPriorityTriggerType(intcInst, intrId, 0xA0, 0x3);
 	/*
 	 * Connect a device driver handler that will be called when an interrupt
 	 * for the device occurs, the device driver handler performs the
@@ -59,14 +54,14 @@ UINT32 WX_SetupUartNs550Interrupt(XUartNs550 *uartInstPtr, WxUartNs550IntrCfg *u
 	/*
 	 * Enable the interrupt for the Timer device.
 	 */
-	XScuGic_Enable(intcInst, uartIntrCfg->intrId);
+	XScuGic_Enable(intcInst, intrId);
 	/*
 	 * Setup the handlers for the UART that will be called from the
 	 * interrupt context when data has been sent and received, specify a
 	 * pointer to the UART driver instance as the callback reference so
 	 * the handlers are able to access the instance data.
 	 */
-	XUartNs550_SetHandler(uartInstPtr, uartIntrCfg->handle, uartIntrCfg->callBackRef);
+	XUartNs550_SetHandler(uartInstPtr, handler, callBackRef);
 
 	return WX_SUCCESS;
 }

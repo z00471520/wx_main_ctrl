@@ -43,7 +43,7 @@ UINT32 WX_CAN_SLAVE_B_Destruct(VOID *module)
 }
 
 /* 模块消息处理入口 */
-UINT32 WX_CAN_SLAVE_B_Entry(VOID *module, WxMsgType *evtMsg)
+UINT32 WX_CAN_SLAVE_B_Entry(VOID *module, WxMsg *evtMsg)
 {
     WxCanSlaveModule *this = WX_GetModuleInfo(module);
     switch (evtMsg->msgHead.msgType)

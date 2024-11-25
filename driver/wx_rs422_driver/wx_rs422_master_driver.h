@@ -1,5 +1,0 @@
-#ifndef __WX_RS422_MASTER_DRIVER_H__
-#define __WX_RS422_MASTER_DRIVER_H__
-
-
-#endif //__WX_RS422_MASTER_DRIVER_H__

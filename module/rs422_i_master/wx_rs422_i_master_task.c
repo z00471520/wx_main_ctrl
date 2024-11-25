@@ -13,13 +13,13 @@ WxRs422IMasterTaskCfgInfo g_wxRs422IMasterCfgInfo = {
     .rs422Format.DataBits = XUN_FORMAT_8_BITS,
     .rs422Format.Parity = XUN_FORMAT_NO_PARITY,
     .rs422Format.StopBits = XUN_FORMAT_1_STOP_BIT,
-    .rs422IntrCfg.handle = WX_RS422I_MASTER_IntrHandler,
+    .rs422IntrCfg.handle = WX_RS422I_DRIVER_MASTER_IntrHandler,
     .rs422IntrCfg.callBackRef = &g_wxRs422IMasterCfgInfo,
     .rs422IntrCfg.intrId = , /* 中断ID */
 };
 
 /* RS422I中断处理函数 */
-void WX_RS422I_MASTER_IntrHandler(void *CallBackRef, u32 Event, unsigned int EventData)
+void WX_RS422I_DRIVER_MASTER_IntrHandler(void *CallBackRef, u32 Event, unsigned int EventData)
 {
     WxRs422IMasterTask *this = CallBackRef;
     /*
@@ -64,42 +64,6 @@ UINT32 WX_RS422I_MASTER_EncodeAdu(WxRs422IMasterMsg *txMsg, WxRs422IAdu *txAdu)
     }
 }
 
-
-/* 这个函数会阻塞直到发送完成或者异常 */
-UINT32 WX_RS422I_MASTER_TxAdu(WxRs422IMasterTask *this, WxModbusAdu *txAdu)
-{
-    /* 清空并预设预期接收的报文大小，防止任务被抢占来不及缓存导致串口消息丢失 */
-    UINT32 recvCount; 
-    do {
-        recvCount = XUartNs550_Recv(&this->rs422Inst, rxAdu->value, txAdu->expectRspLen);
-    } while (recvCount);
-
-    /* 首次发送消息会被缓存到实例，返回缓存了多少报文 */
-    unsigned int sendCount = XUartNs550_Send(&this->rs422Inst, txAdu->value, (unsigned int)txAdu->valueLen);
-    if (sendCount == 0) {
-        /* 是不可能出现发送0情况，这里算是异常了 */
-        return WX_RS422I_MASTER_SNED_ADU_BUFFER_FAIL;
-    }
-
-    /* 这里会阻塞等待发送完成，如果长时间不完成则认为是异常 */
-    if (xSemaphoreTake(this->valueTxFinishSemaphore, (TickType_t)WX_RS422I_MASTER_WAIT_TX_FINISH_TIME) == FALSE) {
-        return WX_RS422I_MASTER_SEND_ADU_TIMEOUT,
-    }
-
-    return WX_SUCCESS;
-}
-
-
-/* 接收报文 */
-UINT32 WX_RS422I_MASTER_RxAdu(WxRs422IMasterTask *this)
-{
-    /* 这里会阻塞等待接收完成，如果长时间不完成则认为是异常 */
-    if (xSemaphoreTake(this->valueRxFinishSemaphore, (TickType_t)WX_RS422I_MASTER_WAIT_RX_FINISH_TIME) == pdFALSE) {
-        return WX_RS422I_MASTER_SEND_ADU_TIMEOUT,
-    }
-
-    return WX_SUCCESS;    
-}
 
 WxMsgType WX_RS422I_MASTER_GetRspMsgType(WxMsgType reqMsgType)
 {

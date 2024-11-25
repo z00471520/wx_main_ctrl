@@ -72,6 +72,6 @@ WxRmtCtrlReqHandle g_wxRmtCtrlReqHandles[WX_RMT_CTRL_CODE_BUTT];
 UINT32 WX_CAN_SLAVE_DecodeRemoteCtrlMsg(WxCanSlaveModule *this, WxCanFrame *canFrame, WxRmtCtrlReqMsg **ppRemoteCtrlMsg);
 UINT32 WX_CAN_SLAVE_SendPdu2CanIf(WxCanSlaveModule *this, WxRmtCtrlPdu *pdu);
 UINT32 WX_CAN_SLAVE_Constuct(WxCanSlaveModule *this, WxCanSlaveCfgInfo *cfg);
-UINT32 WX_CAN_SLAVE_ProcCanFrameMsg(WxCanSlaveModule *this, WxMsgType *evtMsg);
+UINT32 WX_CAN_SLAVE_ProcCanFrameMsg(WxCanSlaveModule *this, WxMsg *evtMsg);
 UINT32 WX_CAN_SLAVE_ProcRmtCtrlReqMsg(WxCanSlaveModule *this, WxRmtCtrlReqMsg *reqMsg);
 #endif

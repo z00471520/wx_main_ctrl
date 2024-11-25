@@ -12,6 +12,7 @@ typedef enum {
     WX_CORE_ID_2 = 0x4,
     WX_CORE_ID_3 = 0x8,
 } WxCoreId;
+
 #define WX_CORE_ID_ALL 0xF
 #define WX_CORE_NUM     4
 #define WX_CORE_IDX_2_ID(coreIdx) ((UINT32)1 << (coreIdx))
@@ -46,7 +47,7 @@ typedef enum {
     WX_MODULE_DRIVER_CAN_B,
     WX_MODULE_DRIVER_RS422_MASTER,
     WX_MODULE_DRIVER_RS422_SLAVE,
-    WX_MODULE_DIRVER_UART
+    WX_MODULE_DIRVER_DBG_UART,
     WX_MODULE_DEBUG,
     /* if more please add here */
     WX_MODULE_BUTT,
@@ -59,6 +60,7 @@ typedef enum {
     WX_MSG_TYPE_INVALID,
     WX_MSG_TYPE_REMOTE_CTRL,        /* 遥控消息， see wx_remote_ctrl_msg_def.h for detail */
     WX_MSG_TYPE_CAN_FRAME,          /* CAN FRAME消息，see wx_msg_can_frame_intf.h.h for detail */
+    WX_MSG_TYPE_RS422_MASTER_DRIVER_REQ,
     WX_MSG_TYPE_BEBUG,
     WX_RS422I_MASTER_MSG_READ_DATA,        /* 读数据请求, 子类型：WxRs422IReadDataType,  消息体为：NA */
     WX_RS422I_MASTER_MSG_READ_DATA_RSP,    /* 读数据响应, 子类型：WxRs422IReadDataType,  消息体为：WxRs422IReadDataRsp */
@@ -83,8 +85,9 @@ typedef enum {
     UINT8 outEvent;  /* 消息处理的出事件， WX_SUCCESS - 表示成功 */ \
     UINT8 isFromIsr: 1; /* 消息是否来自中断，1-来自中断，0-来自任务 */ \
     UINT8 resv: 7;  /* 保留位 */
+
 typedef struct {
     WX_INHERIT_MSG_HEADER
     UINT8  msgData[0]; /* 最大长度为：WX_EVT_MSG_DATA_SIZE */
-} WxMsgType;
+} WxMsg;
 #endif

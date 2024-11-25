@@ -2,7 +2,7 @@
 #include "wx_deploy_task_funcode.h"
 
 /* 任务处理消息 */
-UINT32 WX_Deply_TaskFuncCodeProcMsg(WxTask *task, WxMsgType *evtMsg)
+UINT32 WX_Deply_TaskFuncCodeProcMsg(WxTask *task, WxMsg *evtMsg)
 {
     UINT32 reciver = evtMsg->msgHead.receiver;
     if (!WX_IsValidModuleId(reciver)) {
@@ -21,7 +21,7 @@ VOID WX_Deply_TaskFuncCode(VOID *param)
 {
     WxTask *task = param;
     UINT32 ret;
-    WxMsgType *evtMsg = NULL;
+    WxMsg *evtMsg = NULL;
     for (;;) {
         /* 当前任务等待外界发送的消息 */
         if (xQueueReceive(task->msgQueHandle, &evtMsg, portMAX_DELAY) == pdPASS) {
