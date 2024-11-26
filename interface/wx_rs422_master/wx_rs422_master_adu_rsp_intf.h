@@ -3,7 +3,6 @@
 #include "wx_typedef.h"
 #include "wx_modbus.h"
 #include "wx_msg_common.h"
-#include "wx_rs422_master_rsp_adu_intf.h"
 
 /* WX_MSG_TYPE_RS422_MASTER_ADU_RSP */
 typedef struct {
