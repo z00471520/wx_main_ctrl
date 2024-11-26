@@ -19,14 +19,7 @@ WxRs422MasterRdDataHandle g_wxRs422MasterReadDataHandles[WX_RS422_MASTER_MSG_REA
     [WX_RS422_MASTER_MSG_READ_DATA_YYY] = {WX_RS422_MASTER_SLAVE_YYY, 0, sizeof(WxRs422MasterRdDataY), WX_RS422_MASTER_DecRdDataY},
 };
 
-/* 获取指定数据类型的解码函数 */
-WxRs422MasterRdDateDecFunc WX_RS422_MASTER_GetDecodeFunc(WxRs422MasterRdDataType dataType)
-{
-    if (dataType >= WX_RS422_MASTER_MSG_READ_DATA_BUTT) {
-        return NULL;
-    }
-    return g_wxRs422MasterReadDataHandles[dataType].decFunc;
-}
+
 
 UINT32 WX_RS422_MASTER_DecRdDataAdu(WxModbusAdu *rxAdu, WxRs422MasterReadData *readData)
 {
@@ -34,14 +27,16 @@ UINT32 WX_RS422_MASTER_DecRdDataAdu(WxModbusAdu *rxAdu, WxRs422MasterReadData *r
     if (rxAdu->valueLen < WX_MODBUS_ADU_RD_RSP_MIN_LEN) {
         return WX_RS422_MASTER_RECV_RSP_RD_VALUE_LEN_ERR;
     }
+    /* 数据的长度是否总长度重读 3（从机地址，功能码， 数据长度） 2（CRC校验） */
     UINT8 dataLen = rxAdu->value[WX_MODBUS_ADU_RD_RSP_DATA_LEN_IDX];
     if (dataLen + 3 + 2 != rxAdu->valueLen) {
         return WX_RS422_MASTER_RECV_RSP_RD_VALUE_LEN_ERR;
     }
 
+    /* 指向数据区 */
     CHAR *data = &rxAdu->value[WX_MODBUS_ADU_RD_RSP_DATA_START_IDX];
     /* 获取读数据类型对应的解码函数 */
-    WxRs422MasterRdDateDecFunc decFunc = WX_RS422_MASTER_GetDecodeFunc(rdDataRspMsg->subMsgType);
+    WxRs422MasterRdDateDecFunc decFunc = g_wxRs422MasterReadDataHandles[rxAdu->subMsgType].decFunc;
     if (decFunc == NULL) {
         return WX_RS422_MASTER_RECV_RSP_RD_GET_DEC_FUNC_FAIL;
     }

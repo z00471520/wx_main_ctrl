@@ -29,6 +29,7 @@ typedef struct tagWxDeployTasks {
     UINT32 taskNum;     /* 当前任务数量 */
     WxTask taskList[0]; /* 任务列表 */
 } WxDeployTasks;
+
 WxTask *WX_DeployTasks_QueryTask(CHAR *taskName);
 UINT32 WX_DeployTasks(UINT8 coreId);
 #endif

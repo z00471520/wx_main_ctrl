@@ -34,8 +34,7 @@ typedef struct {
     UINT16  dataLen;  /* 读数据的数据长度, 0- 无效值 */
     WxRs422MasterRdDateDecFunc decFunc; /* 读数据的解码函数，把数据流转换位消息结构体 */
 } WxRs422MasterRdDataHandle;
-UINT32 WX_RS422_MASTER_EncRdDataReqMsg2Adu(WxRs422MasterRdDataReqMsg *req, WxModbusAdu *txAdu);
-WxRs422MasterRdDateDecFunc WX_RS422_MASTER_GetDecodeFunc(WxRs422MasterRdDataType dataType);
+
 UINT32 WX_RS422_MASTER_DecRdDataAdu(WxModbusAdu *rxAdu, WxRs422MasterReadData *readData);
 /* 返回编码的长度 */
 typedef UINT8 (*WxRs422MasterEncStructFunc)(UINT8 buf[], UINT8 bufSize, VOID *data);
@@ -46,15 +45,7 @@ typedef struct {
     WxRs422MasterEncStructFunc encStruct; /* 数据结构体编码函数 */
 } WxRs422MasterWrDataEncHandle;
 
-UINT32 WX_RS422_MASTER_EncRdDataReqMsg2Adu(WxRs422MasterWrDataReqMsg *req, WxModbusAdu *adu);
 
-/* RS422配置信息 */
-typedef struct {
-    UINT32 taskPri; /* 任务优先级 */
-    UINT32 rs422DevId;
-    XUartNs550Format rs422Format; /* 串口配置信息 */
-    WxUartNs550IntrCfg rs422IntrCfg; /* 串口中断配置 */
-} WxRs422MasterCfgInfo;
 
 /* 任务信息 */
 typedef struct {

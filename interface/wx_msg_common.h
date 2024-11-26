@@ -20,14 +20,6 @@ typedef enum {
     WX_MSG_TYPE_BEBUG,
     WX_MSG_TYPE_UART_TX_DATA_REQ,
     WX_MSG_TYPE_UART_CFG_REQ,
-    WX_RS422_MASTER_MSG_READ_DATA,        /* 读数据请求, 子类型：WxRs422MasterRdDataType,  消息体为：NA */
-    WX_RS422_MASTER_MSG_READ_DATA_RSP,    /* 读数据响应, 子类型：WxRs422MasterRdDataType,  消息体为：WxRs422MasterReadData */
-    WX_RS422_MASTER_MSG_WRITE_DATA,       /* 写数据请求, 子类型：WxRs422MasterWrDataType, 消息体为: WxRs422MasterWrData */
-    WX_RS422_MASTER_MSG_WRITE_DATA_RSP,   /* 写数据响应, 子类型: WxRs422MasterWrDataType, NA */
-    WX_RS422_MASTER_MSG_READ_FILE,
-    WX_RS422_MASTER_MSG_READ_FILE_RSP,
-    WX_RS422_MASTER_MSG_WRITE_FILE,
-    WX_RS422_MASTER_MSG_WRITE_FILE_RSP,
     /* if more please add here */
     WX_MSG_TYPE_BUTT,
 } WxMsgType;

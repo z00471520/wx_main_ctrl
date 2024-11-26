@@ -6,18 +6,6 @@
 #include "wx_msg_schedule.h"
 WxRs422Master g_wxRs422IMasterTask = {0};
 
-/*
- * This is the configuration of the RS422I-master
- **/
-WxRs422MasterCfgInfo g_wxRs422IMasterCfgInfo = {
-    .rs422DevId = 0,
-    .taskPri = 5,
-    .rs422Format.BaudRate = 9600,
-    .rs422Format.DataBits = XUN_FORMAT_8_BITS,
-    .rs422Format.Parity = XUN_FORMAT_NO_PARITY,
-    .rs422Format.StopBits = XUN_FORMAT_1_STOP_BIT,
-};
-
 WxMsgType WX_RS422_MASTER_GetRspMsgType(WxMsgType reqMsgType)
 {
     switch (reqMsgType) {
@@ -88,7 +76,7 @@ UINT32 WX_RS422_MASTER_ProcRdDataRspAduMsg(WxRs422Master *this, WxRs422MasterRsp
     if (rspMsg->rspAdu.failCode != WX_SUCCESS) {
         rdDataRspMsg->rsp.failCode = rspMsg->rspAdu.failCode;
     } else {
-        rdDataRspMsg->rsp.failCode  = WX_RS422_MASTER_DecRdDataAdu(rxAdu, &rdDataRspMsg->rsp.data);
+        rdDataRspMsg->rsp.failCode = WX_RS422_MASTER_DecRdDataAdu(rxAdu, &rdDataRspMsg->rsp.data);
     }
     ret = WX_MsgShedule(this->moduleId, rdDataRspMsg->reciever, rdDataRspMsg);
     if (ret != WX_SUCCESS) {
