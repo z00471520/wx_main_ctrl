@@ -1,5 +1,5 @@
-#ifndef WX_RS422_I_SLAVE_TASK_H
-#define WX_RS422_I_SLAVE_TASK_H
+#ifndef __WX_RS422_SLAVE_H__
+#define __WX_RS422_SLAVE_H__
 #include "wx_uart_ns550.h"
 #include "wx_modbus.h"
 #include "wx_rs422_i_master_intf.h"
