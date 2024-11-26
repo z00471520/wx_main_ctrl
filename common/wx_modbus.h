@@ -69,6 +69,9 @@
 #define WX_MODBUS_MAX_EXCP_CODE_NUM         256 /* 异常码U8最多支持256个数 */
 
 typedef struct {
+    UINT32 failCode;       /* 响应失败码，WX_SUCCESS：相应成功，其他：相应失败，详见failcode定义 */
+    UINT16 msgType;       /* 请求对应的消息类型，RS422驱动根据请求消息填写 */
+    UINT16 subMsgType;     /* 请求对应的子消息类型，RS422驱动根据请求消息填写 */
     UINT16 valueLen;
     UINT16 expectRspLen; /* 期望的响应长度 */
     UINT8 value[WX_MODBUS_ADU_MAX_SIZE]; /* 数组 */

@@ -17,22 +17,25 @@ typedef enum {
  * 读数据响应
  ******************************************************************************/
 typedef struct {
-
+    UINT8 RESV;
 } WxRs422MasterRdDataY;
 
 typedef struct {
-    
+    UINT8 RESV;
 } WxRs422MasterRdDataX;
 
-
-typedef struct {
-    UINT32 failCode; /* 错误码 */
-    UINT32 resv;     /* 保留 */
-    union { 
+typedef struct tagWxRs422MasterReadData {
+     union { 
         WxRs422MasterRdDataX dataX;
         WxRs422MasterRdDataY dataY;
         /* if more please add here */
     };
+} WxRs422MasterReadData;
+
+typedef struct tagWxRs422MsgReadDataRsp{
+    UINT32 failCode; /* 错误码 */
+    UINT32 resv;     /* 保留 */
+    WxRs422MasterReadData data;
 } WxRs422MsgReadDataRsp;
 
 /******************************************************************************

@@ -2,7 +2,7 @@
 #define __WX_UTIL_H__
 #include "wx_include.h"
 /* 适用于结构体对象的初始化 */
-#define WX_CLEAR_OBJ(op) memset(op, sizeof(*op), 0)
+#define WX_CLEAR_OBJ(op) memset(op, sizeof(*(op)), 0)
 /*
  * memname          内存的名字，字符串
  * item_num         item个数

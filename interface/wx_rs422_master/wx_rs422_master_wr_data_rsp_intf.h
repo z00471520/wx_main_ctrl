@@ -6,7 +6,7 @@
 
 /* 写数据响应 */
 typedef struct {
-    WxRs422MasterWrDataType type;
+    WxRs422MasterWrDataType subMsgType;
     UINT32 failCode;
 } WxRs422MasterWrDataRsp;
 
