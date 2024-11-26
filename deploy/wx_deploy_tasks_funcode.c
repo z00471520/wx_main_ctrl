@@ -1,6 +1,6 @@
 
 #include "wx_deploy_task_funcode.h"
-
+#include "wx_id_def.h"
 /* 任务处理消息 */
 UINT32 WX_Deply_TaskFuncCodeProcMsg(WxTask *task, WxMsg *evtMsg)
 {

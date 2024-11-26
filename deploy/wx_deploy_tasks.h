@@ -27,7 +27,6 @@ typedef struct tagWxTask {
 typedef struct tagWxDeployTasks {
     UINT32 maxTaskNum;  /* 最大任务数量 */
     UINT32 taskNum;     /* 当前任务数量 */
-    WxTask driverTask;  /* 驱动任务，是一个虚拟的任务，不会执行仅用于维护驱动模块 */
     WxTask taskList[0]; /* 任务列表 */
 } WxDeployTasks;
 WxTask *WX_DeployTasks_QueryTask(CHAR *taskName);

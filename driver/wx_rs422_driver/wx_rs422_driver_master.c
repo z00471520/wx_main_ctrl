@@ -89,6 +89,33 @@ VOID WX_RS422I_DRIVER_MASTER_IntrHandler(VOID *callBackRef, UINT32 event, UINT32
 	}
 }
 
+UINT32 WX_RS422_DRIVER_MASTER_ProcTxAduMsg(WxRs422DriverMaster *this, WxRs422MasterDriverMsg *msg)
+{
+    if (this->status != WX_RS422_MASTER_STATUS_IDLE) {
+        /* 缓存待发送的消息 */
+        if (xQueueSend(this->msgQueHandle, &msg->modbusAdu, 0) != pdPASS) {
+            return WX_RS422_MASTER_CACHE_MSG_FAIL;
+        }
+        return WX_SUCCESS;
+    }
+    
+    /* 清空并预设预期接收的报文大小，防止任务被抢占来不及缓存导致串口消息丢失 */
+    UINT32 recvCount; 
+    do {
+        recvCount = XUartNs550_Recv(&this->rs422Inst, rxAdu->value, txAdu->expectRspLen);
+    } while (recvCount);
+    
+    /* 首次发送消息会被缓存到实例，返回缓存了多少报文 */
+    UINT32 sendCount = XUartNs550_Send(&this->rs422Inst, txAdu->value, (unsigned int)txAdu->valueLen);
+    if (sendCount == 0) {
+        /* 是不可能出现发送0情况，这里算是异常了 */
+        return WX_RS422_MASTER_SNED_ADU_BUFFER_FAIL;
+    }
+    this->status = WX_RS422_MASTER_STATUS_TX_ADU;
+    return WX_SUCCESS;
+}
+
+
 UINT32 WX_RS422_DRIVER_MASTER_Construct(VOID *module)
 {
     UINT32 ret;
@@ -119,33 +146,6 @@ UINT32 WX_RS422_DRIVER_MASTER_Construct(VOID *module)
     WX_SetModuleInfo(module, this);
     return WX_SUCCESS;
 }
-
-UINT32 WX_RS422_DRIVER_MASTER_ProcTxAduMsg(WxRs422DriverMaster *this, WxRs422MasterDriverMsg *msg)
-{
-    if (this->status != WX_RS422_MASTER_STATUS_IDLE) {
-        /* 缓存待发送的消息 */
-        if (xQueueSend(this->msgQueHandle, &msg->modbusAdu, 0) != pdPASS) {
-            return WX_RS422_MASTER_CACHE_MSG_FAIL;
-        }
-        return WX_SUCCESS;
-    }
-    
-    /* 清空并预设预期接收的报文大小，防止任务被抢占来不及缓存导致串口消息丢失 */
-    UINT32 recvCount; 
-    do {
-        recvCount = XUartNs550_Recv(&this->rs422Inst, rxAdu->value, txAdu->expectRspLen);
-    } while (recvCount);
-    
-    /* 首次发送消息会被缓存到实例，返回缓存了多少报文 */
-    UINT32 sendCount = XUartNs550_Send(&this->rs422Inst, txAdu->value, (unsigned int)txAdu->valueLen);
-    if (sendCount == 0) {
-        /* 是不可能出现发送0情况，这里算是异常了 */
-        return WX_RS422_MASTER_SNED_ADU_BUFFER_FAIL;
-    }
-    this->status = WX_RS422_MASTER_STATUS_TX_ADU;
-    return WX_SUCCESS;
-}
-
 
 UINT32 WX_RS422_DRIVER_MASTER_Entry(VOID *module, WxMsg *evtMsg)
 {

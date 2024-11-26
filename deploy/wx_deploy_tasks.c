@@ -47,7 +47,6 @@ WxDeployTasks *WX_DeployTasks_Create(UINT8 coreId, UINT32 taskNum)
     }
     g_wxDeployTasks->taskNum = 0;
     g_wxDeployTasks->maxTaskNum = taskNum;
-    WX_CLEAR_OBJ(&g_wxDeployTasks->driverTask);
     return g_wxDeployTasks;
 }
 
@@ -114,7 +113,7 @@ UINT32 WX_DeployTasks_DeployTask(WxTask *task, WxTaskDeploy *taskDeploy)
 }
 
 /* 部署指定核的任务 */
-UINT32 WX_DeployTasks(UINT8 coreId)
+UINT32 WX_DeployTasks(UINT8 curCoreId)
 {
     /* 创建消息资源池 */
     UINT32 ret = WX_CreateMsgResPool();
@@ -123,7 +122,7 @@ UINT32 WX_DeployTasks(UINT8 coreId)
     } 
     UINT32 ret;
     UINT32 taskDeployNum = WX_DeployTasks_GetTaskDeployNum();
-    WxDeployTasks *taskList = WX_DeployTasks_Create(coreId, taskDeployNum);
+    WxDeployTasks *taskList = WX_DeployTasks_Create(curCoreId, taskDeployNum);
     WxTaskDeploy *taskDeploy = NULL;
     for (UINT32 i = 0; i < taskDeployNum; i++) {
         taskDeploy = WX_DeployTasks_GetTaskDeploy(i);
@@ -136,6 +135,7 @@ UINT32 WX_DeployTasks(UINT8 coreId)
         if (ret != WX_SUCCESS) {
             return ret;
         }
+        taskList->taskNum++;
     }
 
     return WX_SUCCESS;

@@ -59,6 +59,7 @@ WxModuleDeploy g_wxModuleDepolyInfos[] = {
 /* 把一个任务部署到模块 */
 UINT32 WX_DeployModules_DeployOneModule(WxTask *task, WxModule *module, WxModuleDeploy *moduleDeploy)
 {
+    WX_CLEAR_OBJ(module);
     module->moduleName = moduleDeploy->moduleName;
     module->coreId = task->coreId;
     module->moduleId = moduleDeploy->moduleId;

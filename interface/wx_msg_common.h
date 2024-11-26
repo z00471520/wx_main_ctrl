@@ -9,7 +9,7 @@
 typedef enum {
     WX_MSG_TYPE_INVALID,
     WX_MSG_TYPE_REMOTE_CTRL,        /* 遥控消息， see wx_remote_ctrl_msg_def.h for detail */
-    WX_MSG_TYPE_CAN_FRAME,          /* CAN FRAME消息，see wx_msg_can_frame_intf.h.h for detail */
+    WX_MSG_TYPE_CAN_FRAME,          /* CAN FRAME消息，see wx_msg_can_frame_intf.h for detail */
     WX_MSG_TYPE_RS422_MASTER_DRIVER, /* WxRs422MasterDriverMsg */
     /* RS422 master */
     WX_MSG_TYPE_RS422_MASTER_ADU_RSP,
@@ -18,6 +18,8 @@ typedef enum {
     WX_MSG_TYPE_RS422_MASTER_RD_DATA_REQ, /* WxRs422MasterRdDatReqMsg */
     WX_MSG_TYPE_RS422_MASTER_RD_DATA_RSP, /* WxRs422MasterRdDatRspMsg */
     WX_MSG_TYPE_BEBUG,
+    WX_MSG_TYPE_UART_TX_DATA_REQ,
+    WX_MSG_TYPE_UART_CFG_REQ,
     WX_RS422_MASTER_MSG_READ_DATA,        /* 读数据请求, 子类型：WxRs422MasterRdDataType,  消息体为：NA */
     WX_RS422_MASTER_MSG_READ_DATA_RSP,    /* 读数据响应, 子类型：WxRs422MasterRdDataType,  消息体为：WxRs422MasterReadData */
     WX_RS422_MASTER_MSG_WRITE_DATA,       /* 写数据请求, 子类型：WxRs422MasterWrDataType, 消息体为: WxRs422MasterWrData */
