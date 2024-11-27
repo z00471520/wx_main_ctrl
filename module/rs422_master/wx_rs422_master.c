@@ -61,7 +61,7 @@ UINT32 WX_RS422_MASTER_SendAdu2Driver(WxRs422Master *this, WxAdu *adu)
 
 UINT32 WX_RS422_MASTER_ProcRdDataRspAduMsg(WxRs422Master *this, WxRs422MasterRspAduMsg *rspAduMsg)
 {
-     UINT32 ret = WX_SUCCESS;
+    UINT32 ret = WX_SUCCESS;
     WxModbusAdu *rxAdu = &rspAduMsg->rspAdu;
     if (rxAdu->subMsgType >= WX_RS422_MASTER_MSG_READ_DATA_BUTT) {
         wx_excp_cnt(WX_EXCP_UNEXPECT_MSG_TYPE);

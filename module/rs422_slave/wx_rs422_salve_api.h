@@ -1,4 +1,4 @@
-#ifndef WX_RS422_I_SLAVE_TASK_H
-#define WX_RS422_I_SLAVE_TASK_H
+#ifndef WX_RS422_SLAVE_TASK_H
+#define WX_RS422_SLAVE_TASK_H
 
 #endif

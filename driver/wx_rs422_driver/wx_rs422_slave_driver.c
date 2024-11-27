@@ -11,7 +11,7 @@ WxRs422SlaveDriverCfg g_rs422SlaverDriverCfg = {
 VOID WX_RS422SlaveDriver_SentRxAdu2Upper(WxRs422SlaverDriver *this, WxModbusAdu *rxAdu)
 {
     /* 申请消息 */
-    WxRs422SalverRxAduMsg *msg = WX_ApplyEvtMsg(WX_MSG_TYPE_RS422_SALVER_RX_ADU);
+    WxRs422SalverRxAduMsg *msg = WX_ApplyEvtMsg(WX_MSG_TYPE_RS422_SLAVE_RX_ADU_REQ);
     if (msg == NULL) {
         return;
     }
@@ -22,7 +22,7 @@ VOID WX_RS422SlaveDriver_SentRxAdu2Upper(WxRs422SlaverDriver *this, WxModbusAdu 
     /* 填写消息信息 */
     msg->sender = this->moduleId;
     msg->receiver = WX_MODULE_RS422_SLAVE;
-    msg->msgType = WX_MSG_TYPE_RS422_SALVER_RX_ADU;
+    msg->msgType = WX_MSG_TYPE_RS422_SLAVE_RX_ADU_REQ;
     msg->rxAdu.failCode = WX_SUCCESS;
     for (UINT8 i = 0; i < rxAdu->valueLen; i++) {
         msg->rxAdu.value[i] = rxAdu->value[i];

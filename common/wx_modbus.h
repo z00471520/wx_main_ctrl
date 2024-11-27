@@ -74,13 +74,12 @@ typedef enum {
     WX_MODBUS_EXCP_ILLEGAL_FUNCTION = 1,
     WX_MODBUS_EXCP_ILLEGAL_DATA_ADDRESS = 2,
     WX_MODBUS_EXCP_ILLEGAL_DATA_VALUE = 3,
-    WX_MODBUS_EXCP_SLAVE_DEVICE_FAILURE = 4,
-    WX_MODBUS_EXCP_ACKNOWLEDGE = 5,
-    WX_MODBUS_EXCP_SLAVE_DEVICE_BUSY = 6,
-    WX_MODBUS_EXCP_NEGATIVE_ACKNOWLEDGE = 7,
-    WX_MODBUS_EXCP_MEMORY_PARITY_ERROR = 8,
-    WX_MODBUS_EXCP_GATEWAY_PATH_UNAVAILABLE = 10,
-    WX_MODBUS_EXCP_GATEWAY_TARGET_DEVICE_FAILED_TO_RESPOND = 11,
+    WX_MODBUS_EXCP_RD_ADDR_NOT_DEFINED = 4,
+    WX_MODBUS_EXCP_RD_DATA_FAIL = 5,
+    WX_MODBUS_EXCP_ENC_RD_DATA_FAIL = 6,
+    WX_MODBUS_EXCP_WR_HANDLE_UNFINE = 7,
+    WX_MODBUS_EXCP_WR_DATA_DEC_FAIL = 8,
+    WX_MODBUS_EXCP_WR_DATA_FAIL = 9,
     WX_MODBUS_EXCP_MAX_EXCP_CODE_NUM = 256
 } WxModbusExcpCode;
 
@@ -88,7 +87,11 @@ typedef struct {
     UINT32 failCode;       /* 响应失败码，WX_SUCCESS：相应成功，其他：相应失败，详见failcode定义 */
     UINT16 msgType;       /* 请求对应的消息类型，RS422驱动根据请求消息填写 */
     UINT16 subMsgType;     /* 请求对应的子消息类型，RS422驱动根据请求消息填写 */
-    UINT16 valueLen;
+    UINT8 slaveAddr;      /* 从机地址 */
+    UINT8 funcCode;   /* 功能码 */
+    UINT8 receiver;   /* 接收方模块 */
+    UINT16 dataAddr;      /* 数据地址 */
+    UINT16 valueLen;      /* ADU的数据长度 */
     UINT16 expectRspLen; /* 期望的响应长度 */
     UINT8 value[WX_MODBUS_ADU_MAX_SIZE]; /* 数组 */
 } WxModbusAdu;

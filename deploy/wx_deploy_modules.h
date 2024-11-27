@@ -1,5 +1,7 @@
 #ifndef __WX_DEPLOY_MODULES_H__
 #define __WX_DEPLOY_MODULES_H__
+#include "wx_include.h"
+#include "wx_module_id.h"
 /* 模块构建函数 */
 typedef UINT32 (*WxModuleConstructFunc)(VOID *module);
 typedef UINT32 (*WxModuleDestructFunc)(VOID *module);
@@ -32,5 +34,5 @@ typedef struct {
 #define WX_GetModuleInfo(m)         (((WxModule *)m)->moduleInfo)
 #define WX_SetModuleInfo(m, v)      (((WxModule *)m)->moduleInfo = (v))
 #define WX_GetModuleCoreId(m)       (((WxModule *)m)->coreId)
-
+#define WX_GetModuleId(m)           (((WxModule *)m)->moduleId)
 #endif // __WX_DEPLOY_MODULE_H__
