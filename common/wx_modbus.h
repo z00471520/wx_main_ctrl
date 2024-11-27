@@ -13,7 +13,7 @@
 #define WX_MODBUS_INVALID_SLAVE_ADDR        0xff    /* 0xFF不能作为从机地址使用 */
 
 #define WX_MODBUS_SLAVE_ADDR_IDX            0
-#define WX_MODBUS_SLAVE_FUNC_CODE_IDX       1
+#define WX_MODBUS_FUNC_CODE_IDX       1
 /* mobus function code define */
 #define WX_MODBUS_FUNC_CODE_READ_DATA       0x41    /* 读数据 */
 #define WX_MODBUS_FUNC_CODE_WRITE_DATA      0x42    /* 写数据 */
@@ -68,6 +68,22 @@
 
 #define WX_MODBUS_MAX_EXCP_CODE_NUM         256 /* 异常码U8最多支持256个数 */
 
+/* 定义从机异常码的枚举值 */
+typedef enum {
+    WX_MODBUS_EXCP_NONE = 0,
+    WX_MODBUS_EXCP_ILLEGAL_FUNCTION = 1,
+    WX_MODBUS_EXCP_ILLEGAL_DATA_ADDRESS = 2,
+    WX_MODBUS_EXCP_ILLEGAL_DATA_VALUE = 3,
+    WX_MODBUS_EXCP_SLAVE_DEVICE_FAILURE = 4,
+    WX_MODBUS_EXCP_ACKNOWLEDGE = 5,
+    WX_MODBUS_EXCP_SLAVE_DEVICE_BUSY = 6,
+    WX_MODBUS_EXCP_NEGATIVE_ACKNOWLEDGE = 7,
+    WX_MODBUS_EXCP_MEMORY_PARITY_ERROR = 8,
+    WX_MODBUS_EXCP_GATEWAY_PATH_UNAVAILABLE = 10,
+    WX_MODBUS_EXCP_GATEWAY_TARGET_DEVICE_FAILED_TO_RESPOND = 11,
+    WX_MODBUS_EXCP_MAX_EXCP_CODE_NUM = 256
+} WxModbusExcpCode;
+
 typedef struct {
     UINT32 failCode;       /* 响应失败码，WX_SUCCESS：相应成功，其他：相应失败，详见failcode定义 */
     UINT16 msgType;       /* 请求对应的消息类型，RS422驱动根据请求消息填写 */
@@ -80,6 +96,7 @@ typedef struct {
 /* 计算CRC的取值 */
 uint16_t WX_Modbus_Crc16(uint8_t *pFrame, uint16_t len);
 UINT32 WX_Modbus_AduCrcCheck(WxModbusAdu *adu);
+VOID WX_Modbus_AduGenerateExceptionRsp(UINT8 slaveAddr, UINT8 functionCode, UINT8 exceptionCode, WxModbusAdu *adu);
 UINT16 WX_Modbug_GetAduCrcValue(WxModbusAdu *adu);
 UINT32 WX_Modbus_AduEncodeBasic(WxModbusAdu *adu, intptr_t value, UINT32 valueSize);
 UINT32 WX_Modbus_AduEncodeBlock(WxModbusAdu *adu, UINT8 *block, UINT32 blockSize);

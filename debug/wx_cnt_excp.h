@@ -21,9 +21,16 @@ typedef enum {
 
 
 	/* module B */
-
+	WX_EXCP_RS422_SLAVE_RECV_DATA_TX_FINISH,
+	WX_EXCP_RS422_SLAVE_RECV_DATA_LEN_ERR,
+	WX_EXCP_RS422_SLAVE_RECV_DATA_CRC_ERR,
+	WX_EXCP_RS422_SLAVE_SEND_DATA_FAIL,
+	WX_EXCP_RS422_SLAVE_SEND_DATA_FAIL_0,
+	WX_EXCP_RS422_SLAVE_UNSPT_MSG_TYPE,
 
 	/* if more please add here */
 	WX_EXCP_CNT_BUTT,
 } WxExcpCntDef;
+
+#define wx_excp_cnt(a) 
 #endif

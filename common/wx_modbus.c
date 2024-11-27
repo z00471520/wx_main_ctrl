@@ -90,6 +90,20 @@ UINT32 WX_Modbus_AduCrcCheck(WxModbusAdu *adu)
     return (realCrc16 == expectCrc16) ? WX_SUCCESS : WX_MODBUS_ADU_CRC_CHECK_FAIL;
 }
 
+/* 生成异常响应报文 */
+VOID WX_Modbus_AduGenerateExceptionRsp(UINT8 slaveAddr, UINT8 functionCode, UINT8 exceptionCode, WxModbusAdu *adu)
+{
+
+    adu->value[WX_MODBUS_ADU_ERR_RSP_SLAVE_ADDR_IDX] = slaveAddr;
+    adu->value[WX_MODBUS_ADU_ERR_RSP_FUNC_CODE_IDX] = functionCode + 0x80;
+    adu->value[WX_MODBUS_ADU_ERR_RSP_EXPC_CODE_IDX] = exceptionCode;
+    /* 获取CRC16校验值 */
+    UINT16 crc16 = WX_Modbus_Crc16(adu->value, WX_MODBUS_ADU_ERR_RSP_LEN - WX_MODBUS_CRC_LEN);
+    adu->value[WX_MODBUS_ADU_ERR_RSP_CRC_HI_IDX] = (UINT8)(crc16 >> 8);
+    adu->value[WX_MODBUS_ADU_ERR_RSP_CRC_LO_IDX] = (UINT8)(crc16 & 0xFF);
+    adu->valueLen = WX_MODBUS_ADU_ERR_RSP_LEN;
+}
+
 /* 
  * 函数功能：编码基础类型的数据数据到ADU
  * 参数说明：
