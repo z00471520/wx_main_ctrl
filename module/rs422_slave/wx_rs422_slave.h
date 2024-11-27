@@ -31,8 +31,8 @@ typedef struct {
 /******************************************************************************
  * RS422从机的顶层配置
 ******************************************************************************/
-typedef WxRs422SlaveWrDataHandle (*WxRs422SlaveGetWrDataHandles)(UINT8 moduleId); /* 获取写数据的hanlde */
-typedef WxRs422SlaveRdDataHandle (*WxRs422SlaveGetRdDataHandles)(UINT8 moduleId); /* 获取读数据的hanlde */
+typedef WxRs422SlaveWrDataHandle (*WxRs422SlaveGetWrDataHandles)(UINT8 moduleId, UINT16 *handleNum); /* 获取写数据的hanlde */
+typedef WxRs422SlaveRdDataHandle (*WxRs422SlaveGetRdDataHandles)(UINT8 moduleId, UINT16 *handleNum); /* 获取读数据的hanlde */
 typedef struct {
     WxModuleId moduleId; /* 模块ID的配置 */
     UINT8 slaveAddr; /* 从机地址 */
@@ -48,14 +48,16 @@ typedef struct {
     UINT8 slaveAddr; /* 从机地址 */
     UINT64 excpCnt[WX_MODBUS_EXCP_MAX_EXCP_CODE_NUM]; /* 用于记录不同操作不同从机返回的异常码 */
     WxModbusAdu txAdu;  /* 待发送的Modbus协议ADU */
+    UINT16 rdHandleNum; /* 读数据的hanldes的数量 */
+    UINT16 wrHandleNum; /* 写数据的hanldes的数量 */
     WxRs422SlaveRdDataHandle *rdDataHandles; /* 读数据的hanlde */
     WxRs422SlaveWrDataHandle *wrDataHandles; /* 写数据的hanlde */
     WxRs422SlaveCfg *cfg; /* 指向配置 */
 } WxRs422Slave;
 
-
-WxRs422SlaveWrDataHandle *WX_RS422Slave_GetWrDataHandles(UINT8 moduleId);
-WxRs422SlaveRdDataHandle *WX_RS422Slave_GetRdDataHandles(UINT8 moduleId);
+/* get the write data handle */
+WxRs422SlaveWrDataHandle *WX_RS422Slave_GetWrDataHandles(UINT8 moduleId, UINT16 *handleNum);
+WxRs422SlaveRdDataHandle *WX_RS422Slave_GetRdDataHandles(UINT8 moduleId, UINT16 *handleNum);
 /******************************************************************************
  * 函数声明
 ******************************************************************************/

@@ -66,7 +66,11 @@ UINT32 WX_RS422Slave_ProcReadDataReq(WxRs422Slave *this, WxModbusAdu *rxAdu, WxM
 {
     UINT32 ret;
     /* 获取数据地址对应的Handle */
-    WxRs422SlaveRdDataHandle *handle = WX_RS422Slave_GetRdDataHandle(txAdu->dataAddr);
+    if (txAdu->dataAddr >= this->rdHandleNum) {
+        wx_excp_cnt(WX_EXCP_RS422_SLAVE_DATA_READ_ADDR_OUT_RANGE);
+        return WX_RS422Slave_SendExcpRsp(this, txAdu, WX_MODBUS_EXCP_ILLEGAL_DATA_ADDRESS);
+    }
+    WxRs422SlaveRdDataHandle *handle = &this->rdDataHandles[txAdu->dataAddr];
     if (handle == NULL) {
         wx_excp_cnt(WX_EXCP_RS422_SLAVE_DATA_READ_HANDLE_NULL);
         return WX_RS422Slave_SendExcpRsp(this, txAdu, WX_MODBUS_EXCP_ILLEGAL_DATA_ADDRESS);
@@ -102,8 +106,12 @@ UINT32 WX_RS422Slave_ProcReadDataReq(WxRs422Slave *this, WxModbusAdu *rxAdu, WxM
 /* 从机处理写数据请求 */
 UINT32 WX_RS422Slave_ProcWriteDataReq(WxRs422Slave *this, WxModbusAdu *rxAdu, WxModbusAdu *txAdu)
 {
+     (txAdu->dataAddr >= this->wrHandleNum) {
+        wx_excp_cnt(WX_EXCP_RS422_SLAVE_DATA_WRITE_ADDR_OUT_RANGE);
+        return WX_RS422Slave_SendExcpRsp(this, txAdu, WX_MODBUS_EXCP_ILLEGAL_DATA_ADDRESS);
+    }
     /* 获取写Handle */
-    WxRs422SlaveWrDataHandle *handle = WX_RS422Slave_GetWrDataHandle(txAdu->dataAddr);
+    WxRs422SlaveWrDataHandle *handle = this->wrDataHandles + txAdu->dataAddr;
     if (handle == NULL) {
         wx_excp_cnt(WX_EXCP_RS422_SLAVE_DATA_WRITE_HANDLE_NULL);
         return WX_RS422Slave_SendExcpRsp(this, txAdu, WX_MODBUS_EXCP_ILLEGAL_DATA_ADDRESS);
@@ -175,8 +183,8 @@ UINT32 WX_RS422Slave_Construct(VOID *module)
     WX_CLEAR_OBJ(this);
     this->moduleId = WX_GetModuleId(module);
     this->cfg = &g_wxRs422SlaveCfg;
-    this->rdDataHandles = cfg->getRdHandles(this);
-    this->wrDataHandles = cfg->getWrHandles(this);
+    this->rdDataHandles = cfg->getRdHandles(this, &this->rdHandleNum);
+    this->wrDataHandles = cfg->getWrHandles(this, &this->wrHandleNum);
     this->slaveAddr = cfg->slaveAddr;
     /* 设置上Module */
     WX_SetModuleInfo(module, this);
