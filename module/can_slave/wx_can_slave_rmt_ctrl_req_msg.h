@@ -15,10 +15,9 @@ typedef enum {
 /* 遥控消息定义 */
 typedef struct {
     WxRmtCtrlReqMsgType type; /* 请求消息类型 */
-    typedef union {
+    union {
     };
 } WxRmtCtrlReqMsg;
 
-
-UINT32 WX_CAN_SLAVE_ProcRmtCtrlReqMsgReset(WxCanSlaveModule *this, WxRmtCtrlReqMsg *msg);
+UINT32 WX_CAN_SLAVE_ProcRmtCtrlReqMsgReset(WxCanSlave *this, WxRmtCtrlReqMsg *msg);
 #endif

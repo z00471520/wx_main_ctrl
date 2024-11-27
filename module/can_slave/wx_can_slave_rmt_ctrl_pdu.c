@@ -3,14 +3,14 @@
 #include "wx_msg_res_pool.h"
 #include "wx_msg_can_frame_intf.h"
 #include "wx_msg_schedule.h"
-UINT32 WX_CAN_SLAVE_DecRmtCtrlPduReset(WxCanSlaveModule *this, WxRmtCtrlPdu *pdu, WxRmtCtrlReqMsg *msg)
+UINT32 WX_CAN_SLAVE_DecRmtCtrlPduReset(WxCanSlave *this, WxRmtCtrlPdu *pdu, WxRmtCtrlReqMsg *msg)
 {
     return WX_SUCCESS;
 }
 
 
 /* 根据PDU解析出消息的内容，涉及到大小端转换 */
-UINT32 WX_CAN_SLAVE_DecRmtCtrlPdu(WxCanSlaveModule *this, WxRmtCtrlPdu *pdu, WxRmtCtrlReqMsg *msg)
+UINT32 WX_CAN_SLAVE_DecRmtCtrlPdu(WxCanSlave *this, WxRmtCtrlPdu *pdu, WxRmtCtrlReqMsg *msg)
 {
     UINT16 rmtCtrlCode = (UINT16)pdu->rmtCtrlCode; /* 遥控指令码 */
     if (rmtCtrlCode >= WX_RMT_CTRL_CODE_BUTT) {
@@ -27,10 +27,10 @@ UINT32 WX_CAN_SLAVE_DecRmtCtrlPdu(WxCanSlaveModule *this, WxRmtCtrlPdu *pdu, WxR
 
 
 /* 把PDU封装成CAN Frames, 以便后续发送 */
-UINT32 WX_CAN_SLAVE_EncapPdu2CanFrames(WxCanSlaveModule *this, WxRmtCtrlPdu *pdu, WxCanFrameList *canFrameList)
+UINT32 WX_CAN_SLAVE_EncapPdu2CanFrames(WxCanSlave *this, WxRmtCtrlPdu *pdu, WxCanFrameList *canFrameList)
 {
     canFrameList->canFrameNum = 0;
-    WxCanSlaveCfgInfo *cfgInfo = this->cfgInfo;
+    WxCanSlaveCfg *cfgInfo = this->cfgInfo;
     if (cfgInfo == NULL) {
         return WX_ERR;
     }
@@ -63,7 +63,7 @@ UINT32 WX_CAN_SLAVE_EncapPdu2CanFrames(WxCanSlaveModule *this, WxRmtCtrlPdu *pdu
 }
 
 /* 把CAN FRAME发送到软件缓存队列中 */
-UINT32 WX_CAN_SLAVE_SendFrame2CanIf(WxCanSlaveModule *this, WxCanFrame *frame)
+UINT32 WX_CAN_SLAVE_SendFrame2CanIf(WxCanSlave *this, WxCanFrame *frame)
 {
     UINT32 ret;
     /* 申请消息 */
@@ -90,7 +90,7 @@ UINT32 WX_CAN_SLAVE_SendFrame2CanIf(WxCanSlaveModule *this, WxCanFrame *frame)
 }
 
 /* 把CAM FRAME集合发送给CANIF传输 */
-UINT32 WX_CAN_SLAVE_SendCanFrameList2CanIf(WxCanSlaveModule *this, WxCanFrameList *canFrameList)
+UINT32 WX_CAN_SLAVE_SendCanFrameList2CanIf(WxCanSlave *this, WxCanFrameList *canFrameList)
 {
     UINT32 ret;
      /* 通知CAN DRIVER发送Frame */
@@ -107,7 +107,7 @@ UINT32 WX_CAN_SLAVE_SendCanFrameList2CanIf(WxCanSlaveModule *this, WxCanFrameLis
 }
 
 /* 把PDU发送到CAN IF */
-UINT32 WX_CAN_SLAVE_SendPdu2CanIf(WxCanSlaveModule *this, WxRmtCtrlPdu *pdu)
+UINT32 WX_CAN_SLAVE_SendPdu2CanIf(WxCanSlave *this, WxRmtCtrlPdu *pdu)
 {
     /* PDU封装为CAN FRAME */
     WxCanFrameList *canFrameList = &this->canFrameList;

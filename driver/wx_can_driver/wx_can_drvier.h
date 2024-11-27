@@ -1,8 +1,8 @@
-#ifndef __WX_CAN_DRIVER_DRIVER_H__
-#define __WX_CAN_DRIVER_DRIVER_H__
-#include "wx_include.h"
+#ifndef __WX_CAN_DRIVER_H__
+#define __WX_CAN_DRIVER_H__
 #define WX_CAN_DRIVER_MAX_DATA_LEN 8 /* 支持的最大数据长度，BYTE */
 #define WX_CAN_DRIVER_FRAME_U32_LEN ((XCANPS_MAX_FRAME_SIZE) / (sizeof(u32))) /* FRAM U32长度 */
+
 typedef struct {
     UINT32 deviceId; /* 设备ID */
     UINT8 baudPrescalar; /* 需要结合输入时钟的频率进行设置，用于确定最终的波特率 */
@@ -11,7 +11,7 @@ typedef struct {
     UINT8 timeSegment2;  /* TimeSegment2 is the Time Segment 2 value to set. Valid values are from 0 to 7 */
     UINT32 bufferQueLen; /* 缓冲CAN帧数量 */
     /* if more please add here */
-} WxCanDriverCfg;
+} WxCanDriverDevCfg;
 
 typedef struct {
     UINT32 intrId;  /* 中断ID */
@@ -21,6 +21,13 @@ typedef struct {
     XCanPs_EventHandler eventHandle;    /* 事件Handle */
     VOID *callBackRef;                  /* 中断Handle处理函数 */
 } WxCanDriverIntrCfg;
+
+typedef struct {
+    UINT32 moduleId;  /* 模块ID */
+    WxCanDriverDevCfg devCfg;   /* device cfg */  
+    WxCanDriverIntrCfg intrCfg;  /* interrupt cfg */
+} WxCanDriverCfg;
+
 
 typedef struct {
     UINT32 standardMessID;      /* 11:bit, Standard Message ID
@@ -66,8 +73,10 @@ typedef struct {
     QueueHandle_t sendQueue;
     WxModuleId moduleId;
     UINT32 resv;
+    WxCanDriverCfg *cfg; /* driver cfg */
 } WxCanDriver;
-UINT32 WX_CAN_DRIVER_Entry(WxCanDriver *this, WxMsg *evtMsg);
+
+UINT32 WX_CAN_DRIVER_Construct(VOID *module);
+UINT32 WX_CAN_DRIVER_Entry(VOID *module, WxMsg *evtMsg);
 UINT32 WX_CAN_DRIVER_Destruct(VOID *module);
-UINT32 WX_CAN_DRIVER_Constuct(WxCanDriver *this, WxCanDriverCfg *cfg, WxCanDriverIntrCfg *intrCfg);
 #endif

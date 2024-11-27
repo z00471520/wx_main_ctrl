@@ -1,12 +1,23 @@
+
 #include "wx_include.h"
-#include "wx_can_driver.h"
-#include "xcanps.h"
-#include "xparameters.h"
-#include "xil_printf.h"
-#include "wx_msg_common.h"
+#include "wx_can_driver_common.h"
+
+WxCanDriverCfg g_wxCanSlaveCfg[] = {
+    {},
+    {},
+};
+WxCanDriverCfg *WX_CAN_DRIVER_GetCfg(UINT32 moduleId)
+{
+    for (int i = 0; i < sizeof(g_wxCanSlaveCfg) / sizeof(WxCanDriverCfg); i++) {
+        if (g_wxCanSlaveCfg[i].moduleId == moduleId) {
+            return &g_wxCanSlaveCfg[i];
+        }
+    }
+    return NULL;
+}
 
 /* 设置CAN中断 */
-UINT32 WX_CAN_DRIVER_InitialInterrupt(XCanPs *canInstPtr, WxCanDriverIntrCfg *cfg)
+UINT32 WX_CAN_DRIVER_InitInterrupt(XCanPs *canInstPtr, WxCanDriverIntrCfg *cfg)
 {
 	/* 中断控制器 */
 	INTC *intcInst = WX_GetIntrCtrlInst();
@@ -48,7 +59,7 @@ UINT32 WX_CAN_DRIVER_InitialInterrupt(XCanPs *canInstPtr, WxCanDriverIntrCfg *cf
 
 
 /* CAN设备初始化 */
-UINT32 WX_CAN_DRIVER_InitialInstance(XCanPs *canInstPtr, WxCanDriverCfg *cfg)
+UINT32 WX_CAN_DRIVER_InitDevice(XCanPs *canInstPtr, WxCanDriverCfg *cfg)
 {
 	if (canInstPtr == NULL) {
 		return WX_CAN_DRIVER_CONFIG_INVALID_CAN_INST_PRT;
@@ -175,16 +186,25 @@ UINT32 WX_CAN_DRIVER_ProcCanFrameMsg(WxCanDriver *this, WxMsg *evtMsg)
 	return ret;
 }
 
-UINT32 WX_CAN_DRIVER_Constuct(WxCanDriver *this, WxCanDriverCfg *cfg, WxCanDriverIntrCfg *intrCfg)
+
+/* 模块构建函数 */
+UINT32 WX_CAN_DRIVER_Construct(VOID *module)
 {
-	UINT32 ret;
-	/* 初始化实例 */
-	ret = WX_CAN_DRIVER_InitialInstance(&this->canInst, cfg);
+    UINT32 ret;
+    WxCanDriver *this = WX_Mem_Alloc(WX_GetModuleName(module), 1, sizeof(WxCanDriver));
+    if (this == NULL) {
+        return WX_ERR;
+    }
+    WX_CLEAR_OBJ(this);
+    this->moduleId = WX_GetModuleCoreId(module);
+    this->cfg = WX_CAN_DRIVER_GetCfg( this->moduleId);
+    /* 初始化实例 */
+	ret = WX_CAN_DRIVER_InitDevice(&this->canInst, &this->cfg->devCfg);
 	if (ret != WX_SUCCESS) {
 		return ret;
 	}
 
-	/* 初始化发送缓存队列 */
+	/* 初始化发送CAN缓存队列 */
 	QueueHandle_t this->sendQueue = xQueueCreate((UBaseType_t)cfg->bufferQueLen, 
 		(WXUBaseType_t)sizeof(WxCanFrame));
 	if (this->sendQueue == NULL) {
@@ -192,12 +212,13 @@ UINT32 WX_CAN_DRIVER_Constuct(WxCanDriver *this, WxCanDriverCfg *cfg, WxCanDrive
 	}
 
 	/* 初始化中断 */
-	ret = WX_CAN_DRIVER_InitialInterrupt(&this->canInst, intrCfg);
+	ret = WX_CAN_DRIVER_InitInterrupt(&this->canInst, &cfg->intrCfg);
 	if (ret != WX_SUCCESS) {
 		return ret;
 	}
-
-	return WX_SUCCESS;
+    /* 设置上Module */
+    WX_SetModuleInfo(module, this);
+    return WX_SUCCESS;
 }
 
 UINT32 WX_CAN_DRIVER_Destruct(VOID *module)
@@ -211,11 +232,10 @@ UINT32 WX_CAN_DRIVER_Destruct(VOID *module)
     return WX_SUCCESS;
 }
 
-
-/* 消息处理入口 */
-UINT32 WX_CAN_DRIVER_Entry(WxCanDriver *this, WxMsg *evtMsg)
+UINT32 WX_CAN_DRIVER_Entry(VOID *module, WxMsg *evtMsg)
 {
-	switch (evtMsg->msgType) {
+    WxCanDriver *this = WX_GetModuleInfo(module);
+    switch (evtMsg->msgType) {
 		case WX_MSG_TYPE_CAN_FRAME: {
 			return WX_CAN_DRIVER_ProcCanFrameMsg(&this->canInst, evtMsg);
 		}

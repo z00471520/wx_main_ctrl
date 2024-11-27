@@ -14,36 +14,36 @@ WxModuleDeploy g_wxModuleDepolyInfos[] = {
         WX_MODULE_CAN_SLAVE_A,/* 模块ID */
         WX_CORE_ID_0,              /* 模块运行的核  */
         "task_main",               /* 模块运行的核内任务名 */
-        WX_CAN_SLAVE_A_Construct,  /* 模块构建函数-必选 */
-        WX_CAN_SLAVE_A_Destruct,   /* 模块析构函数 */
-        WX_CAN_SLAVE_A_Entry,      /* 模块消息 */
+        WX_CAN_SLAVE_Construct,  /* 模块构建函数-必选 */
+        WX_CAN_SLAVE_Destruct,   /* 模块析构函数 */
+        WX_CAN_SLAVE_Entry,      /* 模块消息 */
     },
     {
         "can_slave_b",       /* 模块名 */
         WX_MODULE_CAN_SLAVE_B, /* 模块ID */
         WX_CORE_ID_0,               /* 模块运行的核 */
         "task_main",                /* 模块运行的核内任务名, 需要保证核内有改函数 */
-        WX_CAN_SLAVE_B_Construct,   /* 模块构建函数-必选 */
-        WX_CAN_SLAVE_B_Destruct,    /* 模块析构函数 */
-        WX_CAN_SLAVE_B_Entry,       /* 模块消息 */
+        WX_CAN_SLAVE_Construct,   /* 模块构建函数-必选 */
+        WX_CAN_SLAVE_Destruct,    /* 模块析构函数 */
+        WX_CAN_SLAVE_Entry,       /* 模块消息 */
     },
     {
         "driver_can_b",       /* 模块名 */
         WX_MODULE_DRIVER_CAN_A, /* 模块ID */
         WX_CORE_ID_0,               /* 模块运行的核 */
         "task_driver",              /* 驱动任务名 */
-        WX_CAN_DRIVER_A_Construct,   /* 模块构建函数-必选 */
-        WX_CAN_DRIVER_A_Destruct,    /* 模块析构函数 */
-        WX_CAN_DRIVER_A_Entry,       /* 模块消息 */
+        WX_CAN_DRIVER_Construct,   /* 模块构建函数-必选 */
+        WX_CAN_DRIVER_Destruct,    /* 模块析构函数 */
+        WX_CAN_DRIVER_Entry,       /* 模块消息 */
     },
     {
         "driver_can_b",       /* 模块名 */
         WX_MODULE_DRIVER_CAN_B, /* 模块ID */
         WX_CORE_ID_0,                /* 模块运行的核 */
         "task_driver",               /* 驱动任务名 */
-        WX_CAN_DRIVER_B_Construct,   /* 模块构建函数-必选 */
+        WX_CAN_DRIVER_Construct,   /* 模块构建函数-必选 */
         WX_CAN_DRIVER_B_Destruct,    /* 模块析构函数 */
-        WX_CAN_DRIVER_B_Entry,       /* 模块消息 */
+        WX_CAN_DRIVER_Entry,       /* 模块消息 */
     },
     {
         "driver_rs422_master",       /* 模块名 */

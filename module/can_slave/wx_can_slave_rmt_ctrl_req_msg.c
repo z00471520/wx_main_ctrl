@@ -1,6 +1,6 @@
 #include "wx_can_slave_rmt_ctrl_req_msg.h"
 #include "wx_can_slave_common.h"
-UINT32 WX_CAN_SLAVE_ProcRmtCtrlReqMsgReset(WxCanSlaveModule *this, WxRmtCtrlReqMsg *reqMsg)
+UINT32 WX_CAN_SLAVE_ProcRmtCtrlReqMsgReset(WxCanSlave *this, WxRmtCtrlReqMsg *reqMsg)
 {
     /* DO reset */
 
@@ -15,7 +15,7 @@ WxRmtCtrlReqMsgHandle g_wxRmtCtrlReqMsgHandle[WX_RMT_CTRL_REQ_MSG_TYPE_BUTT] = {
 };
 
 /* 处理遥控消息 */
-UINT32 WX_CAN_SLAVE_ProcRmtCtrlReqMsg(WxCanSlaveModule *this, WxRmtCtrlReqMsg *reqMsg)
+UINT32 WX_CAN_SLAVE_ProcRmtCtrlReqMsg(WxCanSlave *this, WxRmtCtrlReqMsg *reqMsg)
 {
     /* 检查类型是否合理 */
     if (reqMsg->type >= WX_RMT_CTRL_CODE_BUTT) {
