@@ -1,7 +1,9 @@
 #ifndef __WX_DEPLOY_MODULES_H__
 #define __WX_DEPLOY_MODULES_H__
 #include "wx_include.h"
-#include "wx_module_id.h"
+#include "wx_id_def.h"
+
+#define INTC_DEVICE_ID		XPAR_INTC_0_DEVICE_ID
 /* 模块构建函数 */
 typedef UINT32 (*WxModuleConstructFunc)(VOID *module);
 typedef UINT32 (*WxModuleDestructFunc)(VOID *module);

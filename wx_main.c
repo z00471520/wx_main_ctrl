@@ -24,13 +24,21 @@
 #include "wx_rs422_uart_ns550.h"
 #include "wx_failcode.h"
 #include "xil_exception.h"
-#define INTC_DEVICE_ID		XPAR_SCUGIC_SINGLE_DEVICE_ID
-
 
 int main(void)
 {
+	xil_printf("WX_Deploy start...!");
+	UINT32 ret = WX_Deploy(WX_GetCurCoreId());
+	if (ret != WX_SUCCESS) {
+		xil_printf("WX_Deploy failed(%u)\r\n", ret);
+	} else {
+		xil_printf("WX_Deploy successful!");
+		/* 使能中断开始 */
+		Xil_ExceptionEnable();
+		/* Start the scheduler. */
+		vTaskStartScheduler();
+	}
 	
-
 	/* If all is well, the scheduler will now be running, and the following line
 	will never be reached.  If the following line does execute, then there was
 	insufficient FreeRTOS heap memory available for the idle and/or timer tasks

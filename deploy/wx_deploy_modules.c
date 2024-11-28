@@ -1,4 +1,6 @@
 
+#include "xparameters.h"
+#include "xil_exception.h"
 #include "wx_deploy_modules.h"
 #include "wx_deploy_tasks.h"
 #include "wx_include.h"
@@ -7,6 +9,14 @@
 #include "wx_can_driver_a.h"
 #include "wx_rs422_driver_master.h"
 #include "wx_rs422_slave_driver.h"
+XScuGic_Config *g_wxScuGicCfg = NULL;
+
+XScuGic_Config *WX_GetOrCreateScuGicCfg()
+{
+    
+}
+ XScuGic_LookupConfig(XPAR_SCUGIC_0_DEVICE_ID);
+
 /* 模块部署信息 */
 WxModuleDeploy g_wxModuleDepolyInfos[] = {
     {
