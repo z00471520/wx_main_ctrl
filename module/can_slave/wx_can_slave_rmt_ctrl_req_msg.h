@@ -16,6 +16,7 @@ typedef enum {
 typedef struct {
     WxRmtCtrlReqMsgType type; /* 请求消息类型 */
     union {
+        UINT8 resv; /* 保留 */
     };
 } WxRmtCtrlReqMsg;
 

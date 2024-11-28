@@ -60,9 +60,9 @@ WxModuleDeploy g_wxModuleDepolyInfos[] = {
         WX_MODULE_DRIVER_RS422_MASTER, /* 模块ID */
         WX_CORE_ID_0,                /* 模块运行的核 */
         "task_driver",               /* 驱动任务名 */
-        WX_RS422_DRIVER_MASTER_Construct,   /* 模块构建函数-必选 */
-        WX_RS422_DRIVER_MASTER_Destruct,    /* 模块析构函数 */
-        WX_RS422_DRIVER_MASTER_Entry,       /* 模块消息 */
+        WX_RS422MasterDriver_Construct,   /* 模块构建函数-必选 */
+        WX_RS422MasterDriver_Destruct,    /* 模块析构函数 */
+        WX_RS422MasterDriver_Entry,       /* 模块消息 */
     },
     {
         "driver_rs422_slave",           /* 模块名 */

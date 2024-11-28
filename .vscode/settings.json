@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "wx_msg_common.h": "c",
+        "wx_include.h": "c",
+        "wx_failcode.h": "c"
+    }
+}

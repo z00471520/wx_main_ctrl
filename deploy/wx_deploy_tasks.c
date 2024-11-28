@@ -1,7 +1,10 @@
 
-#include "wx_deploy_task.h"
+#include "wx_deploy_tasks.h"
 #include "wx_include.h"
-
+#include "FreeRTOS.h"
+#include "task.h"
+#include "wx_deploy_tasks_funcode.h"
+#include "wx_msg_common.h"
 WxDeployTasks *g_wxDeployTasks = NULL;     /* 任务列表 */
 
 /* 任务配置信息, 规定各核运行的任务 */
@@ -30,7 +33,7 @@ WxTaskDeploy g_wxTaskDeployInfo[] = {
     // /* if more please add here */
 };
 
-INLINE UINT32 WX_DeployTasks_GetTaskDeployNum(VOID)
+inline UINT32 WX_DeployTasks_GetTaskDeployNum(VOID)
 {
     return sizeof(g_wxTaskDeployInfo) / sizeof(g_wxTaskDeployInfo[0]);
 }
@@ -61,7 +64,7 @@ UINT32 WX_DeployTasks_Destroy(VOID)
 
 
 /* 获取第I个部署，参数合法性由调用者保证 */
-INLINE WxTaskDeploy *WX_DeployTasks_GetTaskDeploy(UINT32 i)
+inline WxTaskDeploy *WX_DeployTasks_GetTaskDeploy(UINT32 i)
 {
     return &g_wxTaskDeployInfo[i];
 }
@@ -77,12 +80,6 @@ WxTask *WX_DeployTasks_QueryTask(CHAR *taskName)
         }
     }
     return task;
-}
-
-/* 获取驱动任务 */
-WxTask *WX_DeployTasks_GetDriverTask(VOID)
-{
-    return&g_wxDeployTasks->driverTask;
 }
 
 /* 部署一个任务 */

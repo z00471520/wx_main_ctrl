@@ -1,6 +1,6 @@
-#ifndef __WX_RS422_DRIVER_MASTER_H__
-#define __WX_RS422_DRIVER_MASTER_H__
-
+#ifndef __WX_RS422MasterDriver_H__
+#define __WX_RS422MasterDriver_H__
+#include "wx_modbus.h"
 typedef enum {
     WX_RS422_MASTER_STATUS_IDLE = 0,
     WX_RS422_MASTER_STATUS_TX_ADU,
@@ -8,15 +8,14 @@ typedef enum {
 } WxRs422Status;
 
 typedef struct {
-    UINT8 status; /* 状态 */
+    UINT8 status; /* 鐘舵�� */
     WxModbusAdu txAdu; /* the adu to be send by rs422 */
     WxModbusAdu rxAdu;  /* the adu recieve from rs422 */
-    QueueHandle_t msgQueHandle; /* 用于缓存外部模块发送给RS422的待发送的消息队列 */
-    XUartNs550 rs422Inst; /* RS422实例 */
-    UINT64 slaveExcpCnt[WX_RS422_MASTER_MB_OPR_BUTT][WX_RS422_MASTER_SLAVE_ADDR_BUTT][WX_MODBUS_MAX_EXCP_CODE_NUM]; /* 用于记录不同操作不同从机返回的异常码 */
+    QueueHandle_t msgQueHandle; /* 鐢ㄤ簬缂撳瓨澶栭儴妯″潡鍙戦�佺粰RS422鐨勫緟鍙戦�佺殑娑堟伅闃熷垪 */
+    XUartNs550 rs422Inst; /* RS422瀹炰緥 */
 } WxRs422DriverMaster;
 
-UINT32 WX_RS422_DRIVER_MASTER_Construct(VOID *module);
-UINT32 WX_RS422_DRIVER_MASTER_Entry(VOID *module, WxMsg *evtMsg);
-UINT32 WX_RS422_DRIVER_MASTER_Destruct(VOID *module);
-#endif //__WX_RS422_DRIVER_MASTER_H__
+UINT32 WX_RS422MasterDriver_Construct(VOID *module);
+UINT32 WX_RS422MasterDriver_Entry(VOID *module, WxMsg *evtMsg);
+UINT32 WX_RS422MasterDriver_Destruct(VOID *module);
+#endif //__WX_RS422MasterDriver_H__

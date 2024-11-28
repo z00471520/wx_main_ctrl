@@ -41,13 +41,12 @@ UINT32 WX_RS422_MASTER_SendAdu2Driver(WxRs422Master *this, WxAdu *adu)
     msg->sender = this->moduleId;
     msg->receiver = WX_MODULE_DRIVER_RS422_MASTER;
     msg->msgType = WX_MSG_TYPE_RS422_MASTER_DRIVER;
-    msg->msgDataLen = sizeof(WxModbusAdu);
     /* 填写数据内容 */
     WxModbusAdu *modbusAdu = (WxModbusAdu *)msg->msgData;
     for (int i = 0; i < adu->dataLen; i++) {
-        modbusAdu->data[i] = adu->data[i];
+        modbusAdu->value[i] = adu->data[i];
     }
-    modbusAdu->dataLen = adu->dataLen;
+    modbusAdu->valueLen = adu->dataLen;
     modbusAdu->expectRspLen = adu->expectRspLen;
 
     /* 发送消息 */
@@ -126,7 +125,7 @@ UINT32 WX_RS422_MASTER_ProRspcAduMsg(WxRs422Master *this, WxMsg *msg)
 /* |salve address: 1byte| func code: 1byte| data addr: 2byte | data len：1byte | data: N | */
 UINT32 WX_RS422_MASTER_EncWrDataReqMsg2Adu(WxRs422MasterWrDataReqMsg *msg, WxModbusAdu *adu)
 {
-    WxRs422MasterWrDataEncHandle *handle = WX_RS422_MASTER_GetWrDataHandle[txMsg->msgSubType];
+    WxRs422MasterWrDataEncHandle *handle = WX_RS422_MASTER_GetWrDataHandle[txMsg->subMsgType];
     if (handle->encStruct == NULL) {
         return WX_RS422_MASTER_WR_REQ_ENCODE_FUNC_UNDEF;
     }
@@ -167,16 +166,16 @@ UINT32 WX_RS422_MASTER_EncWrDataReqMsg2Adu(WxRs422MasterWrDataReqMsg *msg, WxMod
 UINT32 WX_RS422_MASTER_EncRdDataReqMsg2Adu(WxRs422MasterRdDataReqMsg *msg, WxModbusAdu *txAdu)
 {
     /* 判断消息类型是否合理 */
-    if (msg->msgSubType >= WX_RS422_MASTER_MSG_READ_DATA_BUTT) {
+    if (msg->subMsgType >= WX_RS422_MASTER_MSG_READ_DATA_BUTT) {
         return WX_RS422_MASTER_INVALID_SUB_OPR_TYPE;
     }
-    WxRs422MasterRdDataHandle *handle = &g_wxRs422MasterReadDataHandles[txMsg->msgSubType];
+    WxRs422MasterRdDataHandle *handle = &g_wxRs422MasterReadDataHandles[txMsg->subMsgType];
     /* the length 0 means that you not define the encode info, wtf! */
     if (handle->dataLen == 0) {
         return WX_RS422_MASTER_READ_REQ_ENCODE_INFO_UNDEF;
     }
     txAdu->msgType = msg->msgType,
-    txAdu->msgSubType = msg->msgSubType;
+    txAdu->subMsgType = msg->subMsgType;
     txAdu->valueLen = 0;
     /* slave address */
     txAdu->value[txAdu->valueLen++] = handle->slaveDevice;
@@ -194,7 +193,7 @@ UINT32 WX_RS422_MASTER_EncRdDataReqMsg2Adu(WxRs422MasterRdDataReqMsg *msg, WxMod
     txAdu->value[txAdu->valueLen++] = (UINT8)(crcValue & 0xff); 
     /* 期望响应的长度
      * 响应的数据格式如下如下:
-     * |从站：1byte | 功能码：1byte | 数据长度：1byte | 数据： N byte | CRC: 2BYTE| 
+     * |从站：1byte | 功能码：1byte | 数据长度：1byte | 数据： N byte | CRC: 2BYTE|
      **/
     txAdu->expectRspLen = 1 + 1 + 1 + handle->dataLen + WX_MODBUS_CRC_LEN;
 

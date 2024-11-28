@@ -1,6 +1,5 @@
-#include "wx_rs422_i_master_task.h"
-#include "wx_rs422_i_master_enc_adu_read_data_req.h"
-
+#include "wx_rs422_master.h"
+#include "wx_include.h"
 UINT32 WX_RS422_MASTER_DecRdDataX(UINT8 buff[], UINT8 buffSize, WxRs422MasterReadData *rspStruct)
 {
     return WX_ERR;
@@ -15,11 +14,9 @@ UINT32 WX_RS422_MASTER_DecRdDataY(UINT8 buff[], UINT8 buffSize, WxRs422MasterRea
 /* 不同读操作的编码信息, 方便添加我把所有的都放到这里了 */
 WxRs422MasterRdDataHandle g_wxRs422MasterReadDataHandles[WX_RS422_MASTER_MSG_READ_DATA_BUTT] = {
                                      /* 提供数据的从机地址, 读数据地址U16， 读数据的长度（U8），读到数据的解码函数 */
-    [WX_RS422_MASTER_MSG_READ_DATA_XXX] = {WX_RS422_MASTER_SLAVE_XXX, 0, sizeof(WxRs422MasterRdDataX), WX_RS422_MASTER_DecRdDataX},
-    [WX_RS422_MASTER_MSG_READ_DATA_YYY] = {WX_RS422_MASTER_SLAVE_YYY, 0, sizeof(WxRs422MasterRdDataY), WX_RS422_MASTER_DecRdDataY},
+    [WX_RS422_MASTER_MSG_READ_DATA_XXX] = {WX_RS422_MASTER_SLAVE_ADDR_XXX, 0, sizeof(WxRs422MasterRdDataX), WX_RS422_MASTER_DecRdDataX},
+    [WX_RS422_MASTER_MSG_READ_DATA_YYY] = {WX_RS422_MASTER_SLAVE_ADDR_YYY, 0, sizeof(WxRs422MasterRdDataY), WX_RS422_MASTER_DecRdDataY},
 };
-
-
 
 UINT32 WX_RS422_MASTER_DecRdDataAdu(WxModbusAdu *rxAdu, WxRs422MasterReadData *readData)
 {

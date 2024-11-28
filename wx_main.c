@@ -19,9 +19,7 @@
 /* Xilinx includes. */
 #include "xil_printf.h"
 #include "xparameters.h"
-#include "wx_main_ctrl_cpu0.h"
 #include "wx_typedef.h"
-#include "wx_rs422_uart_ns550.h"
 #include "wx_failcode.h"
 #include "xil_exception.h"
 

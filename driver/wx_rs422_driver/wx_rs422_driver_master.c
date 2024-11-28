@@ -1,11 +1,14 @@
 #include "wx_include.h"
 #include "wx_rs422_driver_master.h"
-#include "wx_rs422_driver_master_req_msg.h"
+#include "FreeRTOS.h"
+#include "queue.h"
+#include "wx_msg_common.h"
+#include "wx_rs422_master_driver_intf.h"
 WxRs422DriverCfg g_rs422DriverMasterCfg = {
 
 };
 
-VOID WX_RS422_DRIVER_MASTER_SentRspAdu2Rs422Master(WxRs422DriverMaster *this, WxModbusAdu *rxAdu)
+VOID WX_RS422MasterDriver_SentRspAdu2Rs422Master(WxRs422DriverMaster *this, WxModbusAdu *rxAdu)
 {
     UINT32 ret;
     /* 申请消息 */
@@ -20,7 +23,6 @@ VOID WX_RS422_DRIVER_MASTER_SentRspAdu2Rs422Master(WxRs422DriverMaster *this, Wx
     msg->sender = this->moduleId;
     msg->receiver = WX_MODULE_RS422_I_MASTER;
     msg->msgType = WX_MSG_TYPE_RS422_MASTER_ADU_RSP;
-    msg->msgDataLen = sizeof(WxModbusAdu);
     /* 发送消息 */
     UINT32 ret = WX_MsgShedule(this->moduleId, msg->receiver, msg);
     if (ret != WX_SUCCESS) {
@@ -29,11 +31,11 @@ VOID WX_RS422_DRIVER_MASTER_SentRspAdu2Rs422Master(WxRs422DriverMaster *this, Wx
 }
 
 /* 处理接收到的PDU */
-VOID WX_RS422_DRIVER_MASTER_ProcRecvAduFromISR(WxRs422DriverMaster *this)
+VOID WX_RS422MasterDriver_ProcRecvAduFromISR(WxRs422DriverMaster *this)
 {
     this->status = WX_RS422_MASTER_STATUS_IDLE;
     /* 处理接收到的报文 */
-    WX_RS422_DRIVER_MASTER_SentRspAdu2Rs422Master(this,  &this->rxAdu);
+    WX_RS422MasterDriver_SentRspAdu2Rs422Master(this, &this->rxAdu);
 
     /* 发送消息通知RS422编解码模块处理 */
     WxModbusAdu *txAdu = &this->txAdu;
@@ -42,7 +44,7 @@ VOID WX_RS422_DRIVER_MASTER_ProcRecvAduFromISR(WxRs422DriverMaster *this)
         /* 清空并预设预期接收的报文大小，防止任务被抢占来不及缓存导致串口消息丢失 */
         UINT32 recvCount; 
         do {
-            recvCount = XUartNs550_Recv(&this->rs422Inst, rxAdu->value, txAdu->expectRspLen);
+            recvCount = XUartNs550_Recv(&this->rs422Inst, &this->rxAdu.value, txAdu->expectRspLen);
         } while (recvCount);
         
         /* 首次发送消息会被缓存到实例，返回缓存了多少报文 */
@@ -61,7 +63,7 @@ VOID WX_RS422_DRIVER_MASTER_ProcRecvAduFromISR(WxRs422DriverMaster *this)
 /* RS422I中断处理函数 */
 VOID WX_RS422I_DRIVER_MASTER_IntrHandler(VOID *callBackRef, UINT32 event, UINT32 eventData)
 {
-    WxRs422DriverMaster *this = CallBackRef;
+    WxRs422DriverMaster *this = callBackRef;
     /*
 	 * All of the data has been sent.
 	 */
@@ -76,7 +78,7 @@ VOID WX_RS422I_DRIVER_MASTER_IntrHandler(VOID *callBackRef, UINT32 event, UINT32
 	if (event == XUN_EVENT_RECV_DATA) {
         
         this->rxAdu.valueLen = eventData;
-        WX_RS422_DRIVER_MASTER_ProcRecvAduFromISR(this);
+        WX_RS422MasterDriver_ProcRecvAduFromISR(this);
 	}
 
 	/*
@@ -85,11 +87,11 @@ VOID WX_RS422I_DRIVER_MASTER_IntrHandler(VOID *callBackRef, UINT32 event, UINT32
 	 */
 	if (event == XUN_EVENT_RECV_TIMEOUT) {
         this->rxAdu.valueLen = eventData;
-        WX_RS422_DRIVER_MASTER_ProcRecvAduFromISR(this);
+        WX_RS422MasterDriver_ProcRecvAduFromISR(this);
 	}
 }
 
-UINT32 WX_RS422_DRIVER_MASTER_ProcTxAduMsg(WxRs422DriverMaster *this, WxRs422MasterDriverMsg *msg)
+UINT32 WX_RS422MasterDriver_ProcTxAduMsg(WxRs422DriverMaster *this, WxRs422MasterDriverMsg *msg)
 {
     if (this->status != WX_RS422_MASTER_STATUS_IDLE) {
         /* 缓存待发送的消息 */
@@ -98,7 +100,8 @@ UINT32 WX_RS422_DRIVER_MASTER_ProcTxAduMsg(WxRs422DriverMaster *this, WxRs422Mas
         }
         return WX_SUCCESS;
     }
-    
+    WxModbusAdu *rxAdu = &this->rxAdu;
+    WxModbusAdu *txAdu = &this->txAdu;
     /* 清空并预设预期接收的报文大小，防止任务被抢占来不及缓存导致串口消息丢失 */
     UINT32 recvCount; 
     do {
@@ -116,7 +119,7 @@ UINT32 WX_RS422_DRIVER_MASTER_ProcTxAduMsg(WxRs422DriverMaster *this, WxRs422Mas
 }
 
 
-UINT32 WX_RS422_DRIVER_MASTER_Construct(VOID *module)
+UINT32 WX_RS422MasterDriver_Construct(VOID *module)
 {
     UINT32 ret;
     WxRs422DriverMaster *this = WX_Mem_Alloc(WX_GetModuleName(module), 1, sizeof(WxRs422DriverMaster));
@@ -125,7 +128,7 @@ UINT32 WX_RS422_DRIVER_MASTER_Construct(VOID *module)
     }
     WxRs422DriverCfg *cfg = &g_rs422DriverMasterCfg;
     /* 创建RS422消息缓存队列 */
-    this->msgQueHandle = xQueueCreate(cfg->msgQueItemNum, sizeof(modbusAdu));
+    this->msgQueHandle = xQueueCreate(cfg->msgQueItemNum, sizeof(WxModbusAdu));
     if (this->msgQueHandle == NULL) {
         wx_critical("Error Exit: xQueueCreate fail");
         return WX_RS422_MASTER_CREATE_MSG_QUE_FAIL;
@@ -133,12 +136,12 @@ UINT32 WX_RS422_DRIVER_MASTER_Construct(VOID *module)
     /* the inst or rs422 used for uart data tx/rx */
     ret = WX_InitUartNs550(&this->rs422Inst, cfg->rs422DevId, cfg->rs422Format);
     if (ret != WX_SUCCESS) {
-        return rc;
+        return ret;
     }
 
     /* 设置中断 */
     ret = WX_SetupUartNs550Interrupt(&this->rs422Inst, WX_RS422I_DRIVER_MASTER_IntrHandler, cfg->intrId, this);
-    if (rc != WX_SUCCESS) {
+    if (ret != WX_SUCCESS) {
         return ret;
     }
 
@@ -147,7 +150,7 @@ UINT32 WX_RS422_DRIVER_MASTER_Construct(VOID *module)
     return WX_SUCCESS;
 }
 
-UINT32 WX_RS422_DRIVER_MASTER_Entry(VOID *module, WxMsg *evtMsg)
+UINT32 WX_RS422MasterDriver_Entry(VOID *module, WxMsg *evtMsg)
 {
     WxRs422DriverMaster *this = WX_GetModuleInfo(module);
     if (evtMsg->msgType != WX_MSG_TYPE_RS422_MASTER_DRIVER) {
@@ -156,7 +159,7 @@ UINT32 WX_RS422_DRIVER_MASTER_Entry(VOID *module, WxMsg *evtMsg)
     /* 子消息类型 */
     switch (evtMsg->subMsgType) {
         case WX_SUB_MSG_RS422_DRIVER_MASTER_TX_ADU: {
-            return WX_RS422_DRIVER_MASTER_ProcTxAduMsg(this, evtMsg);
+            return WX_RS422MasterDriver_ProcTxAduMsg(this, evtMsg);
         }
         default: {
             return WX_ERR;
@@ -164,7 +167,7 @@ UINT32 WX_RS422_DRIVER_MASTER_Entry(VOID *module, WxMsg *evtMsg)
     }
 }
 
-UINT32 WX_RS422_DRIVER_MASTER_Destruct(VOID *module)
+UINT32 WX_RS422MasterDriver_Destruct(VOID *module)
 {
     WxRs422DriverMaster *this = WX_GetModuleInfo(module);
     if (this == NULL) {

@@ -24,6 +24,7 @@ typedef struct {
 
 typedef struct {
     UINT32 moduleId;  /* 模块ID */
+    UINT32 txQueueDepth; /* the tx que depth  */
     WxCanDriverDevCfg devCfg;   /* device cfg */  
     WxCanDriverIntrCfg intrCfg;  /* interrupt cfg */
 } WxCanDriverCfg;
@@ -70,7 +71,7 @@ typedef struct {
 
 typedef struct {
     XCanPs canInst;
-    QueueHandle_t sendQueue;
+    QueueHandle_t sendQueue;    /* to buff the send can frame */
     WxModuleId moduleId;
     UINT32 resv;
     WxCanDriverCfg *cfg; /* driver cfg */

@@ -1,6 +1,5 @@
 #ifndef __WX_RS422_SLAVE_H__
 #define __WX_RS422_SLAVE_H__
-#include "wx_uart_ns550.h"
 #include "wx_modbus.h"
 #include "wx_id_def.h"
 /******************************************************************************

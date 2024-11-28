@@ -19,10 +19,10 @@ WxRs422MasterWrDataEncHandle g_wxRs422MasterWrDataEncHandles[WX_RS422_MASTER_MSG
 
 WxRs422MasterWrDataEncHandle* WX_RS422_MASTER_GetWrDataHandle(UINT16 subMsgType)
 {
-    if (msgSubType >= WX_RS422_MASTER_MSG_WRITE_BUTT) {
+    if (subMsgType >= WX_RS422_MASTER_MSG_WRITE_BUTT) {
         return NULL;
     }
-    return &g_wxRs422MasterWrDataEncHandles[msgSubType];
+    return &g_wxRs422MasterWrDataEncHandles[subMsgType];
 }
 
  

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cdtprojectproperties>
+<section name="org.eclipse.cdt.internal.ui.wizards.settingswizards.IncludePaths">
+<language name="s">
+
+</language>
+<language name="c,S">
+<includepath>${resolvePlatformFile:project=wx_main_app,fileType=bspInclude}</includepath>
+<includepath workspace_path="true">/wx_main_app/src/common</includepath>
+<includepath workspace_path="true">/wx_main_app/src/debug</includepath>
+<includepath workspace_path="true">/wx_main_app/src/deploy</includepath>
+
+</language>
+<language name="ld">
+
+</language>
+<language name="Object File">
+
+</language>
+</section>
+<section name="org.eclipse.cdt.internal.ui.wizards.settingswizards.Macros">
+<language name="s">
+
+</language>
+<language name="c,S">
+
+</language>
+<language name="ld">
+
+</language>
+<language name="Object File">
+
+</language>
+</section>
+</cdtprojectproperties>

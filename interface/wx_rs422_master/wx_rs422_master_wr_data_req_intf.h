@@ -3,6 +3,7 @@
 #include "wx_typedef.h"
 #include "wx_modbus.h"
 #include "wx_msg_common.h"
+#include "wx_include.h"
 
 /******************************************************************************
  * 写数据请求子类型定义

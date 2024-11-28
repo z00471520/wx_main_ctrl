@@ -1,54 +1,54 @@
 #ifndef __WX_CAN_SLAVE_H__
 #define __WX_CAN_SLAVE_H__
-/* 卫星遥控的指令码-需要根据卫星通信规范确定 */
-typedef enum{
-    WX_RMT_CTRL_CODE_RESET = 0, /* 复位请求 */
-    WX_RMT_CTRL_CODE_DEVICE_SELF_CHECK = 1, /* 设备自检 */
+#include "wx_include.h"
+#define WX_CAN_SLAVE_PDU_DATA_SIZE 1500
+/* 鍗槦閬ユ帶鐨勬寚浠ょ爜-闇�瑕佹牴鎹崼鏄熼�氫俊瑙勮寖纭畾 */
+typedef enum {
+    WX_RMT_CTRL_CODE_RESET = 0, /* 澶嶄綅璇锋眰 */
+    WX_RMT_CTRL_CODE_DEVICE_SELF_CHECK = 1, /* 璁惧鑷 */
     WX_RMT_CTRL_CODE_BUTT,
 } WxRmtCtrlCodeDef;
 
 #define WX_CAN_DRIVER_FRAME_LIST_MAX_ITERM_NUM 200
-typedef struct
+typedef struct tagWxCanFrameList
 {
-    UINT32 canFrameNum; /* CAN Frame个数 */ 
+    UINT32 canFrameNum; /* CAN Frame涓暟 */
     WxCanFrame canFrames[WX_CAN_DRIVER_FRAME_LIST_MAX_ITERM_NUM];
-}WxCanFrameList;
+} WxCanFrameList;
 
 typedef struct {
-    UINT16 rmtCtrlCode; /* PDU对应遥控指令码 */
-    UINT16 dataLen;     /* 遥控指令码对应的PDU数据长度 */
-    UINT8 data[WX_CAN_SLAVE_PDU_DATA_SIZE]; /* 遥控指令码对应的PDU数据 */
+    UINT16 rmtCtrlCode; /* PDU瀵瑰簲閬ユ帶鎸囦护鐮� */
+    UINT16 dataLen;     /* 閬ユ帶鎸囦护鐮佸搴旂殑PDU鏁版嵁闀垮害 */
+    UINT8 data[WX_CAN_SLAVE_PDU_DATA_SIZE]; /* 閬ユ帶鎸囦护鐮佸搴旂殑PDU鏁版嵁 */
 } WxRmtCtrlPdu;
 
-/* 解码PDU的函数 */
+/* 瑙ｇ爜PDU鐨勫嚱鏁� */
 typedef UINT32 (*WxRmtCtrlPduDecHandle)(WxCanSlave *this, WxRmtCtrlPdu *pdu, WxRmtCtrlReqMsg *msg);
 typedef UINT32 (*WxRmtCtrlReqMsgHandle)(WxCanSlave *this, WxRmtCtrlReqMsg *msg);
 typedef struct {
-    WxRmtCtrlReqMsgType msgType; /* 消息类型 */
-    WxRmtCtrlPduDecHandle decHandle; /* 遥控指令码的对应的PDU解码函数，解析出消息 */
-    WxRmtCtrlReqMsgHandle msgQueHandle; /* 消息处理Handle */
+    WxRmtCtrlReqMsgType msgType; /* 娑堟伅绫诲瀷 */
+    WxRmtCtrlPduDecHandle decHandle; /* 閬ユ帶鎸囦护鐮佺殑瀵瑰簲鐨凱DU瑙ｇ爜鍑芥暟锛岃В鏋愬嚭娑堟伅 */
+    WxRmtCtrlReqMsgHandle msgQueHandle; /* 娑堟伅澶勭悊Handle */
 } WxRmtCtrlReqHandle;
 
-
-
 typedef struct {
-    UINT8 canFrameDataLen; /* CAN帧数据固定长度 */
-    UINT8 moduleId;       /* 模块ID */
-    UINT32 messId;    /* CAN消息ID */
-    WxCanDriverCfg deviceCfgInfo; /* CAN设备配置信息 */ 
-    WxCanDriverIntrCfg intrCfgInfo; /* 中断配置信息 */
+    UINT8 canFrameDataLen; /* CAN甯ф暟鎹浐瀹氶暱搴� */
+    UINT8 moduleId;       /* 妯″潡ID */
+    UINT32 messId;    /* CAN娑堟伅ID */
+    WxCanDriverCfg deviceCfgInfo; /* CAN璁惧閰嶇疆淇℃伅 */
+    WxCanDriverIntrCfg intrCfgInfo; /* 涓柇閰嶇疆淇℃伅 */
 } WxCanSlaveCfg;
 
-/* CAN从机任务信息 */
+/* CAN浠庢満浠诲姟淇℃伅 */
 typedef struct {
-    WxModuleId moduleId;            /* 当前模块的ID */
-    UINT32 resv;                    /* 保留字段 */
-    WxRmtCtrlReqMsg reqMsg;         /* CAN 遥控请求请求 */
+    WxModuleId moduleId;            /* 褰撳墠妯″潡鐨処D */
+    UINT32 resv;                    /* 淇濈暀瀛楁 */
+    WxRmtCtrlReqMsg reqMsg;         /* CAN 閬ユ帶璇锋眰璇锋眰 */
     WxRmtCtrlPdu reqPdu;            /* CAN Req PDU */
     WxRmtCtrlPdu rspPdu;            /* CAN RSP PDU */
-    WxCanFrameList canFrameList;    /* 待发送canFrameList */
-    WxCanSlaveCfg *cfgInfo;     /* 配置信息的指针 */
-    QueueHandle_t txBuffQue;        /* 发送CANframe的缓冲队列 */
+    WxCanFrameList canFrameList;    /* 寰呭彂閫乧anFrameList */
+    WxCanSlaveCfg *cfgInfo;     /* 閰嶇疆淇℃伅鐨勬寚閽� */
+    QueueHandle_t txBuffQue;        /* 鍙戦�丆ANframe鐨勭紦鍐查槦鍒� */
 } WxCanSlave;
 
 #endif //__WX_CAN_SLAVE_H__

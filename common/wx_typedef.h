@@ -17,6 +17,8 @@ typedef unsigned char	BOOL;	/**< boolean (XTRUE or XFALSE) */
 typedef unsigned long long UINT64;
 typedef void VOID;
 typedef inline INLINE;
+#define FALSE 				0
+#define TRUE				1
 /*
  * basic macro define
  */

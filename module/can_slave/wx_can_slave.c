@@ -1,27 +1,28 @@
 #include "wx_include.h"
-#include "wx_can_slave_common.h"
+#include "wx_can_slave.h"
 #include "wx_can_slave.h"
 #include "wx_id_def.h"
+#include  "wx_can_slave_rmt_ctrl_pdu.h"
 WxCanSlaveCfg g_wxCanSlaveCfg[] = {
     {
-        /* 自定义配置 */
+        /* 鑷畾涔夐厤缃� */
         .canFrameDataLen = 8,
         .moduleId = WX_MODULE_CAN_SLAVE_A,
-        /* 设备配置 */
-        .deviceCfgInfo.isEnable = FALSE, /* 是否使能 */
+        /* 璁惧閰嶇疆 */
+        .deviceCfgInfo.isEnable = FALSE, /* 鏄惁浣胯兘 */
         .deviceCfgInfo.baudPrescalar = 0,
-        /* 中断配置 */
+        /* 涓柇閰嶇疆 */
         .intrCfgInfo.intrId = 0,
         .intrCfgInfo.callBackRef = 0,
     }, 
     {
-         /* 自定义配置 */
+         /* 鑷畾涔夐厤缃� */
         .canFrameDataLen = 8,
         .moduleId = WX_MODULE_CAN_SLAVE_B,
-        /* 设备配置 */
-        .deviceCfgInfo.isEnable = FALSE, /* 是否使能 */
+        /* 璁惧閰嶇疆 */
+        .deviceCfgInfo.isEnable = FALSE, /* 鏄惁浣胯兘 */
         .deviceCfgInfo.baudPrescalar = 0,
-        /* 中断配置 */
+        /* 涓柇閰嶇疆 */
         .intrCfgInfo.intrId = 0,
         .intrCfgInfo.callBackRef = 0,
     }
@@ -38,21 +39,14 @@ WxCanSlaveCfg *WX_CanSlave_GetCfg(UINT32 moduleId)
     return NULL;
 }
 
-
-/* 不同指令码对应的Handle */
 WxRmtCtrlReqHandle g_wxRmtCtrlReqHandles[WX_RMT_CTRL_CODE_BUTT] = {
-    /* [指令码] = {内部消息类型，指令码PDU解码函数, 消息处理函数} */
+    /* 指令码						消息类型	消息解码函数		消息处理函数 */
     [WX_RMT_CTRL_CODE_RESET] = {WX_RMT_CTRL_REQ_MSG_TYPE_RESET, WX_CAN_SLAVE_DecRmtCtrlPduReset, WX_CAN_SLAVE_ProcRmtCtrlReqMsgReset},
 };
 
 
 UINT32 WX_CAN_SLAVE_CheckCanFrameMsg(WxCanFrameMsg *msg)
 {
-    if (msg->msgHead.msgDataLen != sizeof(WxCanFrame)) {
-        wx_critical(WX_EXCP_INVALID_MSG_BODY_LEN, "Error Exit: Invalid msgLen(%u)", msg->msgHead.msgDataLen);
-        return WX_INVALID_MSG_BODY_LEN;
-    }
-
     if (msg->canFrame.dataLengCode == 0) {
         wx_excp_cnt(WX_EXCP_CAN_FRAME_DATA_LEN_ERR);
         return WX_CAN_SLAVE_CAN_FRAME_DATA_LEN_ERR;
@@ -61,14 +55,6 @@ UINT32 WX_CAN_SLAVE_CheckCanFrameMsg(WxCanFrameMsg *msg)
     return WX_SUCCESS;
 }
 
-/* 
- * 函数功能: 解封装FRAME, 把CAN frame解析成PDU
- * 返回值说明
- * WX_SUCCESS - 解封装成功
- * WX_TO_BE_CONTINUE - 解封装未完待续
- * 其他：解封装异常
- * 备注：该模块需要根据最终的卫星协议来确定
- **/
 UINT32 WX_CAN_SLAVE_DecapCanFrame(WxCanSlave *this, WxCanFrame *canFrame, WxRmtCtrlPdu *canPdu)
 {
     UINT32 ret = WX_CAN_SLAVE_CheckCanFrameMsg(canFrame);
@@ -80,28 +66,28 @@ UINT32 WX_CAN_SLAVE_DecapCanFrame(WxCanSlave *this, WxCanFrame *canFrame, WxRmtC
     return WX_SUCCESS;
 }
 
-/* 处理CAN驱动发送过来的CAN FRAME */
+/* 澶勭悊CAN椹卞姩鍙戦�佽繃鏉ョ殑CAN FRAME */
 UINT32 WX_CAN_SLAVE_ProcCanFrameMsg(WxCanSlave *this, WxMsg *evtMsg)
 {
     WxCanFrameMsg *canFrameMsg = (WxCanFrameMsg *)evtMsg;
-    /* 解封装CAN Frame, 把CAN Frame组合出CAN PDU */
+    /* 瑙ｅ皝瑁匔AN Frame, 鎶奀AN Frame缁勫悎鍑篊AN PDU */
     UINT32 ret = WX_CAN_SLAVE_DecapCanFrame(this, &canFrameMsg->canFrame, &this->reqPdu);
     if (ret != WX_SUCCESS) {
-        /* 当前CAN Frame不足以解析出PDU */
+        /* 褰撳墠CAN Frame涓嶈冻浠ヨВ鏋愬嚭PDU */
         if (ret == WX_TO_BE_CONTINUE) {
             return WX_SUCCESS;
         }
         return ret;
     }
     
-    /* 对PDU进行解码获取最终的遥控请求消息 */
+    /* 瀵筆DU杩涜瑙ｇ爜鑾峰彇鏈�缁堢殑閬ユ帶璇锋眰娑堟伅 */
     WxRmtCtrlReqMsg *reqMsg = &this->reqMsg;
     ret = WX_CAN_SLAVE_DecRmtCtrlPdu(this, &this->reqPdu, reqMsg);
     if (ret != WX_SUCCESS) {
         return ret;
     }
 
-    /* 处理解码后的消息 */
+    /* 澶勭悊瑙ｇ爜鍚庣殑娑堟伅 */
     ret = WX_CAN_SLAVE_ProcRmtCtrlReqMsg(this, reqMsg);
     if (ret != WX_SUCCESS) {
         return ret;
@@ -110,7 +96,7 @@ UINT32 WX_CAN_SLAVE_ProcCanFrameMsg(WxCanSlave *this, WxMsg *evtMsg)
     return WX_SUCCESS;
 }
 
-/* 模块构建函数 */
+/* 妯″潡鏋勫缓鍑芥暟 */
 UINT32 WX_CAN_SLAVE_Construct(VOID *module)
 {
     UINT32 ret;
@@ -125,12 +111,12 @@ UINT32 WX_CAN_SLAVE_Construct(VOID *module)
         wx_critical("Error Exit: WX_CanSlave_GetCfg(%u) fail", this->moduleId);
         return WX_CAN_SLAVE_MODULE_CFG_UNDEF;
     }
-    /* 设置上Module */
+    /* 璁剧疆涓奙odule */
     WX_SetModuleInfo(module, this);
     return WX_SUCCESS;
 }
 
-/* 模块析构函数 */
+/* 妯″潡鏋愭瀯鍑芥暟 */
 UINT32 WX_CAN_SLAVE_Destruct(VOID *module)
 {
     WxCanSlave *this = WX_GetModuleInfo(module);
@@ -142,7 +128,7 @@ UINT32 WX_CAN_SLAVE_Destruct(VOID *module)
     return WX_SUCCESS;
 }
 
-/* 模块消息处理入口 */
+/* 妯″潡娑堟伅澶勭悊鍏ュ彛 */
 UINT32 WX_CAN_SLAVE_Entry(VOID *module, WxMsg *evtMsg)
 {
     WxCanSlave *this = WX_GetModuleInfo(module);

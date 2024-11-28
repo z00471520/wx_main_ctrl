@@ -2,7 +2,6 @@
 #ifndef WT_RS422_I_MASTER_TASK_H
 #define WT_RS422_I_MASTER_TASK_H
 #include "wx_typedef.h"
-#include "wx_rs422_master_adu_rsp_intf.h"
 #include "wx_rs422_master_rd_data_req_intf.h"
 #include "wx_rs422_master_rd_data_rsp_intf.h"
 #include "wx_rs422_master_wr_data_req_intf.h"

@@ -114,12 +114,12 @@ UINT32 WX_RS422SlaveDriver_Construct(VOID *module)
     /* the inst or rs422 used for uart data tx/rx */
     ret = WX_InitUartNs550(&this->rs422Inst, cfg->rs422DevId, cfg->rs422Format);
     if (ret != WX_SUCCESS) {
-        return rc;
+        return ret;
     }
 
     /* 设置中断 */
     ret = WX_SetupUartNs550Interrupt(&this->rs422Inst, WX_RS422SlaveDriver_IntrHandle, cfg->intrId, this);
-    if (rc != WX_SUCCESS) {
+    if (ret != WX_SUCCESS) {
         return ret;
     }
 

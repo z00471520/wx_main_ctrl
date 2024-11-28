@@ -1,25 +1,25 @@
 #ifndef __WX_UTIL_H__
 #define __WX_UTIL_H__
 #include "wx_include.h"
-/* 适用于结构体对象的初始化 */
-#define WX_CLEAR_OBJ(op) memset(op, sizeof(*(op)), 0)
+/* 閫傜敤浜庣粨鏋勪綋瀵硅薄鐨勫垵濮嬪寲 */
+#define WX_CLEAR_OBJ(op) memset(op, sizeof(*(op)), (UINT8)0)
 /*
- * memname          内存的名字，字符串
- * item_num         item个数
- * item_byte_size   每个item的尺寸大小
- * 该模块支持内存统计，方便定位内存残留问题，暂时不支持
+ * memname          鍐呭瓨鐨勫悕瀛楋紝瀛楃涓�
+ * item_num         item涓暟
+ * item_byte_size   姣忎釜item鐨勫昂瀵稿ぇ灏�
+ * 璇ユā鍧楁敮鎸佸唴瀛樼粺璁★紝鏂逛究瀹氫綅鍐呭瓨娈嬬暀闂锛屾殏鏃朵笉鏀寔
  **/
 #define WX_Mem_Alloc(memname, item_num, item_byte_size) malloc((item_num) * (item_byte_size))
 /*
- * 改函数释放后会把指针设置为NULL
+ * 鏀瑰嚱鏁伴噴鏀惧悗浼氭妸鎸囬拡璁剧疆涓篘ULL
  **/
-#define WX_Mem_Free(p) /
-do {/
-    if ((p) != NULL) {/
-        free((p)); /
-        (p) = NULL;/
-    }/
-} while(FALSE)
+#define WX_Mem_Free(p) 	\
+do {					\
+    if ((p) != NULL) {	\
+        free((p)); 		\
+        (p) = NULL;		\
+    }					\
+} while (FALSE)
 
 #define WX_8BYTE_ALIGN_SIZE(size) (((size) + 7 / 8) * 8)
 #endif

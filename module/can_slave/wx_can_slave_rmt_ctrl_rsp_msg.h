@@ -3,19 +3,20 @@
 #include "wx_can_slave.h"
 
 /*
- * 遥控消息子类型
+ * 閬ユ帶娑堟伅瀛愮被鍨�
  */
 typedef enum {
-    WX_RMT_CTRL_RSP_MSG_TYPE_RESET, /* 指示复位无数据 */
-    WX_RMT_CTRL_RSP_MSG_TYPE_TELEMETRY_DATA, /* 遥测数据请求 */
+    WX_RMT_CTRL_RSP_MSG_TYPE_RESET, /* 鎸囩ず澶嶄綅鏃犳暟鎹� */
+    WX_RMT_CTRL_RSP_MSG_TYPE_TELEMETRY_DATA, /* 閬ユ祴鏁版嵁璇锋眰 */
     /* if more please */
     WX_RMT_CTRL_RSP_MSG_TYPE_BUTT,
 } WxRmtCtrlRspMsgType;
 
-/* 遥控消息定义 */
+/* 閬ユ帶娑堟伅瀹氫箟 */
 typedef struct {
-    WxRmtCtrlRspMsgType type; /* 请求消息类型 */
-    typedef union {
+    WxRmtCtrlRspMsgType type; /* 璇锋眰娑堟伅绫诲瀷 */
+    union {
+    	UINT8 resv;
     };
 } WxRmtCtrlRspMsg;
 

@@ -1,6 +1,5 @@
 #ifndef WX_MODBUS_H
 #define WX_MODBUS_H
-#include "wx_modbus_crc16.h"
 #include "wx_typedef.h"
 #include <stdint.h>
 /* modus field length define */
@@ -27,7 +26,7 @@
 
 /* Modus ADU */
 #define WX_MODBUS_ADU_MAX_SIZE              256     /* ADU的最大长度 */
-#define WX_MODBUS_ADU_MIN_SIZE              (4)     /* 从机地址(1) + function code(1) + crc(2) */ 
+#define WX_MODBUS_ADU_MIN_SIZE              (4)     /* 从机地址(1) + function code(1) + crc(2) */
 #define WX_MODBUS_ADU_SLAVE_ADDR_IDX        0
 #define WX_MODBUS_ADU_FUNC_CODE_IDX         1         
 
@@ -90,6 +89,7 @@ typedef struct {
     UINT8 slaveAddr;      /* 从机地址 */
     UINT8 funcCode;   /* 功能码 */
     UINT8 receiver;   /* 接收方模块 */
+    UINT8 excpCode;
     UINT16 dataAddr;      /* 数据地址 */
     UINT16 valueLen;      /* ADU的数据长度 */
     UINT16 expectRspLen; /* 期望的响应长度 */

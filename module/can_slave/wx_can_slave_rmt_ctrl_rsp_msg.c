@@ -1,5 +1,5 @@
 #include "wx_can_slave_rmt_ctrl_rsp_msg.h"
-#include "wx_can_slave_common.h"
+#include "wx_can_slave.h"
 UINT32 WX_CAN_SLAVE_EncodeRspPduReset(WxCanSlave *this, WxRmtCtrlRspMsg *rspMsg, WxRmtCtrlPdu *pdu)
 {
     return;
