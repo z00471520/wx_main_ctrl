@@ -10,8 +10,45 @@
 #include "wx_frame.h"
 #include "wx_modules.h"
 #include "wx_tasks.h"
+#include "wx_debug.h"
 /* 模块部署信息 */
 WxModuleDeploy g_wxModuleDepolyInfos[] = {
+     {
+        "debug_c0",           /* 模块名 */
+        WX_MODULE_DEBUG_C0,   /* 模块ID */
+        WX_CORE_ID_0,                   /* 模块运行的核 */
+        "task_om",                  /* 驱动任务名 */
+        WX_DEBUG_Construct,   /* 模块构建函数-必选 */
+        WX_DEBUG_Destruct,    /* 模块析构函数 */
+        WX_DEBUG_Entry,       /* 模块消息 */
+    },
+    {
+        "debug_c1",           /* 模块名 */
+        WX_MODULE_DEBUG_C1,   /* 模块ID */
+        WX_CORE_ID_1,                   /* 模块运行的核 */
+        "task_om",                  /* 驱动任务名 */
+        WX_DEBUG_Construct,   /* 模块构建函数-必选 */
+        WX_DEBUG_Destruct,    /* 模块析构函数 */
+        WX_DEBUG_Entry,       /* 模块消息 */
+    },
+    {
+        "debug_c2",           /* 模块名 */
+        WX_MODULE_DEBUG_C2,   /* 模块ID */
+        WX_CORE_ID_2,                   /* 模块运行的核 */
+        "task_om",                  /* 驱动任务名 */
+        WX_DEBUG_Construct,   /* 模块构建函数-必选 */
+        WX_DEBUG_Destruct,    /* 模块析构函数 */
+        WX_DEBUG_Entry,       /* 模块消息 */
+    },
+    {
+        "debug_c3",      /* 模块名 */
+        WX_MODULE_DEBUG_C3,   /* 模块ID */
+        WX_CORE_ID_3,          /* 模块运行的核 */
+        "task_om",                  /* 驱动任务名 */
+        WX_DEBUG_Construct,   /* 模块构建函数-必选 */
+        WX_DEBUG_Destruct,    /* 模块析构函数 */
+        WX_DEBUG_Entry,       /* 模块消息 */
+    },
     {
         "can_slave_a",      /* 模块名 */
         WX_MODULE_CAN_SLAVE_A,/* 模块ID */

@@ -2,9 +2,7 @@
 #define WX_CNT_H
 #include "wx_cnt_excp.h"
 #include "wx_cnt_norm.h"
-
-#define wx_norm_cnt(i) g_wxNormCnt[i]++
-
+VOID WX_Cnt_DbgShow(char *argv[], UINT32 argc);
 #endif
 
 

@@ -18,7 +18,7 @@ typedef enum {
     WX_MSG_TYPE_RS422_MASTER_RD_DATA_RSP, /* WxRs422MasterRdDatRspMsg */
     WX_MSG_TYPE_RS422_SLAVE_RX_ADU_REQ,   /* WxRs422SalverRxAduMsg */
     WX_MSG_TYPE_RS422_SLAVE_TX_ADU_REQ,  /* WxRs422SlaveTxAduReq */
-    WX_MSG_TYPE_BEBUG,
+    WX_MSG_TYPE_BEBUG_REQ,
     WX_MSG_TYPE_UART_TX_DATA_REQ,
     WX_MSG_TYPE_UART_CFG_REQ,
     /* if more please add here */

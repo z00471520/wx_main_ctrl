@@ -1,8 +1,8 @@
 #ifndef WX_CNT_EXCP_H
 #define WX_CNT_EXCPM_H
-/* excp cnt from 10000  */
+/* excp cnt from 0  */
 typedef enum {
-	WX_EXCP_CNT_START = 10000, // keep this first
+	WX_EXCP_CNT_START, // keep this first
 	WX_EXCP_UNEXPECT_MSG_TYPE,
 	WX_EXCP_UNDEFINE,
 	WX_EXCP_INVALID_MSG_BODY_LEN,
@@ -41,4 +41,7 @@ typedef enum {
 } WxExcpCntDef;
 
 #define wx_excp_cnt(a) 
+
+
+VOID WX_ExcpCnt_DbgShow(VOID);
 #endif

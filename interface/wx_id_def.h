@@ -1,7 +1,7 @@
 #ifndef __WX_ID_DEF_H__
 #define __WX_ID_DEF_H__
 /******************************************************************************
- * ºËID¶¨Òå
+ * ï¿½ï¿½IDï¿½ï¿½ï¿½ï¿½
  *****************************************************************************/
 typedef enum {
     WX_CORE_ID_NA = 0,
@@ -19,8 +19,7 @@ typedef enum {
  * module ID
  *****************************************************************************/
 typedef enum {
-
-    WX_MODULE_INVALID, /* ÎÞÐ§µÄÄ£¿éID */
+    WX_MODULE_INVALID, /* ï¿½ï¿½Ð§ï¿½ï¿½Ä£ï¿½ï¿½ID */
     WX_MODULE_CAN_SLAVE_A,
     WX_MODULE_CAN_SLAVE_B,
     WX_MODULE_RS422_I_MASTER,
@@ -31,7 +30,10 @@ typedef enum {
     WX_MODULE_DRIVER_RS422_MASTER,
     WX_MODULE_DRIVER_RS422_SLAVE,
     WX_MODULE_DIRVER_DBG_UART,
-    WX_MODULE_DEBUG,
+    WX_MODULE_DEBUG_C0,
+    WX_MODULE_DEBUG_C1,
+    WX_MODULE_DEBUG_C2,
+    WX_MODULE_DEBUG_C3,
     /* if more please add here */
     WX_MODULE_BUTT,
 } WxModuleId;

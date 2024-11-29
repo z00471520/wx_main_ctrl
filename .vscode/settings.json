@@ -7,6 +7,7 @@
         "wx_id_def.h": "c",
         "wx_deploy.h": "c",
         "wx_deploy_tasks.h": "c",
-        "wx_debug.h": "c"
+        "wx_debug.h": "c",
+        "wx_tasks.h": "c"
     }
 }

@@ -9,4 +9,6 @@ typedef enum {
 	WX_NORM_CNT_BUTT,
 } WxNormCntDef;
 
+
+VOID WX_NormCnt_DbgShow(VOID);
 #endif
