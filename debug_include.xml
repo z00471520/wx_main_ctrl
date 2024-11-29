@@ -7,14 +7,25 @@
 <language name="c,S">
 <includepath>${resolvePlatformFile:project=wx_main_app,fileType=bspInclude}</includepath>
 <includepath workspace_path="true">/wx_main_app/src/common</includepath>
-<includepath workspace_path="true">/wx_main_app/src/debug</includepath>
-<includepath workspace_path="true">/wx_main_app/src/deploy</includepath>
-
-</language>
-<language name="ld">
+<includepath workspace_path="true">/wx_main_app/src/driver/wx_can_driver</includepath>
+<includepath workspace_path="true">/wx_main_app/src/driver/wx_rs422_driver</includepath>
+<includepath workspace_path="true">/wx_main_app/src/interface</includepath>
+<includepath workspace_path="true">/wx_main_app/src/interface/wx_rs422_master_driver</includepath>
+<includepath workspace_path="true">/wx_main_app/src/interface/wx_rs422_master</includepath>
+<includepath workspace_path="true">/wx_main_app/src/interface/wx_rs422_slave</includepath>
+<includepath workspace_path="true">/wx_main_app/src/interface/wx_rs422_slave_driver</includepath>
+<includepath workspace_path="true">/wx_main_app/src/module/can_slave</includepath>
+<includepath workspace_path="true">/wx_main_app/src/module/rs422_master</includepath>
+<includepath workspace_path="true">/wx_main_app/src/module/rs422_slave</includepath>
+<includepath workspace_path="true">/wx_main_app/src/frame</includepath>
+<includepath workspace_path="true">/wx_main_app/src/om</includepath>
+<includepath workspace_path="true">/wx_main_app/src/module/debug</includepath>
 
 </language>
 <language name="Object File">
+
+</language>
+<language name="ld">
 
 </language>
 </section>
@@ -25,10 +36,10 @@
 <language name="c,S">
 
 </language>
-<language name="ld">
+<language name="Object File">
 
 </language>
-<language name="Object File">
+<language name="ld">
 
 </language>
 </section>
