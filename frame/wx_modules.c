@@ -9,6 +9,7 @@
 #include "wx_can_slave.h"
 #include "wx_frame.h"
 #include "wx_modules.h"
+#include "wx_tasks.h"
 /* 模块部署信息 */
 WxModuleDeploy g_wxModuleDepolyInfos[] = {
     {
