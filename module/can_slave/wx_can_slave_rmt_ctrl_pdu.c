@@ -3,13 +3,14 @@
 #include "wx_msg_res_pool.h"
 #include "wx_msg_can_frame_intf.h"
 #include "wx_msg_schedule.h"
-UINT32 WX_CAN_SLAVE_DecRmtCtrlPduReset(WxCanSlave *this, WxRmtCtrlPdu *pdu, WxRmtCtrlReqMsg *msg)
+// WxCanSlave *canSlave = this;
+UINT32 WX_CAN_SLAVE_DecRmtCtrlPduReset(VOID *this, WxRmtCtrlPdu *pdu, WxRmtCtrlReqMsg *msg)
 {
     return WX_SUCCESS;
 }
 
 
-/* 鏍规嵁PDU瑙ｆ瀽鍑烘秷鎭殑鍐呭锛屾秹鍙婂埌澶у皬绔浆鎹� */
+/* 解码接收到远程遥控PDU */
 UINT32 WX_CAN_SLAVE_DecRmtCtrlPdu(WxCanSlave *this, WxRmtCtrlPdu *pdu, WxRmtCtrlReqMsg *msg)
 {
     UINT16 rmtCtrlCode = (UINT16)pdu->rmtCtrlCode; /* 閬ユ帶鎸囦护鐮� */
@@ -17,12 +18,12 @@ UINT32 WX_CAN_SLAVE_DecRmtCtrlPdu(WxCanSlave *this, WxRmtCtrlPdu *pdu, WxRmtCtrl
         wx_critical(WX_EXCP_CAN_SLAVE_INVALID_CTRL_CODE, "Error Exit: unknown rmtCtrlCode(%u)", rmtCtrlCode);
         return WX_CAN_SLAVE_INVALID_RMT_CTRL_CODE;
     }
-    /* 鑾峰彇PDU 瑙ｇ爜鍑芥暟  */
-    WxRmtCtrlPduDecHandle handle = g_wxRmtCtrlReqHandles[rmtCtrlCode];
+    /* 获取指令码对应的解码handle  */
+    WxRmtCtrlReqHandle *handle = &g_wxRmtCtrlReqHandles[rmtCtrlCode];
     if (handle == NULL) {
         return WX_CAN_SLAVE_CTRL_CODE_DEC_UNSPT;
     }
-    return handle(this, pdu, msg);
+    return handle->decHandle(this, pdu, msg);
 }
 
 
@@ -76,9 +77,9 @@ UINT32 WX_CAN_SLAVE_SendFrame2CanIf(WxCanSlave *this, WxCanFrame *frame)
         WX_MODULE_DRIVER_CAN_A : WX_MODULE_DRIVER_CAN_B;
     canFrameMsg->msgType = WX_MSG_TYPE_CAN_FRAME;
 
-    UINT32 ret = WX_MsgShedule(this->moduleId, canFrameMsg->receiver, canFrameMsg);
+    ret = WX_MsgShedule(this->moduleId, canFrameMsg->receiver, canFrameMsg);
     if (ret != WX_SUCCESS) {
-        WX_FreeEvtMsg(&canFrameMsg);
+        WX_FreeEvtMsg((WxMsg **)&canFrameMsg);
     }
 
     return ret;

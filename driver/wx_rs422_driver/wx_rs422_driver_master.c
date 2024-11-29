@@ -5,12 +5,12 @@
 #include "wx_msg_common.h"
 #include "wx_rs422_master_driver_intf.h"
 #include "xuartns550.h"
-#include "wx_deploy_modules.h"
-WxRs422DriverCfg g_rs422DriverMasterCfg = {0};
+#include "wx_deploy.h"
+#include "wx_uart_ns50.h"
+WxRs422MasterDriverCfg g_rs422DriverMasterCfg = {0};
 
 VOID WX_RS422MasterDriver_SentRspAdu2Rs422Master(WxRs422DriverMaster *this, WxModbusAdu *rxAdu)
 {
-    UINT32 ret;
     /* 申请消息 */
     WxMsg *msg = WX_ApplyEvtMsg(WX_MSG_TYPE_CAN_FRAME);
     if (msg == NULL) {
@@ -126,7 +126,7 @@ UINT32 WX_RS422MasterDriver_Construct(VOID *module)
     if (this == NULL) {
         return WX_ERR;
     }
-    WxRs422DriverCfg *cfg = &g_rs422DriverMasterCfg;
+    WxRs422MasterDriverCfg *cfg = &g_rs422DriverMasterCfg;
     /* 创建RS422消息缓存队列 */
     this->msgQueHandle = xQueueCreate(cfg->msgQueItemNum, sizeof(WxModbusAdu));
     if (this->msgQueHandle == NULL) {
@@ -134,13 +134,14 @@ UINT32 WX_RS422MasterDriver_Construct(VOID *module)
         return WX_RS422_MASTER_CREATE_MSG_QUE_FAIL;
     }
     /* the inst or rs422 used for uart data tx/rx */
-    ret = WX_InitUartNs550(&this->rs422Inst, cfg->rs422DevId, cfg->rs422Format);
+    ret = WX_InitUartNs550(&this->rs422Inst, cfg->rs422DevId, &cfg->rs422Format);
     if (ret != WX_SUCCESS) {
         return ret;
     }
 
     /* 设置中断 */
-    ret = WX_SetupUartNs550Interrupt(&this->rs422Inst, WX_RS422I_DRIVER_MASTER_IntrHandler, cfg->intrId, this);
+    ret = WX_SetupUartNs550Interrupt(&this->rs422Inst,
+    	WX_RS422I_DRIVER_MASTER_IntrHandler, cfg->intrId, this);
     if (ret != WX_SUCCESS) {
         return ret;
     }

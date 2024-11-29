@@ -2,24 +2,20 @@
 #include "wx_can_slave.h"
 #include "wx_can_slave.h"
 #include "wx_id_def.h"
-#include  "wx_can_slave_rmt_ctrl_pdu.h"
-#include "wx_deploy_modules.h"
+#include "wx_can_slave_rmt_ctrl_pdu.h"
+#include "wx_deploy.h"
+#include "wx_msg_can_frame_intf.h"
+#include "wx_can_slave_rmt_ctrl_pdu.h"
+#include "wx_can_slave_rmt_ctrl_req_msg.h"
+#include "wx_can_slave_rmt_ctrl_rsp_msg.h"
 WxCanSlaveCfg g_wxCanSlaveCfg[] = {
     {
         .canFrameDataLen = 8,
         .moduleId = WX_MODULE_CAN_SLAVE_A,
-        .deviceCfgInfo.isEnable = FALSE,
-        .deviceCfgInfo.baudPrescalar = 0,
-        .intrCfgInfo.intrId = 0,
-        .intrCfgInfo.callBackRef = 0,
     }, 
     {
         .canFrameDataLen = 8,
         .moduleId = WX_MODULE_CAN_SLAVE_B,
-        .deviceCfgInfo.isEnable = FALSE,
-        .deviceCfgInfo.baudPrescalar = 0,
-        .intrCfgInfo.intrId = 0,
-        .intrCfgInfo.callBackRef = 0,
     }
 };
 
@@ -36,7 +32,11 @@ WxCanSlaveCfg *WX_CanSlave_GetCfg(UINT32 moduleId)
 
 WxRmtCtrlReqHandle g_wxRmtCtrlReqHandles[WX_RMT_CTRL_CODE_BUTT] = {
     /* 指令码						消息类型	消息解码函数		消息处理函数 */
-    [WX_RMT_CTRL_CODE_RESET] = {WX_RMT_CTRL_REQ_MSG_TYPE_RESET, WX_CAN_SLAVE_DecRmtCtrlPduReset, WX_CAN_SLAVE_ProcRmtCtrlReqMsgReset},
+    [WX_RMT_CTRL_CODE_RESET] = {
+    	WX_RMT_CTRL_REQ_MSG_TYPE_RESET,
+		WX_CAN_SLAVE_DecRmtCtrlPduReset,
+		WX_CAN_SLAVE_ProcRmtCtrlReqMsgReset
+    },
 };
 
 

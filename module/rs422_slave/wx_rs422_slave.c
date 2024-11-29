@@ -2,9 +2,11 @@
 #include "wx_msg_common.h"
 #include "wx_rs422_slave_rx_adu_req_intf.h"
 #include "wx_rs422_slave_driver_tx_adu_req_intf.h"
-#include "wx_deploy_modules.h"
+#include "wx_deploy.h"
 #include "wx_rs422_slave.h"
 #include "wx_rs422_slave_addr_intf.h"
+#include "wx_msg_schedule.h"
+#include "wx_msg_res_pool.h"
 /*
  * This is the configuration of the RS422I-master
  **/
@@ -21,7 +23,7 @@ UINT32 WX_RS422Slave_SendAdu2Driver(WxRs422Slave *this, UINT8 receiver, WxModbus
     /* 申请消息 */
     WxRs422SlaverDriverTxAduReq *msg = WX_ApplyEvtMsg(WX_MSG_TYPE_RS422_SLAVE_TX_ADU_REQ);
     if (msg == NULL) {
-        return;
+        return WX_APPLY_EVT_MSG_ERR;
     }
     /* 初始化消息头 */
     WX_CLEAR_OBJ((WxMsg *)msg);
@@ -37,7 +39,7 @@ UINT32 WX_RS422Slave_SendAdu2Driver(WxRs422Slave *this, UINT8 receiver, WxModbus
     /* 发送消息 */
     UINT32 ret = WX_MsgShedule(this->moduleId, msg->receiver, msg);
     if (ret != WX_SUCCESS) {
-        WX_FreeEvtMsg(&msg);
+        WX_FreeEvtMsg((WxMsg **)&msg);
     }
     return ret;
 }
@@ -82,13 +84,15 @@ UINT32 WX_RS422Slave_ProcReadDataReq(WxRs422Slave *this, WxModbusAdu *rxAdu, WxM
         return WX_RS422Slave_SendExcpRsp(this, txAdu, WX_MODBUS_EXCP_RD_ADDR_NOT_DEFINED);
     }
     /* 获取数据 */
-    ret = handle->readData(&txAdu->value);
+    WxRs422SlaveData data;
+    WX_CLEAR_OBJ(&data);
+    ret = handle->readData(this, &data);
     if (ret != WX_SUCCESS) {
         wx_excp_cnt(WX_EXCP_RS422_SLAVE_DATA_READ_FAIL);
         return WX_RS422Slave_SendExcpRsp(this, txAdu, WX_MODBUS_EXCP_RD_DATA_FAIL);
     }
     /* 数据编码 */
-    ret = handle->encAdu(&txAdu->value, txAdu, &this->txAdu);
+    ret = handle->encAdu(this, &data, txAdu);
     if (ret != WX_SUCCESS) {
         wx_excp_cnt(WX_EXCP_RS422_SLAVE_DATA_ENC_FAIL);
         return WX_RS422Slave_SendExcpRsp(this, txAdu, WX_MODBUS_EXCP_ENC_RD_DATA_FAIL);
@@ -121,14 +125,16 @@ UINT32 WX_RS422Slave_ProcWriteDataReq(WxRs422Slave *this, WxModbusAdu *rxAdu, Wx
         wx_excp_cnt(WX_EXCP_RS422_SLAVE_DATA_WRITE_HANDLE_ITEM_MISS)
         return WX_RS422Slave_SendExcpRsp(this, txAdu, WX_MODBUS_EXCP_WR_HANDLE_UNFINE);
     }
+    WxRs422SlaveData data;
+    WX_CLEAR_OBJ(&data);
     /* 先对写数据的ADU进行解码 */
-    UINT32 ret = handle->decAdu(rxAdu, &txAdu->value);
+    UINT32 ret = handle->decAdu(rxAdu, &data);
     if (ret != WX_SUCCESS) {
         wx_excp_cnt(WX_EXCP_RS422_SLAVE_DATA_DEC_FAIL);
         return WX_RS422Slave_SendExcpRsp(this, txAdu, WX_MODBUS_EXCP_WR_DATA_DEC_FAIL);
     }
     /* 数据写到本地 */
-    ret = handle->writeData(&txAdu->value);
+    ret = handle->writeData(&data);
     if (ret != WX_SUCCESS) {
         wx_excp_cnt(WX_EXCP_RS422_SLAVE_DATA_WRITE_FAIL);
         return WX_RS422Slave_SendExcpRsp(this, txAdu, WX_MODBUS_EXCP_WR_DATA_FAIL);
@@ -146,7 +152,6 @@ UINT32 WX_RS422Slave_ProcWriteDataReq(WxRs422Slave *this, WxModbusAdu *rxAdu, Wx
 UINT32 WX_RS422Slave_ProcRxAduReq(WxRs422Slave *this, WxRs422SlaveRxAduReq *rxAduReq)
 {
     WxModbusAdu *rxAdu = &rxAduReq->rxAdu;
-    UINT32 ret = WX_SUCCESS;
     /* 检查长度 */
     if (rxAdu->valueLen < WX_MODBUS_ADU_MIN_SIZE) {
         wx_excp_cnt(WX_EXCP_RS422_SLAVE_RECV_ADU_SHORT_LEN);
@@ -175,7 +180,6 @@ UINT32 WX_RS422Slave_ProcRxAduReq(WxRs422Slave *this, WxRs422SlaveRxAduReq *rxAd
 
 UINT32 WX_RS422Slave_Construct(VOID *module)
 {
-    UINT32 ret;
     WxRs422Slave *this = WX_Mem_Alloc(WX_GetModuleName(module), 1, sizeof(WxRs422Slave));
     if (this == NULL) {
         return WX_ERR;
@@ -184,8 +188,8 @@ UINT32 WX_RS422Slave_Construct(VOID *module)
     this->moduleId = WX_GetModuleId(module);
     WxRs422SlaveCfg *cfg = &g_wxRs422SlaveCfg;
     this->cfg = cfg;
-    this->rdDataHandles = cfg->getRdHandles(this, &this->rdHandleNum);
-    this->wrDataHandles = cfg->getWrHandles(this, &this->wrHandleNum);
+    this->rdDataHandles = cfg->getRdHandles(this->moduleId, &this->rdHandleNum);
+    this->wrDataHandles = cfg->getWrHandles(this->moduleId, &this->wrHandleNum);
     this->slaveAddr = cfg->slaveAddr;
     /* 设置上Module */
     WX_SetModuleInfo(module, this);

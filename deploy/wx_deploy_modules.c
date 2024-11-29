@@ -1,7 +1,7 @@
 
 #include "xparameters.h"
 #include "xil_exception.h"
-#include "wx_deploy_modules.h"
+#include "wx_deploy.h"
 #include "wx_deploy_tasks.h"
 #include "wx_include.h"
 #include "wx_msg_schedule.h"
@@ -101,7 +101,7 @@ UINT32 WX_DeployModules(UINT8 curCoreId)
     WxModule *module = NULL;
     WxModuleDeploy *deploy = NULL;
     /* 遍历模块部署信息 */
-    for (UINT32 i = 0; i < sizeof(g_wxModuleDepolyInfos) / g_wxModuleDepolyInfos[0]; i++) {
+    for (UINT32 i = 0; i < sizeof(g_wxModuleDepolyInfos)/sizeof(g_wxModuleDepolyInfos[0]); i++) {
         deploy = &g_wxModuleDepolyInfos[i];
         if (!WX_IsValidModuleId(deploy->moduleId)) {
             continue;
@@ -109,9 +109,9 @@ UINT32 WX_DeployModules(UINT8 curCoreId)
 
         /* 如果核ID不相等，则说明当前核任务不包含该模块, 但是需要注册路由以便消息调度 */
         if ((deploy->coreId != curCoreId)) {
-            ret = WX_MsgShedule_RegRouter(deploy->moduleId, deploy->coreId, NULL, NULL, NULL);
+            ret = WX_RegModuleRouter(deploy->moduleId, deploy->coreId, NULL, NULL);
             if (ret != WX_SUCCESS) {
-                wx_critical("Error Exit: WX_MsgShedule_RegRouter(%s) fail(%u)", deploy->moduleName, ret);
+                wx_critical("Error Exit: WX_RegModuleRouter(%s) fail(%u)", deploy->moduleName, ret);
                 return ret;
             }
             continue;
@@ -127,10 +127,12 @@ UINT32 WX_DeployModules(UINT8 curCoreId)
             wx_critical("Error Exit: WX_DeployModules_DeployOneModule(%s) fail(%u)", deploy->moduleName, ret);
             return ret;
         }
-        ret = WX_MsgShedule_RegRouter(deploy->moduleId, deploy->coreId, task, module, deploy->entryFunc);
+        ret = WX_RegModuleRouter(deploy->moduleId, deploy->coreId, task, module);
         if (ret != WX_SUCCESS) {
-            wx_critical("Error Exit: WX_MsgShedule_RegRouter(%s) fail(%u)", deploy->moduleName, ret)
+            wx_critical("Error Exit: WX_RegModuleRouter(%s) fail(%u)", deploy->moduleName, ret)
             return ret;
         }
     }
+
+    return WX_SUCCESS;
 }

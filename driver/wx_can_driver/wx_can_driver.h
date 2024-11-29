@@ -2,6 +2,7 @@
 #define __WX_CAN_DRIVER_H__
 #include "FreeRTOS.h"
 #include "queue.h"
+#include "wx_can_driver.h"
 #define WX_CAN_DRIVER_MAX_DATA_LEN 8 /* 支持的最大数据长度，BYTE */
 #define WX_CAN_DRIVER_FRAME_U32_LEN ((XCANPS_MAX_FRAME_SIZE) / (sizeof(u32))) /* FRAM U32长度 */
 
@@ -21,7 +22,6 @@ typedef struct {
     XCanPs_SendRecvHandler recvHandle;  /* 接收handle */
     XCanPs_ErrorHandler errHandle;      /* 错误Handle */
     XCanPs_EventHandler eventHandle;    /* 事件Handle */
-    VOID *callBackRef;                  /* 中断Handle处理函数 */
 } WxCanDriverIntrCfg;
 
 typedef struct {

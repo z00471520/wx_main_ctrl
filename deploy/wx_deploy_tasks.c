@@ -33,12 +33,6 @@ WxTaskDeploy g_wxTaskDeployInfo[] = {
     // /* if more please add here */
 };
 
-inline UINT32 WX_DeployTasks_GetTaskDeployNum(VOID)
-{
-    return sizeof(g_wxTaskDeployInfo) / sizeof(g_wxTaskDeployInfo[0]);
-}
-
-
 WxDeployTasks *WX_DeployTasks_Create(UINT8 coreId, UINT32 taskNum)
 {
     if (g_wxDeployTasks == NULL) {
@@ -60,13 +54,6 @@ UINT32 WX_DeployTasks_Destroy(VOID)
         g_wxDeployTasks = NULL;
     }
     return WX_SUCCESS;
-}
-
-
-/* 获取第I个部署，参数合法性由调用者保证 */
-inline WxTaskDeploy *WX_DeployTasks_GetTaskDeploy(UINT32 i)
-{
-    return &g_wxTaskDeployInfo[i];
 }
 
 /* 根据名字查找一个任务 */
@@ -91,7 +78,7 @@ UINT32 WX_DeployTasks_DeployTask(WxTask *task, WxTaskDeploy *taskDeploy)
     /* 创建任务消息队列 */
     if (taskDeploy->msgQueDepth > 0) {
         task->msgQueHandle = xQueueCreate(taskDeploy->msgQueDepth, sizeof(WxMsg *));
-        if (task->msgQueHandle = NULL) {
+        if (task->msgQueHandle == NULL) {
             return WX_CREATE_MSG_QUE_FAIL;
         }
     }
@@ -117,12 +104,11 @@ UINT32 WX_DeployTasks(UINT8 curCoreId)
     if (ret != WX_SUCCESS) {
         return ret;
     } 
-    UINT32 ret;
-    UINT32 taskDeployNum = WX_DeployTasks_GetTaskDeployNum();
+    UINT32 taskDeployNum = sizeof(g_wxTaskDeployInfo) / sizeof(g_wxTaskDeployInfo[0]);
     WxDeployTasks *taskList = WX_DeployTasks_Create(curCoreId, taskDeployNum);
     WxTaskDeploy *taskDeploy = NULL;
     for (UINT32 i = 0; i < taskDeployNum; i++) {
-        taskDeploy = WX_DeployTasks_GetTaskDeploy(i);
+        taskDeploy = &g_wxTaskDeployInfo[i];
         /* 如果当前任务不需要部署到该核该不处理 */
         if ((taskDeploy->coreIdMask & curCoreId) == 0) {
             continue;

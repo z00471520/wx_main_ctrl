@@ -3,24 +3,26 @@
 #include "wx_can_driver.h"
 #include "FreeRTOS.h"
 #include "queue.h"
-#include "wx_deploy_modules.h"
-WxCanDriverCfg g_wxCanSlaveCfg[] = {
+#include "wx_deploy.h"
+
+WxCanDriverCfg g_wxCanDriverCfg[] = {
     {},
     {},
 };
 WxCanDriverCfg *WX_CAN_DRIVER_GetCfg(UINT32 moduleId)
 {
-    for (int i = 0; i < sizeof(g_wxCanSlaveCfg) / sizeof(WxCanDriverCfg); i++) {
-        if (g_wxCanSlaveCfg[i].moduleId == moduleId) {
-            return &g_wxCanSlaveCfg[i];
+    for (int i = 0; i < sizeof(g_wxCanDriverCfg) / sizeof(WxCanDriverCfg); i++) {
+        if (g_wxCanDriverCfg[i].moduleId == moduleId) {
+            return &g_wxCanDriverCfg[i];
         }
     }
     return NULL;
 }
 
-UINT32 WX_CAN_DRIVER_InitInterrupt(XCanPs *canInstPtr, WxCanDriverIntrCfg *cfg)
+UINT32 WX_CAN_DRIVER_InitInterrupt(WxCanDriver *this , WxCanDriverIntrCfg *cfg)
 {
-	INTC *intcInst = WX_GetOrCreateScuGicInstance();
+	XCanPs *canInstPtr = &this->canInst;
+	XScuGic *intcInst = WX_GetOrCreateScuGicInstance();
 	if (intcInst == NULL) {
 		return WX_UART_NS550_INTR_CTRL_UNREADY;
 
@@ -50,16 +52,16 @@ UINT32 WX_CAN_DRIVER_InitInterrupt(XCanPs *canInstPtr, WxCanDriverIntrCfg *cfg)
 	/*
 	 * Set interrupt handlers.
 	 */
-	XCanPs_SetHandler(canInstPtr, XCANPS_HANDLER_SEND, (void *)SendHandler, (void *)CanInstPtr);
-	XCanPs_SetHandler(canInstPtr, XCANPS_HANDLER_RECV, (void *)RecvHandler, (void *)CanInstPtr);
-	XCanPs_SetHandler(canInstPtr, XCANPS_HANDLER_ERROR, (void *)ErrorHandler, (void *)CanInstPtr);
-	XCanPs_SetHandler(canInstPtr, XCANPS_HANDLER_EVENT, (void *)EventHandler, (void *)CanInstPtr);
+	XCanPs_SetHandler(canInstPtr, XCANPS_HANDLER_SEND, (void *)cfg->sendHandle, (void *)this);
+	XCanPs_SetHandler(canInstPtr, XCANPS_HANDLER_RECV, (void *)cfg->recvHandle, (void *)this);
+	XCanPs_SetHandler(canInstPtr, XCANPS_HANDLER_ERROR, (void *)cfg->errHandle, (void *)this);
+	XCanPs_SetHandler(canInstPtr, XCANPS_HANDLER_EVENT, (void *)cfg->eventHandle, (void *)this);
 	return WX_SUCCESS;
 }
 
 
-/* CAN璁惧鍒濆鍖� */
-UINT32 WX_CAN_DRIVER_InitDevice(XCanPs *canInstPtr, WxCanDriverCfg *cfg)
+/* 初始化设备 */
+UINT32 WX_CAN_DRIVER_InitDevice(XCanPs *canInstPtr, WxCanDriverDevCfg *cfg)
 {
 	if (canInstPtr == NULL) {
 		return WX_CAN_DRIVER_CONFIG_INVALID_CAN_INST_PRT;
@@ -161,7 +163,7 @@ UINT32 WX_CAN_DRIVER_SendFrameDirectly(XCanPs *canInstPtr, WxCanFrame *frame)
 UINT32 WX_CAN_DRIVER_SendCanFrameToSendQue(QueueHandle_t sendQueue, WxCanFrame *frame)
 {
 	BaseType_t ret = xQueueSend(sendQueue, (const void * )frame, (TickType_t)0);
-	if (ret != pdPASS) {	/* 鍙戦�佸け璐� */
+	if (ret != pdPASS) {	/*  鍙戦�佸け璐� */
 		return WX_CAN_DRIVER_CONFIG_TX_QUEUE_SEND_FAIL;
 	}
 	return WX_SUCCESS;
@@ -201,7 +203,7 @@ UINT32 WX_CAN_DRIVER_Construct(VOID *module)
 	if (this->sendQueue == NULL) {
 		return WX_CAN_DRIVER_CONFIG_TX_QUEUE_CREATE_FAIL;
 	}
-	ret = WX_CAN_DRIVER_InitInterrupt(&this->canInst, &cfg->intrCfg);
+	ret = WX_CAN_DRIVER_InitInterrupt(this, &cfg->intrCfg);
 	if (ret != WX_SUCCESS) {
 		return ret;
 	}

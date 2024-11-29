@@ -21,12 +21,12 @@ UINT32 WX_CreateMsgResPool(VOID)
     evtMsgPool->evtMsgQue = xQueueCreate((UBaseType_t)TASK_EVT_MSG_NODE_NUM, (UBaseType_t)sizeof(WxMsg *));
     if (evtMsgPool->evtMsgQue == NULL) {
         WX_Mem_Free(evtMsgPool);
-        return NULL;
+        return WX_CREATE_QUEUE_FAIL;
     }
     /* 把节点指针加入到消息队列中 */
     WxMsg *evtMsg = NULL;
     for (UINT32 i = 0; i < TASK_EVT_MSG_NODE_NUM; i++) {
-        evtMsg = &evtMsgPool->evtMsgArray[i];
+        evtMsg = (WxMsg *)&evtMsgPool->evtMsgArray[i];
         xQueueSend(evtMsgPool->evtMsgQue, (void *)&evtMsg, (TickType_t)0);
     }
 
@@ -35,7 +35,7 @@ UINT32 WX_CreateMsgResPool(VOID)
 }
 
 /* 中断申请 */
-WxMsg *WX_ApplyEvtMsgFromISR(WxMsgType msgType)
+VOID *WX_ApplyEvtMsgFromISR(WxMsgType msgType)
 {
     WxMsg *evtMsg = NULL;
     if (xQueueReceiveFromISR(g_wxEvtMsgPool->evtMsgQue, (void *)&evtMsg, (TickType_t)0) != pdPASS) {
@@ -47,7 +47,7 @@ WxMsg *WX_ApplyEvtMsgFromISR(WxMsgType msgType)
     return evtMsg;
 }
 
-WxMsg *WX_ApplyEvtMsg(WxMsgType msgType) 
+VOID *WX_ApplyEvtMsg(WxMsgType msgType) 
 {
     WxMsg *evtMsg = NULL;
     if (xQueueReceive(g_wxEvtMsgPool->evtMsgQue, (void *)&evtMsg, (TickType_t)0) != pdPASS) {
@@ -58,30 +58,30 @@ WxMsg *WX_ApplyEvtMsg(WxMsgType msgType)
     return evtMsg;
 }
 /* 非中断释放 */
-VOID WX_FreeEvtMsg(WxMsg **ppEvtMsg)
+VOID WX_FreeEvtMsg(WxMsg **pp)
 {
-    if (*ppEvtMsg == NULL) {
+    if (*pp == NULL) {
         return;
     }
     /* 节点节点到消息队列 */
-    if (xQueueSend(g_wxEvtMsgPool->evtMsgQue, (VOID *)ppEvtMsg, (TickType_t)0) != pdPASS) {
+    if (xQueueSend(g_wxEvtMsgPool->evtMsgQue, (VOID *)pp, (TickType_t)0) != pdPASS) {
         return;
     }
-    *ppEvtMsg = NULL;
+    *pp = NULL;
     return;
 }
 
 /* 中断释放消息节点 */
-VOID WX_FreeEvtMsgFromISR(WxMsg **ppEvtMsg)
+VOID WX_FreeEvtMsgFromISR(WxMsg **pp)
 {
-    if (*ppEvtMsg == NULL) {
+    if (*pp == NULL) {
         return;
     }
     /* 发送节点到消息队列 */
-    if (xQueueSendFromISR(g_wxEvtMsgPool->evtMsgQue, (VOID *)ppEvtMsg, (TickType_t)0) != pdPASS) {
+    if (xQueueSendFromISR(g_wxEvtMsgPool->evtMsgQue, (VOID *)pp, (TickType_t)0) != pdPASS) {
         return;
     }
-    *ppEvtMsg = NULL;
+    *pp = NULL;
     return;
 }
 

@@ -2,14 +2,16 @@
 #include "wx_rs422_slave_driver.h"
 #include "wx_id_def.h"
 #include "wx_rs422_slave_driver_tx_adu_req_intf.h"
-#include "wx_deploy_modules.h"
+#include "wx_deploy.h"
+#include "wx_rs422_slave_rx_adu_req_intf.h"
+#include "wx_uart_ns50.h"
 WxRs422SlaveDriverCfg g_rs422SlaverDriverCfg = {0};
 
 /* 发送接收到的报文给上层处理 */
 VOID WX_RS422SlaveDriver_SentRxAdu2Upper(WxRs422SlaverDriver *this, WxModbusAdu *rxAdu)
 {
     /* 申请消息 */
-    WxRs422SalverRxAduMsg *msg = WX_ApplyEvtMsg(WX_MSG_TYPE_RS422_SLAVE_RX_ADU_REQ);
+	WxRs422SlaveRxAduReq *msg = WX_ApplyEvtMsg(WX_MSG_TYPE_RS422_SLAVE_RX_ADU_REQ);
     if (msg == NULL) {
         return;
     }
@@ -78,7 +80,7 @@ VOID WX_RS422SlaveDriver_ProcRecvAduFromISR(WxRs422SlaverDriver *this)
     }
 
     /* 报文发送给上层处理 */
-    WX_RS422SlaveDriver_SentRxAdu2UpperLayer(this, &this->rxAdu);
+    WX_RS422SlaveDriver_SentRxAdu2Upper(this, &this->rxAdu);
     return;
 }
 
@@ -112,7 +114,7 @@ UINT32 WX_RS422SlaveDriver_Construct(VOID *module)
     }
     WxRs422SlaveDriverCfg *cfg = &g_rs422SlaverDriverCfg;
     /* the inst or rs422 used for uart data tx/rx */
-    ret = WX_InitUartNs550(&this->rs422Inst, cfg->rs422DevId, cfg->rs422Format);
+    ret = WX_InitUartNs550(&this->rs422Inst, cfg->rs422DevId, &cfg->rs422Format);
     if (ret != WX_SUCCESS) {
         return ret;
     }
@@ -138,7 +140,7 @@ UINT32 WX_RS422SlaveDriver_Construct(VOID *module)
 UINT32 WX_RS422SlaveDriver_ProcTxAduReq(WxRs422SlaverDriver *this, WxRs422SlaverDriverTxAduReq *msg)
 {
     /* 首次发送消息会被缓存到实例，返回缓存了多少报文 */
-    UINT32 sendCount = XUartNs550_Send(&this->rs422Inst, this->txAdu.value, this->txAdu->valueLen);
+    UINT32 sendCount = XUartNs550_Send(&this->rs422Inst, this->txAdu.value, this->txAdu.valueLen);
     if (sendCount == 0) {
         wx_excp_cnt(WX_EXCP_RS422_SLAVE_SEND_DATA_FAIL_0);
     }

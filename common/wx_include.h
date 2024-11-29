@@ -13,4 +13,8 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "xscugic.h"
+#include "wx_id_def.h"
+#include "wx_msg_common.h"
+#include "xcanps.h"
+#include "xparameters.h"	/* SDK generated parameters */
 #endif

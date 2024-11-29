@@ -2,11 +2,13 @@
 #define __WX_RS422_SLAVE_H__
 #include "wx_modbus.h"
 #include "wx_id_def.h"
+#include "wx_rs422_slave_addr_intf.h"
+#include "wx_msg_common.h"
 /******************************************************************************
  * 读数据请求
 ******************************************************************************/
-typedef UINT32 (*WxRs422SlaveGetDataHandle)(WxRs422SlaveData *data);
-typedef UINT32 (*WxRs422SlaveEncDataHandle)(WxRs422SlaveData *data, WxRs422SlaveMsg *req, WxModbusAdu *adu);
+typedef UINT32 (*WxRs422SlaveGetDataHandle)(VOID *rs422Slave, WxRs422SlaveData *data);
+typedef UINT32 (*WxRs422SlaveEncDataHandle)(VOID *rs422Slave, WxRs422SlaveData *data, WxModbusAdu *txAdu);
 /* 读数据的hanlde - g_wxRs422SlaveRdDataHandles for detail */
 typedef struct {
     WxRs422SlaveGetDataHandle readData; /* 读取要获取的数据，数据获取的handle */
@@ -30,8 +32,8 @@ typedef struct {
 /******************************************************************************
  * RS422从机的顶层配置
 ******************************************************************************/
-typedef WxRs422SlaveWrDataHandle (*WxRs422SlaveGetWrDataHandles)(UINT8 moduleId, UINT16 *handleNum); /* 获取写数据的hanlde */
-typedef WxRs422SlaveRdDataHandle (*WxRs422SlaveGetRdDataHandles)(UINT8 moduleId, UINT16 *handleNum); /* 获取读数据的hanlde */
+typedef WxRs422SlaveWrDataHandle *(*WxRs422SlaveGetWrDataHandles)(UINT8 moduleId, UINT16 *handleNum); /* 获取写数据的hanlde */
+typedef WxRs422SlaveRdDataHandle *(*WxRs422SlaveGetRdDataHandles)(UINT8 moduleId, UINT16 *handleNum); /* 获取读数据的hanlde */
 typedef struct {
     WxModuleId moduleId; /* 模块ID的配置 */
     UINT8 slaveAddr; /* 从机地址 */

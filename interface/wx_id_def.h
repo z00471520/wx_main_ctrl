@@ -1,8 +1,7 @@
-#ifndef __WX_MODULE_ID_H__
-#define __WX_MODULE_ID_H__
-#include  "wx_include.h"
+#ifndef __WX_ID_DEF_H__
+#define __WX_ID_DEF_H__
 /******************************************************************************
- * æ ¸IDå®šä¹‰ 
+ * ºËID¶¨Òå
  *****************************************************************************/
 typedef enum {
     WX_CORE_ID_NA = 0,
@@ -15,32 +14,17 @@ typedef enum {
 #define WX_CORE_ID_ALL 0xF
 #define WX_CORE_NUM     4
 #define WX_CORE_IDX_2_ID(coreIdx) ((UINT32)1 << (coreIdx))
-inline UINT32 WX_CORE_ID_2_IDX(WxCoreId coreId)
-{
-    switch (coreId) {
-        case WX_CORE_ID_0:
-            return 0;
-        case WX_CORE_ID_1:
-            return 1;
-        case WX_CORE_ID_2:
-            return 2;
-        case WX_CORE_ID_3:
-            return 3;
-        default:
-            return ;
-    }
-}
 #define WX_IS_VALID_CORE_ID(coreId) (((coreId) != WX_CORE_ID_NA) && ((coreId) & WX_CORE_ID_ALL == (coreId)))
 /******************************************************************************
  * module ID
  *****************************************************************************/
 typedef enum {
 
-    WX_MODULE_INVALID, /* æ— æ•ˆID */
+    WX_MODULE_INVALID, /* ÎÞÐ§µÄÄ£¿éID */
     WX_MODULE_CAN_SLAVE_A,
     WX_MODULE_CAN_SLAVE_B,
-    WX_MODULE_RS422_I_MASTER, /* å†…éƒ¨å¤–è®¾é€šä¿¡ä½¿ç”¨çš„RS422 */
-    WX_MODULE_RS422_SLAVE,  /* RS422ä»Žæœºä¸Šå±‚æ¨¡å— */
+    WX_MODULE_RS422_I_MASTER,
+    WX_MODULE_RS422_SLAVE,
     WX_MODULE_ZJ_SPI_DRIVER,
     WX_MODULE_DRIVER_CAN_A,
     WX_MODULE_DRIVER_CAN_B,

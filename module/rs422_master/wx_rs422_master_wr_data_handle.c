@@ -6,12 +6,6 @@ UINT8 WX_RS422_MASTER_EncodeWrDataX(UINT8 buf[], UINT8 bufSize, VOID *data)
     return WX_ERR;
 }
 
-UINT8 WX_RS422_MASTER_EncodeWrDataX(UINT8 buf[], UINT8 bufSize, VOID *data)
-{
-    return WX_ERR;
-}
-
-
 /* messege wrdata proc handle */
 WxRs422MasterWrDataEncHandle g_wxRs422MasterWrDataEncHandles[WX_RS422_MASTER_MSG_WRITE_BUTT] = {
     /* sub msg type                     slave address            data addr         data encode func */

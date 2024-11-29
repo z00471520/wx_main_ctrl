@@ -22,7 +22,7 @@
 #include "wx_typedef.h"
 #include "wx_failcode.h"
 #include "xil_exception.h"
-
+#include "wx_deploy.h"
 int main(void)
 {
 	xil_printf("WX_Deploy start...!");

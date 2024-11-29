@@ -4,7 +4,6 @@
 #include "wx_typedef.h"
 #define WX_EVT_MSG_DATA_SIZE 1500 /* 默认的消息长度 */
 
-
 /* 消息大类 */
 typedef enum {
     WX_MSG_TYPE_INVALID,
@@ -37,7 +36,7 @@ typedef enum {
     UINT8 isFromISR: 1; /* 消息是否来自中断，1-来自中断，0-来自任务 */           \
     UINT8 resv: 7;  /* 保留位 */
 
-typedef struct {
+typedef struct tagWxMsg{
     WX_INHERIT_MSG_HEADER
     UINT8  msgData[0]; /* 最大长度为：WX_EVT_MSG_DATA_SIZE */
 } WxMsg;

@@ -3,7 +3,10 @@
 #include "wx_id_def.h"
 #include "FreeRTOS.h"
 #include "queue.h"
-/* 浠诲姟澶勭悊娑堟伅 */
+#include "wx_deploy_tasks.h"
+#include "wx_msg_res_pool.h"
+#include "wx_deploy.h"
+/* 任务处理消息 */
 UINT32 WX_Deply_TaskFuncCodeProcMsg(WxTask *task, WxMsg *evtMsg)
 {
     UINT32 reciver = evtMsg->receiver;
@@ -18,14 +21,14 @@ UINT32 WX_Deply_TaskFuncCodeProcMsg(WxTask *task, WxMsg *evtMsg)
     return task->modules[reciver].entryFunc(&task->modules[reciver], evtMsg);
 }
 
-/* 鏅�氫换鍔″潎杩愯璇ュ嚱鏁� */
+/* 这是一个通用的任务处理函数 */
 VOID WX_Deply_TaskFuncCode(VOID *param)
 {
     WxTask *task = param;
     UINT32 ret;
     WxMsg *evtMsg = NULL;
     for (;;) {
-        /* 褰撳墠浠诲姟绛夊緟澶栫晫鍙戦�佺殑娑堟伅 */
+        /* 在这里阻塞等待消息的到来 */
         if (xQueueReceive(task->msgQueHandle, &evtMsg, portMAX_DELAY) == pdPASS) {
             ret = WX_Deply_TaskFuncCodeProcMsg(task, evtMsg);
             if (ret != WX_SUCCESS) {

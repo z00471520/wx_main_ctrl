@@ -2,7 +2,7 @@
 #include "wx_can_slave.h"
 UINT32 WX_CAN_SLAVE_EncodeRspPduReset(WxCanSlave *this, WxRmtCtrlRspMsg *rspMsg, WxRmtCtrlPdu *pdu)
 {
-    return;
+    return WX_ERR;
 }
 
 /* 响应消息的编码为PDU */
