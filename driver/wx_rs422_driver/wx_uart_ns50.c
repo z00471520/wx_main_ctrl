@@ -1,4 +1,5 @@
 #include "wx_include.h"
+#include "wx_frame.h"
 /*
  * 初始化指定的UART NS550 IP core
  */

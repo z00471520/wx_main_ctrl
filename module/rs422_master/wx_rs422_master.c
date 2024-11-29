@@ -62,7 +62,7 @@ UINT32 WX_RS422_MASTER_ProcRdDataRspAduMsg(WxRs422Master *this, WxRs422MasterRsp
     }
     ret = WX_MsgShedule(this->moduleId, rdDataRspMsg->receiver, rdDataRspMsg);
     if (ret != WX_SUCCESS) {
-        WX_FreeEvtMsg(&rdDataRspMsg);
+        WX_FreeEvtMsg((WxMsg **)&rdDataRspMsg);
     }
 
     return ret;
@@ -80,7 +80,7 @@ UINT32 WX_RS422_MASTER_ProcWrDataRspAduMsg(WxRs422Master *this, WxRs422MasterRsp
     UINT8 reciever = this->wrDataModule[rspAduMsg->rspAdu.subMsgType];
     UINT32 ret = WX_MsgShedule(this->moduleId, reciever, wrDataRspMsg);
     if (ret != WX_SUCCESS) {
-        WX_FreeEvtMsg(&wrDataRspMsg);
+        WX_FreeEvtMsg((WxMsg **)&wrDataRspMsg);
     }
     return ret;
 }
@@ -88,7 +88,7 @@ UINT32 WX_RS422_MASTER_ProcWrDataRspAduMsg(WxRs422Master *this, WxRs422MasterRsp
 /* 处理从RS422驱动收到的响应ADU消息 */
 UINT32 WX_RS422_MASTER_ProRspcAduMsg(WxRs422Master *this, WxMsg *msg)
 {
-    WxRs422MasterRspAduMsg *rspAduMsg = msg;
+    WxRs422MasterRspAduMsg *rspAduMsg = (WxRs422MasterRspAduMsg *)msg;
 
     /* 响应消息对应的请求消息 */
     switch (rspAduMsg->rspAdu.msgType) {
@@ -257,5 +257,10 @@ UINT32 WX_RS422_MASTER_Entry(VOID *module, WxMsg *msg)
         case WX_MSG_TYPE_RS422_MASTER_WR_DATA_REQ: {
             return WX_RS422_MASTER_ProcWrDataReqMsg(this, msg);
         }
+        default: {
+        	break;
+        }
     }
+
+    return WX_ERR;
 }

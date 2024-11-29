@@ -1,14 +1,13 @@
 #include "wx_can_slave.h"
 #include "wx_can_slave_rmt_ctrl_pdu.h"
 #include "wx_msg_can_frame_intf.h"
-#include "../../frame/wx_msg_res_pool.h"
+#include "wx_frame.h"
  
 // WxCanSlave *canSlave = this;
 UINT32 WX_CAN_SLAVE_DecRmtCtrlPduReset(VOID *this, WxRmtCtrlPdu *pdu, WxRmtCtrlReqMsg *msg)
 {
     return WX_SUCCESS;
 }
-
 
 /* 解码接收到远程遥控PDU */
 UINT32 WX_CAN_SLAVE_DecRmtCtrlPdu(WxCanSlave *this, WxRmtCtrlPdu *pdu, WxRmtCtrlReqMsg *msg)
@@ -66,7 +65,7 @@ UINT32 WX_CAN_SLAVE_EncapPdu2CanFrames(WxCanSlave *this, WxRmtCtrlPdu *pdu, WxCa
 UINT32 WX_CAN_SLAVE_SendFrame2CanIf(WxCanSlave *this, WxCanFrame *frame)
 {
     UINT32 ret;
-    WxCanFrameMsg *canFrameMsg = WX_ApplyEvtMsg(WX_MSG_TYPE_CAN_FRAME);
+    WxCanFrameMsg *canFrameMsg = (WxCanFrameMsg *)WX_ApplyEvtMsg(WX_MSG_TYPE_CAN_FRAME);
     if (canFrameMsg == NULL) {
         return WX_APPLY_EVT_MSG_ERR;
     }
