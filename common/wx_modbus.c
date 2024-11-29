@@ -270,7 +270,7 @@ UINT32 WX_Modbus_AduDecodeBlock(WxModbusAdu *adu, UINT32 *startPtr, UINT32 len, 
     if (len > buffSize) {
         return WX_MODBUS_ADU_DECODE_BUF_SIZE_ERR;
     }
-    memcpy(buff, adu->value[start], len);
+    memcpy(buff, &adu->value[start], len);
     *startPtr += len;
 
     return WX_SUCCESS;

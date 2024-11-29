@@ -89,7 +89,6 @@ UINT32 WX_CAN_SLAVE_ProcCanFrameMsg(WxCanSlave *this, WxMsg *evtMsg)
 
 UINT32 WX_CAN_SLAVE_Construct(VOID *module)
 {
-    UINT32 ret;
     WxCanSlave *this = WX_Mem_Alloc(WX_GetModuleName(module), 1, sizeof(WxCanSlave));
     if (this == NULL) {
         return WX_ERR;
