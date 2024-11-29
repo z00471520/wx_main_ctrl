@@ -41,9 +41,9 @@ WxRmtCtrlReqHandle g_wxRmtCtrlReqHandles[WX_RMT_CTRL_CODE_BUTT] = {
 };
 
 
-UINT32 WX_CAN_SLAVE_CheckCanFrameMsg(WxCanFrameMsg *msg)
+UINT32 WX_CAN_SLAVE_CheckCanFrameMsg(WxCanFrame *canFrame)
 {
-    if (msg->canFrame.dataLengCode == 0) {
+    if (canFrame->dataLengCode == 0) {
         wx_excp_cnt(WX_EXCP_CAN_FRAME_DATA_LEN_ERR);
         return WX_CAN_SLAVE_CAN_FRAME_DATA_LEN_ERR;
     }
