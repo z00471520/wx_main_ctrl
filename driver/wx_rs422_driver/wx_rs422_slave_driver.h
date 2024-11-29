@@ -2,8 +2,10 @@
 #define __WX_RS422_SLAVE_DRIVER_H__
 #include "wx_modbus.h"
 #include "wx_include.h"
-
-
+#include "xuartns550.h"
+#include "FreeRTOS.h"
+#include "wx_msg_common.h"
+#include "queue.h"
 /* RS422配置信息 */
 typedef struct {
     UINT32 rs422DevId;  /* 设备ID */
@@ -15,9 +17,13 @@ typedef struct {
 /* RS422 Slave Driver */
 typedef struct {
     UINT8 status; /* 状态 */
+    UINT8 moduleId;
+    UINT8 slaveAddr; /* the slave addr of he device */
+    UINT16 res;
+    UINT32 resv;
     WxModbusAdu txAdu; /* the adu to be send by rs422 */
     WxModbusAdu rxAdu;  /* the adu recieve from rs422 */
-    QueueHandle_t msgQueHandle; /* 用于缓存外部模块发送给RS422的待发送的消息队列 */
+    QueueHandle_t msgQueHandle; /* 用于待发送的消息 */
     XUartNs550 rs422Inst; /* RS422实例 */
 } WxRs422SlaverDriver;
 

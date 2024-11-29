@@ -2,7 +2,7 @@
 #define __WX_MSG_SCHEDULE_H__
 #include "wx_include.h"
 #include "wx_msg_common.h"
-#include "wx_task_deploy.h"
+#include "wx_deploy_tasks.h"
 
 typedef enum {
     WX_MSG_SEND_TO_CORE,    /* 消息发送到其他核 */

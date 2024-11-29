@@ -6,6 +6,6 @@
 
 
 /* 获取中断控制实例 */
-INTC *WX_GetIntrCtrlInst(VOID);
+INTC *WX_GetOrCreateScuGicInstance(VOID);
 
 #endif

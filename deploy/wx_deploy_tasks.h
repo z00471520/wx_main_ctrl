@@ -15,7 +15,9 @@ typedef struct tagWxTask {
     TaskHandle_t handle;
     QueueHandle_t msgQueHandle;
     UINT32 msgQueFullCnt;
-    UINT32 resv;
+    UINT8 coreId;
+    UINT8 resv;
+    UINT16 res16;
     WxModule modules[WX_MODULE_BUTT];
 } WxTask;
 

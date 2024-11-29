@@ -1,5 +1,7 @@
 #ifndef __WX_CAN_DRIVER_H__
 #define __WX_CAN_DRIVER_H__
+#include "FreeRTOS.h"
+#include "queue.h"
 #define WX_CAN_DRIVER_MAX_DATA_LEN 8 /* 支持的最大数据长度，BYTE */
 #define WX_CAN_DRIVER_FRAME_U32_LEN ((XCANPS_MAX_FRAME_SIZE) / (sizeof(u32))) /* FRAM U32长度 */
 

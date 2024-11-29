@@ -1,11 +1,10 @@
 
-#include "wx_task.h"
 #include "wx_include.h"
-#include "wx_task_deploy.h"
+#include "wx_deploy_tasks.h"
 #include "wx_msg_common.h"
 #include "wx_evt_msg_res_pool.h"
-#include "wx_can_slave_a.h"
-#include "wx_can_slave_b.h"
+#include "wx_can_slave.h"
+#include "wx_can_slave.h"
 UINT8 g_curCoreId = WX_CORE_ID_0; /* 褰撳墠杩愯鐨勬牳ID */
 #define INTC_DEVICE_ID		XPAR_SCUGIC_SINGLE_DEVICE_ID
 XScuGic g_wxScuGicInst = {0}; /* Instance of the Interrupt Controller */

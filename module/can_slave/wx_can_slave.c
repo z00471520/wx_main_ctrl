@@ -3,26 +3,21 @@
 #include "wx_can_slave.h"
 #include "wx_id_def.h"
 #include  "wx_can_slave_rmt_ctrl_pdu.h"
+#include "wx_deploy_modules.h"
 WxCanSlaveCfg g_wxCanSlaveCfg[] = {
     {
-        /* 鑷畾涔夐厤缃� */
         .canFrameDataLen = 8,
         .moduleId = WX_MODULE_CAN_SLAVE_A,
-        /* 璁惧閰嶇疆 */
-        .deviceCfgInfo.isEnable = FALSE, /* 鏄惁浣胯兘 */
+        .deviceCfgInfo.isEnable = FALSE,
         .deviceCfgInfo.baudPrescalar = 0,
-        /* 涓柇閰嶇疆 */
         .intrCfgInfo.intrId = 0,
         .intrCfgInfo.callBackRef = 0,
     }, 
     {
-         /* 鑷畾涔夐厤缃� */
         .canFrameDataLen = 8,
         .moduleId = WX_MODULE_CAN_SLAVE_B,
-        /* 璁惧閰嶇疆 */
-        .deviceCfgInfo.isEnable = FALSE, /* 鏄惁浣胯兘 */
+        .deviceCfgInfo.isEnable = FALSE,
         .deviceCfgInfo.baudPrescalar = 0,
-        /* 涓柇閰嶇疆 */
         .intrCfgInfo.intrId = 0,
         .intrCfgInfo.callBackRef = 0,
     }
@@ -66,28 +61,23 @@ UINT32 WX_CAN_SLAVE_DecapCanFrame(WxCanSlave *this, WxCanFrame *canFrame, WxRmtC
     return WX_SUCCESS;
 }
 
-/* 澶勭悊CAN椹卞姩鍙戦�佽繃鏉ョ殑CAN FRAME */
 UINT32 WX_CAN_SLAVE_ProcCanFrameMsg(WxCanSlave *this, WxMsg *evtMsg)
 {
     WxCanFrameMsg *canFrameMsg = (WxCanFrameMsg *)evtMsg;
-    /* 瑙ｅ皝瑁匔AN Frame, 鎶奀AN Frame缁勫悎鍑篊AN PDU */
     UINT32 ret = WX_CAN_SLAVE_DecapCanFrame(this, &canFrameMsg->canFrame, &this->reqPdu);
     if (ret != WX_SUCCESS) {
-        /* 褰撳墠CAN Frame涓嶈冻浠ヨВ鏋愬嚭PDU */
         if (ret == WX_TO_BE_CONTINUE) {
             return WX_SUCCESS;
         }
         return ret;
     }
     
-    /* 瀵筆DU杩涜瑙ｇ爜鑾峰彇鏈�缁堢殑閬ユ帶璇锋眰娑堟伅 */
     WxRmtCtrlReqMsg *reqMsg = &this->reqMsg;
     ret = WX_CAN_SLAVE_DecRmtCtrlPdu(this, &this->reqPdu, reqMsg);
     if (ret != WX_SUCCESS) {
         return ret;
     }
 
-    /* 澶勭悊瑙ｇ爜鍚庣殑娑堟伅 */
     ret = WX_CAN_SLAVE_ProcRmtCtrlReqMsg(this, reqMsg);
     if (ret != WX_SUCCESS) {
         return ret;
@@ -96,7 +86,6 @@ UINT32 WX_CAN_SLAVE_ProcCanFrameMsg(WxCanSlave *this, WxMsg *evtMsg)
     return WX_SUCCESS;
 }
 
-/* 妯″潡鏋勫缓鍑芥暟 */
 UINT32 WX_CAN_SLAVE_Construct(VOID *module)
 {
     UINT32 ret;
@@ -111,12 +100,10 @@ UINT32 WX_CAN_SLAVE_Construct(VOID *module)
         wx_critical("Error Exit: WX_CanSlave_GetCfg(%u) fail", this->moduleId);
         return WX_CAN_SLAVE_MODULE_CFG_UNDEF;
     }
-    /* 璁剧疆涓奙odule */
     WX_SetModuleInfo(module, this);
     return WX_SUCCESS;
 }
 
-/* 妯″潡鏋愭瀯鍑芥暟 */
 UINT32 WX_CAN_SLAVE_Destruct(VOID *module)
 {
     WxCanSlave *this = WX_GetModuleInfo(module);
@@ -128,7 +115,6 @@ UINT32 WX_CAN_SLAVE_Destruct(VOID *module)
     return WX_SUCCESS;
 }
 
-/* 妯″潡娑堟伅澶勭悊鍏ュ彛 */
 UINT32 WX_CAN_SLAVE_Entry(VOID *module, WxMsg *evtMsg)
 {
     WxCanSlave *this = WX_GetModuleInfo(module);

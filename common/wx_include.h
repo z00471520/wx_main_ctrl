@@ -7,5 +7,10 @@
 #include "wx_cnt.h"
 #include "wx_util.h"
 #include "wx_id_def.h"
-
+#include "xuartns550.h"
+#include "FreeRTOS.h"
+#include "queue.h"
+#include "FreeRTOS.h"
+#include "task.h"
+#include "xscugic.h"
 #endif

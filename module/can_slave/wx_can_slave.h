@@ -1,6 +1,8 @@
 #ifndef __WX_CAN_SLAVE_H__
 #define __WX_CAN_SLAVE_H__
 #include "wx_include.h"
+#include "FreeRTOS.h"
+#include "queue.h"
 #define WX_CAN_SLAVE_PDU_DATA_SIZE 1500
 /* 鍗槦閬ユ帶鐨勬寚浠ょ爜-闇�瑕佹牴鎹崼鏄熼�氫俊瑙勮寖纭畾 */
 typedef enum {
@@ -30,7 +32,7 @@ typedef struct {
     WxRmtCtrlPduDecHandle decHandle; /* 閬ユ帶鎸囦护鐮佺殑瀵瑰簲鐨凱DU瑙ｇ爜鍑芥暟锛岃В鏋愬嚭娑堟伅 */
     WxRmtCtrlReqMsgHandle msgQueHandle; /* 娑堟伅澶勭悊Handle */
 } WxRmtCtrlReqHandle;
-
+WxRmtCtrlReqHandle g_wxRmtCtrlReqHandles[WX_RMT_CTRL_CODE_BUTT];
 typedef struct {
     UINT8 canFrameDataLen; /* CAN甯ф暟鎹浐瀹氶暱搴� */
     UINT8 moduleId;       /* 妯″潡ID */
@@ -51,4 +53,7 @@ typedef struct {
     QueueHandle_t txBuffQue;        /* 鍙戦�丆ANframe鐨勭紦鍐查槦鍒� */
 } WxCanSlave;
 
+UINT32 WX_CAN_SLAVE_Construct(VOID *module);
+UINT32 WX_CAN_SLAVE_Destruct(VOID *module);
+UINT32 WX_CAN_SLAVE_Entry(VOID *module, WxMsg *evtMsg);
 #endif //__WX_CAN_SLAVE_H__

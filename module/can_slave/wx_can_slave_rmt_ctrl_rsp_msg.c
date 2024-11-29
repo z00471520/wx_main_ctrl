@@ -29,7 +29,7 @@ UINT32 WX_CAN_SLAVE_EncodeRspPdu(WxCanSlave *this, WxRmtCtrlRspMsg *rspMsg, WxRm
 UINT32 WX_CAN_SLAVE_SendRspMsg2CanIf(WxCanSlave *this, WxRmtCtrlRspMsg *rspMsg)
 {
     /* 消息编码为PDU */
-    UINT32 ret = WX_CAN_SLAVE_EncodeRspPdu(this, rspMsg, this->rspPdu);
+    UINT32 ret = WX_CAN_SLAVE_EncodeRspPdu(this, rspMsg, &this->rspPdu);
     if (ret != WX_SUCCESS) {
         return ret;
     }

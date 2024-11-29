@@ -31,7 +31,7 @@ UINT32 WX_InitUartNs550(XUartNs550 *this, UINT32 deviceId, XUartNs550Format *for
 
 UINT32 WX_SetupUartNs550Interrupt(XUartNs550 *uartInstPtr, XUartNs550_Handler handler, UINT32 intrId, VOID *callBackRef)
 {
-	INTC *intcInst = WX_GetIntrCtrlInst();
+	XScuGic *intcInst = WX_GetOrCreateScuGicInstance();
 	if (intcInst == NULL) {
 		return WX_UART_NS550_INTR_CTRL_UNREADY;
 
@@ -43,7 +43,7 @@ UINT32 WX_SetupUartNs550Interrupt(XUartNs550 *uartInstPtr, XUartNs550_Handler ha
 	 * for the device occurs, the device driver handler performs the
 	 * specific interrupt processing for the device.
 	 */
-	int status = XScuGic_Connect(intcInst, intrCfg->intrId,
+	int status = XScuGic_Connect(intcInst, intrId,
 				 (Xil_ExceptionHandler)XUartNs550_InterruptHandler, uartInstPtr);
 	if (status != XST_SUCCESS) {
 		wx_log(WX_CRITICAL, "Error Exit: XScuGic_Connect RS422(%u) fail(%u)", status);

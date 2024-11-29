@@ -1,7 +1,9 @@
 
 #include "wx_include.h"
 #include "wx_can_driver.h"
-
+#include "FreeRTOS.h"
+#include "queue.h"
+#include "wx_deploy_modules.h"
 WxCanDriverCfg g_wxCanSlaveCfg[] = {
     {},
     {},
@@ -18,7 +20,7 @@ WxCanDriverCfg *WX_CAN_DRIVER_GetCfg(UINT32 moduleId)
 
 UINT32 WX_CAN_DRIVER_InitInterrupt(XCanPs *canInstPtr, WxCanDriverIntrCfg *cfg)
 {
-	INTC *intcInst = WX_GetIntrCtrlInst();
+	INTC *intcInst = WX_GetOrCreateScuGicInstance();
 	if (intcInst == NULL) {
 		return WX_UART_NS550_INTR_CTRL_UNREADY;
 

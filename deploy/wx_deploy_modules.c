@@ -5,18 +5,10 @@
 #include "wx_deploy_tasks.h"
 #include "wx_include.h"
 #include "wx_msg_schedule.h"
-#include "wx_can_driver_b.h"
-#include "wx_can_driver_a.h"
+#include "wx_can_driver.h"
 #include "wx_rs422_driver_master.h"
 #include "wx_rs422_slave_driver.h"
-XScuGic_Config *g_wxScuGicCfg = NULL;
-
-XScuGic_Config *WX_GetOrCreateScuGicCfg()
-{
-    
-}
- XScuGic_LookupConfig(XPAR_SCUGIC_0_DEVICE_ID);
-
+#include "wx_can_slave.h"
 /* 模块部署信息 */
 WxModuleDeploy g_wxModuleDepolyInfos[] = {
     {
@@ -52,7 +44,7 @@ WxModuleDeploy g_wxModuleDepolyInfos[] = {
         WX_CORE_ID_0,                /* 模块运行的核 */
         "task_driver",               /* 驱动任务名 */
         WX_CAN_DRIVER_Construct,   /* 模块构建函数-必选 */
-        WX_CAN_DRIVER_B_Destruct,    /* 模块析构函数 */
+        WX_CAN_DRIVER_Destruct,    /* 模块析构函数 */
         WX_CAN_DRIVER_Entry,       /* 模块消息 */
     },
     {

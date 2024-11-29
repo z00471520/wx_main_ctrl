@@ -1,11 +1,9 @@
 #include "wx_include.h"
 #include "wx_rs422_slave_driver.h"
 #include "wx_id_def.h"
-#include "wx_rs422_slave_rx_adu_msg_intf.h"
 #include "wx_rs422_slave_driver_tx_adu_req_intf.h"
-WxRs422SlaveDriverCfg g_rs422SlaverDriverCfg = {
-
-};
+#include "wx_deploy_modules.h"
+WxRs422SlaveDriverCfg g_rs422SlaverDriverCfg = {0};
 
 /* 发送接收到的报文给上层处理 */
 VOID WX_RS422SlaveDriver_SentRxAdu2Upper(WxRs422SlaverDriver *this, WxModbusAdu *rxAdu)
@@ -60,7 +58,7 @@ VOID WX_RS422SlaveDriver_ProcRecvAduFromISR(WxRs422SlaverDriver *this)
         return;
     }
     /* 检查CRC */
-    if (WX_Modbus_AduCrcCheck(this->rxAdu.value, this->rxAdu.valueLen) != WX_SUCCESS) {
+    if (WX_Modbus_AduCrcCheck(&this->rxAdu) != WX_SUCCESS) {
         wx_excp_cnt(WX_EXCP_RS422_SLAVE_RECV_DATA_CRC_ERR);
         return;
     }
@@ -68,9 +66,11 @@ VOID WX_RS422SlaveDriver_ProcRecvAduFromISR(WxRs422SlaverDriver *this)
     if (!WX_RS422SlaveDriver_IsSupportFuncCode(this, this->rxAdu.funcCode)) {
         wx_excp_cnt(WX_EXCP_RS422_SLAVE_RECV_DATA_FUNC_CODE_ERR);
         /* 发送异常响应报文 */
-        WX_Modbus_AduGenerateExceptionRsp(&this->txAdu, slaveAddr, funcCode, WX_MODBUS_EXCP_ILLEGAL_FUNCTION);
+        WX_Modbus_AduGenerateExceptionRsp(&this->txAdu, slaveAddr, funcCode,
+        	WX_MODBUS_EXCP_ILLEGAL_FUNCTION);
         /* 首次发送消息会被缓存到实例，返回缓存了多少报文 */
-        UINT32 sendCount = XUartNs550_Send(&this->rs422Inst, txAdu->value, (unsigned int)txAdu->valueLen);
+        UINT32 sendCount = XUartNs550_Send(&this->rs422Inst, this->txAdu.value,
+        	(unsigned int)this->txAdu.valueLen);
         if (sendCount == 0) {
             wx_excp_cnt(WX_EXCP_RS422_SLAVE_SEND_DATA_FAIL);
         }
@@ -86,10 +86,10 @@ VOID WX_RS422SlaveDriver_ProcRecvAduFromISR(WxRs422SlaverDriver *this)
 /* RS422I中断处理函数 */
 VOID WX_RS422SlaveDriver_IntrHandle(VOID *callBackRef, UINT32 event, UINT32 eventData)
 {
-    WxRs422SlaverDriver *this = CallBackRef;
+    WxRs422SlaverDriver *this = callBackRef;
     /* 从机数据发送完毕转换为接收 */
 	if (event == XUN_EVENT_SENT_DATA) {
-        UINT32 recvCount = XUartNs550_Recv(&this->rs422Inst, this->rxAdu.adu, WX_MODBUS_ADU_MAX_SIZE);
+        UINT32 recvCount = XUartNs550_Recv(&this->rs422Inst, this->rxAdu.value, WX_MODBUS_ADU_MAX_SIZE);
         if (recvCount == 0) {
             wx_excp_cnt(WX_EXCP_RS422_SLAVE_RECV_DATA_TX_FINISH);
         }
@@ -126,7 +126,7 @@ UINT32 WX_RS422SlaveDriver_Construct(VOID *module)
     /* 接收准备 */
     UINT32 recvCount; 
     do {
-        recvCount = XUartNs550_Recv(&this->rs422Inst, rxAdu->value, txAdu->expectRspLen);
+        recvCount = XUartNs550_Recv(&this->rs422Inst, this->rxAdu.value, WX_MODBUS_ADU_MAX_SIZE);
     } while (recvCount);
 
     /* 设置上Module */
@@ -138,7 +138,7 @@ UINT32 WX_RS422SlaveDriver_Construct(VOID *module)
 UINT32 WX_RS422SlaveDriver_ProcTxAduReq(WxRs422SlaverDriver *this, WxRs422SlaverDriverTxAduReq *msg)
 {
     /* 首次发送消息会被缓存到实例，返回缓存了多少报文 */
-    UINT32 sendCount = XUartNs550_Send(&this->rs422Inst, txAdu->value, (unsigned int)txAdu->valueLen);
+    UINT32 sendCount = XUartNs550_Send(&this->rs422Inst, this->txAdu.value, this->txAdu->valueLen);
     if (sendCount == 0) {
         wx_excp_cnt(WX_EXCP_RS422_SLAVE_SEND_DATA_FAIL_0);
     }

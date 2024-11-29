@@ -1,5 +1,5 @@
-#include "wx_rs422_salve.h"
-
+#include "wx_rs422_slave.h"
+#include "wx_rs422_slave_addr_intf.h"
 /* 不同地址由自己的对应的读和编码操作 */
 WxRs422SlaveRdDataHandle g_wxRs422SlaveRdDataHandles[WX_RS422_SLAVE_DATA_ADDR_BUTT] = {
     /* 读数据地址X                    获取数据函数  对数据编码的函数 */

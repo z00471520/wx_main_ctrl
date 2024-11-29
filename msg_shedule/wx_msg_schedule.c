@@ -1,7 +1,7 @@
 #include "wx_msg_schedule.h"
 #include "wx_failcode.h"
 #include "wx_msg_common.h"
-#include "wx_task_deploy.h"
+#include "wx_deploy_tasks.h"
 #include "wx_include.h"
 WxMsgTypeRouterList *g_wxMsgRouterList = NULL;
 

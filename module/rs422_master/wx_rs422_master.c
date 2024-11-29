@@ -1,34 +1,10 @@
 #include "wx_include.h"
 #include "wx_rs422_master.h"
-#include "wx_rs422_master_rsp_adu_intf.h"
 #include "wx_rs422_master_rd_data_rsp_intf.h"
 #include "wx_rs422_master_wr_data_rsp_intf.h"
 #include "wx_msg_schedule.h"
-WxRs422Master g_wxRs422IMasterTask = {0};
-
-WxMsgType WX_RS422_MASTER_GetRspMsgType(WxMsgType reqMsgType)
-{
-    switch (reqMsgType) {
-        case WX_RS422_MASTER_MSG_READ_DATA: {
-            return WX_RS422_MASTER_MSG_READ_DATA_RSP;
-        }
-        case WX_RS422_MASTER_MSG_WRITE_DATA: {
-            return WX_RS422_MASTER_MSG_WRITE_DATA_RSP;
-        }
-        case WX_RS422_MASTER_MSG_READ_FILE: {
-            return WX_RS422_MASTER_MSG_READ_FILE_RSP;
-        }
-        case WX_RS422_MASTER_MSG_WRITE_FILE: {
-            return WX_RS422_MASTER_MSG_WRITE_FILE_RSP;
-        }
-        default:
-            wx_excp_cnt(WX_EXCP_UNEXPECT_MSG_TYPE); 
-            return reqMsgType;
-    }
-}
-
-
-UINT32 WX_RS422_MASTER_SendAdu2Driver(WxRs422Master *this, WxAdu *adu)
+#include "wx_deploy_modules.h"
+UINT32 WX_RS422_MASTER_SendAdu2Driver(WxRs422Master *this, WxModbusAdu *adu)
 {
     /* 申请消息 */
     WxMsg *msg = WX_ApplyEvtMsg(WX_MSG_TYPE_CAN_FRAME);
@@ -43,14 +19,14 @@ UINT32 WX_RS422_MASTER_SendAdu2Driver(WxRs422Master *this, WxAdu *adu)
     msg->msgType = WX_MSG_TYPE_RS422_MASTER_DRIVER;
     /* 填写数据内容 */
     WxModbusAdu *modbusAdu = (WxModbusAdu *)msg->msgData;
-    for (int i = 0; i < adu->dataLen; i++) {
-        modbusAdu->value[i] = adu->data[i];
+    for (int i = 0; i < adu->valueLen; i++) {
+        modbusAdu->value[i] = adu->value[i];
     }
-    modbusAdu->valueLen = adu->dataLen;
+    modbusAdu->valueLen = adu->valueLen;
     modbusAdu->expectRspLen = adu->expectRspLen;
 
     /* 发送消息 */
-    UINT32 ret = WX_MsgShedule(his->moduleId, msg->msgHead.receiver, msg);
+    UINT32 ret = WX_MsgShedule(this->moduleId, msg->receiver, msg);
     if (ret != WX_SUCCESS) {
         WX_FreeEvtMsg(&msg);
     }
@@ -125,7 +101,7 @@ UINT32 WX_RS422_MASTER_ProRspcAduMsg(WxRs422Master *this, WxMsg *msg)
 /* |salve address: 1byte| func code: 1byte| data addr: 2byte | data len：1byte | data: N | */
 UINT32 WX_RS422_MASTER_EncWrDataReqMsg2Adu(WxRs422MasterWrDataReqMsg *msg, WxModbusAdu *adu)
 {
-    WxRs422MasterWrDataEncHandle *handle = WX_RS422_MASTER_GetWrDataHandle[txMsg->subMsgType];
+    WxRs422MasterWrDataEncHandle *handle = WX_RS422_MASTER_GetWrDataHandle[msg->subMsgType];
     if (handle->encStruct == NULL) {
         return WX_RS422_MASTER_WR_REQ_ENCODE_FUNC_UNDEF;
     }
@@ -144,7 +120,7 @@ UINT32 WX_RS422_MASTER_EncWrDataReqMsg2Adu(WxRs422MasterWrDataReqMsg *msg, WxMod
     UINT16 lelfLen = WX_MODBUS_ADU_MAX_SIZE - adu->valueLen - WX_MODBUS_CRC_LEN; /* the crc and adu len */
     /* 4 is the data length */
     adu->value[WX_MODBUS_ADU_WR_REQ_DATA_LEN_IDX] = 
-        handle->encStruct(&adu->value[WX_MODBUG_ADU_WR_REQ_DATA_START_IDX], lelfLen, &msg->msgData[0]);
+        handle->encStruct(&adu->value[WX_MODBUG_ADU_WR_REQ_DATA_START_IDX], lelfLen, &msg->wrData);
     if (adu->value[WX_MODBUS_ADU_WR_REQ_DATA_LEN_IDX] == 0) {
         return WX_RS422_MASTER_WR_REQ_ENCODE_FAIL;
     }
@@ -169,7 +145,7 @@ UINT32 WX_RS422_MASTER_EncRdDataReqMsg2Adu(WxRs422MasterRdDataReqMsg *msg, WxMod
     if (msg->subMsgType >= WX_RS422_MASTER_MSG_READ_DATA_BUTT) {
         return WX_RS422_MASTER_INVALID_SUB_OPR_TYPE;
     }
-    WxRs422MasterRdDataHandle *handle = &g_wxRs422MasterReadDataHandles[txMsg->subMsgType];
+    WxRs422MasterRdDataHandle *handle = &g_wxRs422MasterReadDataHandles[msg->subMsgType];
     /* the length 0 means that you not define the encode info, wtf! */
     if (handle->dataLen == 0) {
         return WX_RS422_MASTER_READ_REQ_ENCODE_INFO_UNDEF;

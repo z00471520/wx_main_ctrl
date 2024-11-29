@@ -25,15 +25,18 @@ typedef struct {
     
 } WxRs422MasterWrDataY;
 
+typedef struct {
+	union {
+		WxRs422MasterWrDataX MMM;
+		WxRs422MasterWrDataY NNN;
+	};
+}WxRs422MasterWrData;
 /******************************************************************************
  * RS422消息
  *****************************************************************************/
 typedef struct {
     WX_INHERIT_MSG_HEADER
-    union {
-        WxRs422MasterWrDataX MMM;
-        WxRs422MasterWrDataY NNN; 
-    };
+	WxRs422MasterWrData wrData; /* the data to write */
 } WxRs422MasterWrDataReqMsg;
 
 #endif

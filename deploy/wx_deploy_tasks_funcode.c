@@ -6,7 +6,7 @@
 /* 浠诲姟澶勭悊娑堟伅 */
 UINT32 WX_Deply_TaskFuncCodeProcMsg(WxTask *task, WxMsg *evtMsg)
 {
-    UINT32 reciver = evtMsg->msgHead.receiver;
+    UINT32 reciver = evtMsg->receiver;
     if (!WX_IsValidModuleId(reciver)) {
         return WX_ERR;
     }
