@@ -2,9 +2,10 @@
 #include "wx_rs422_slave_driver.h"
 #include "wx_id_def.h"
 #include "wx_rs422_slave_driver_tx_adu_req_intf.h"
-#include "wx_deploy.h"
 #include "wx_rs422_slave_rx_adu_req_intf.h"
 #include "wx_uart_ns50.h"
+#include "wx_msg_res_pool.h"
+ #include "wx_frame.h"
 WxRs422SlaveDriverCfg g_rs422SlaverDriverCfg = {0};
 
 /* 发送接收到的报文给上层处理 */

@@ -1,5 +1,5 @@
-#ifndef __WX_DEPLOY_MODULES_H__
-#define __WX_DEPLOY_MODULES_H__
+#ifndef __WX_FRAME_MODULES_H__
+#define __WX_FRAME_MODULES_H__
 #include "wx_include.h"
 
 UINT32 WX_DeployModules(UINT8 curCoreId);

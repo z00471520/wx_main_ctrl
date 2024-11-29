@@ -1,14 +1,14 @@
 
 #include "xparameters.h"
 #include "xil_exception.h"
-#include "wx_deploy.h"
-#include "wx_deploy_tasks.h"
 #include "wx_include.h"
  
 #include "wx_can_driver.h"
 #include "wx_rs422_driver_master.h"
 #include "wx_rs422_slave_driver.h"
 #include "wx_can_slave.h"
+#include "wx_frame.h"
+#include "wx_modules.h"
 /* 模块部署信息 */
 WxModuleDeploy g_wxModuleDepolyInfos[] = {
     {
@@ -69,7 +69,7 @@ WxModuleDeploy g_wxModuleDepolyInfos[] = {
 
 
 /* 把一个任务部署到模块 */
-UINT32 WX_DeployModules_DeployOneModule(WxTask *task, WxModule *module, WxModuleDeploy *moduleDeploy)
+UINT32 WX_DeployOneModule(WxTask *task, WxModule *module, WxModuleDeploy *moduleDeploy)
 {
     WX_CLEAR_OBJ(module);
     module->moduleName = moduleDeploy->moduleName;
@@ -116,15 +116,15 @@ UINT32 WX_DeployModules(UINT8 curCoreId)
             }
             continue;
         }
-        task = WX_DeployTasks_QueryTask(deploy->taskName);
+        task = WX_QueryTask(deploy->taskName);
         if (task == NULL) {
-            wx_critical("Error Exit: WX_DeployTasks_QueryTask(%s) fail", deploy->taskName);
+            wx_critical("Error Exit: WX_QueryTask(%s) fail", deploy->taskName);
             return WX_ERR;            
         }
         module = &task->modules[deploy->moduleId];
-        ret = WX_DeployModules_DeployOneModule(task, module, deploy);
+        ret = WX_DeployOneModule(task, module, deploy);
         if (ret != WX_SUCCESS) {
-            wx_critical("Error Exit: WX_DeployModules_DeployOneModule(%s) fail(%u)", deploy->moduleName, ret);
+            wx_critical("Error Exit: WX_DeployOneModule(%s) fail(%u)", deploy->moduleName, ret);
             return ret;
         }
         ret = WX_RegModuleRouter(deploy->moduleId, deploy->coreId, task, module);

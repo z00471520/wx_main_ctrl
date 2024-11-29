@@ -22,15 +22,15 @@
 #include "wx_typedef.h"
 #include "wx_failcode.h"
 #include "xil_exception.h"
-#include "wx_deploy.h"
+#include "wx_frame.h"
 int main(void)
 {
-	xil_printf("WX_Deploy start...!");
-	UINT32 ret = WX_Deploy(WX_GetCurCoreId());
+	xil_printf("WX_SetupFrame start...!");
+	UINT32 ret = WX_SetupFrame(WX_GetCurCoreId());
 	if (ret != WX_SUCCESS) {
-		xil_printf("WX_Deploy failed(%u)\r\n", ret);
+		xil_printf("WX_SetupFrame failed(%u)\r\n", ret);
 	} else {
-		xil_printf("WX_Deploy successful!");
+		xil_printf("WX_SetupFrame successful!");
 		/* 使能中断开始 */
 		Xil_ExceptionEnable();
 		/* Start the scheduler. */

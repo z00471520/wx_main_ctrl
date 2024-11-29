@@ -3,11 +3,12 @@
 #include "wx_can_slave.h"
 #include "wx_id_def.h"
 #include "wx_can_slave_rmt_ctrl_pdu.h"
-#include "wx_deploy.h"
 #include "wx_msg_can_frame_intf.h"
 #include "wx_can_slave_rmt_ctrl_pdu.h"
 #include "wx_can_slave_rmt_ctrl_req_msg.h"
 #include "wx_can_slave_rmt_ctrl_rsp_msg.h"
+
+ #include "wx_frame.h"
 WxCanSlaveCfg g_wxCanSlaveCfg[] = {
     {
         .canFrameDataLen = 8,

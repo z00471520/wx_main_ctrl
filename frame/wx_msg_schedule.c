@@ -1,12 +1,14 @@
  
+#include <wx_tasks.h>
+#include "../frame/wx_msg_schedule.h"
+
 #include "wx_failcode.h"
 #include "wx_msg_common.h"
-#include "wx_deploy_tasks.h"
 #include "wx_include.h"
-#include "wx_deploy.h"
+#include "wx_frame.h"
 WxModuleRouterList *g_wxModuleRouterList = NULL;
 
-/* 创建消息调度的路由表 */
+/* 鍒涘缓娑堟伅璋冨害鐨勮矾鐢辫〃 */
 UINT32 WX_CreateModuleRouterList(void)
 {
     if (g_wxModuleRouterList == NULL) {
@@ -30,7 +32,7 @@ UINT32 WX_DestroyModuleRouterList(void)
     return WX_SUCCESS;
 }
 
-/* 注册模块的调度路由 */
+/* 娉ㄥ唽妯″潡鐨勮皟搴﹁矾鐢� */
 UINT32 WX_RegModuleRouter(WxModuleId moduleId, UINT8 coreId, 
     WxTask *belongTask, WxModule *belongModule)
 {
@@ -63,10 +65,10 @@ UINT32 WX_CheckSheduleReq(UINT8 sender, UINT8 receiver, VOID *msg)
     }
     return WX_SUCCESS;
 }
-/* 计算消息的发送方式 */
+/* 璁＄畻娑堟伅鐨勫彂閫佹柟寮� */
 WxMsgSendMethod WX_MsgSchedule_CalcMsgSendMethod(WxModuleRouter *sender, WxModuleRouter *receiver)
 {
-    /* 核不同不能直接发送消息 */
+    /* 鏍镐笉鍚屼笉鑳界洿鎺ュ彂閫佹秷鎭� */
     if (receiver->coreId != sender->coreId) {
         return WX_MSG_SEND_TO_CORE;
     } else {
@@ -74,14 +76,14 @@ WxMsgSendMethod WX_MsgSchedule_CalcMsgSendMethod(WxModuleRouter *sender, WxModul
     }
 }
 
-/* 发送消息到其他核 TODO*/
+/* 鍙戦�佹秷鎭埌鍏朵粬鏍� TODO*/
 UINT32 WX_SheduleMsgToCore(WxModuleRouter *receiver, VOID *msg)
 {
     /* TODO */
     return WX_ERR;
 }
 
-/* 发送消息到任务 */
+/* 鍙戦�佹秷鎭埌浠诲姟 */
 UINT32 WX_SheduleMsgToTask(WxModuleRouter *receiver, VOID *msg)
 {
     WxTask *task = receiver->belongTask;
@@ -101,11 +103,11 @@ UINT32 WX_SheduleMsgToTask(WxModuleRouter *receiver, VOID *msg)
 
 
 /*
- * 函数功能：消息调度，用于发送消息到指定的模块
- * 参数说明
- * sender：发送者模块ID
- * receiver：接收者模块ID
- * msg：消息体指针
+ * 鍑芥暟鍔熻兘锛氭秷鎭皟搴︼紝鐢ㄤ簬鍙戦�佹秷鎭埌鎸囧畾鐨勬ā鍧�
+ * 鍙傛暟璇存槑
+ * sender锛氬彂閫佽�呮ā鍧桰D
+ * receiver锛氭帴鏀惰�呮ā鍧桰D
+ * msg锛氭秷鎭綋鎸囬拡
  **/
 UINT32 WX_MsgShedule(UINT8 sender, UINT8 receiver, VOID *msg)
 {

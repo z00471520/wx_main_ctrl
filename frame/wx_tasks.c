@@ -1,10 +1,12 @@
 
-#include "wx_deploy_tasks.h"
+#include <wx_tasks.h>
 #include "wx_include.h"
 #include "FreeRTOS.h"
 #include "task.h"
-#include "wx_deploy_tasks_funcode.h"
 #include "wx_msg_common.h"
+#include "wx_frame.h"
+#include "wx_tasks.h"
+
 WxDeployTasks *g_wxDeployTasks = NULL;     /* 任务列表 */
 
 /* 任务配置信息, 规定各核运行的任务 */
@@ -33,7 +35,40 @@ WxTaskDeploy g_wxTaskDeployInfo[] = {
     // /* if more please add here */
 };
 
-WxDeployTasks *WX_DeployTasks_Create(UINT8 coreId, UINT32 taskNum)
+/* 任务处理消息 */
+UINT32 WX_TaskHandleMsg(WxTask *task, WxMsg *evtMsg)
+{
+    UINT32 reciver = evtMsg->receiver;
+    if (!WX_IsValidModuleId(reciver)) {
+        return WX_ERR;
+    }
+
+    if (task->modules[reciver].entryFunc == NULL) {
+        return WX_ERR;
+    }
+
+    return task->modules[reciver].entryFunc(&task->modules[reciver], evtMsg);
+}
+
+/* 这是一个通用的任务处理函数 */
+VOID WX_TaskHandle(VOID *param)
+{
+    WxTask *task = param;
+    UINT32 ret;
+    WxMsg *evtMsg = NULL;
+    for (;;) {
+        /* 在这里阻塞等待消息的到来 */
+        if (xQueueReceive(task->msgQueHandle, &evtMsg, portMAX_DELAY) == pdPASS) {
+            ret = WX_TaskHandleMsg(task, evtMsg);
+            if (ret != WX_SUCCESS) {
+                wx_fail_code_cnt(ret);
+            }
+            WX_FreeEvtMsg(&evtMsg);
+        }
+    }
+}
+
+WxDeployTasks *WX_CreateTasks(UINT8 coreId, UINT32 taskNum)
 {
     if (g_wxDeployTasks == NULL) {
         g_wxDeployTasks = WX_Mem_Alloc("WxDeployTasks", 1, sizeof(WxDeployTasks) + taskNum * sizeof(WxTask));
@@ -47,7 +82,7 @@ WxDeployTasks *WX_DeployTasks_Create(UINT8 coreId, UINT32 taskNum)
     return g_wxDeployTasks;
 }
 
-UINT32 WX_DeployTasks_Destroy(VOID)
+UINT32 WX_DestroyDeployTasks(VOID)
 {
     if (g_wxDeployTasks!= NULL) {
         WX_Mem_Free(g_wxDeployTasks);
@@ -57,7 +92,7 @@ UINT32 WX_DeployTasks_Destroy(VOID)
 }
 
 /* 根据名字查找一个任务 */
-WxTask *WX_DeployTasks_QueryTask(CHAR *taskName)
+WxTask *WX_QueryTask(CHAR *taskName)
 {
     WxTask *task = NULL;
     for (UINT32 i = 0; i < g_wxDeployTasks->taskNum; i++) {
@@ -85,7 +120,7 @@ UINT32 WX_DeployTasks_DeployTask(WxTask *task, WxTaskDeploy *taskDeploy)
 
     /* 初始化任务主函数 */
     if (taskDeploy->stackDepth > 0) {
-        BaseType_t xReturned = xTaskCreate(WX_Deply_TaskFuncCode, taskDeploy->taskName, taskDeploy->stackDepth, 
+        BaseType_t xReturned = xTaskCreate(WX_TaskHandle, taskDeploy->taskName, taskDeploy->stackDepth, 
             (VOID *) task, taskDeploy->priority, &task->handle);
         if (xReturned != pdPASS) {
             wx_critical(WX_EXCP_UNDEFINE, "Error Exit: core[%u] task(%s) create fail!", coreId, taskDeploy->taskName);
@@ -105,7 +140,7 @@ UINT32 WX_DeployTasks(UINT8 curCoreId)
         return ret;
     } 
     UINT32 taskDeployNum = sizeof(g_wxTaskDeployInfo) / sizeof(g_wxTaskDeployInfo[0]);
-    WxDeployTasks *taskList = WX_DeployTasks_Create(curCoreId, taskDeployNum);
+    WxDeployTasks *taskList = WX_CreateTasks(curCoreId, taskDeployNum);
     WxTaskDeploy *taskDeploy = NULL;
     for (UINT32 i = 0; i < taskDeployNum; i++) {
         taskDeploy = &g_wxTaskDeployInfo[i];

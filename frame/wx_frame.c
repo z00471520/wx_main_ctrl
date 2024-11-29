@@ -1,13 +1,11 @@
-
-#include "wx_include.h"
-#include "wx_deploy_tasks.h"
-#include "wx_msg_common.h"
+#include "wx_frame.h"
 #include "wx_msg_res_pool.h"
-#include "wx_can_slave.h"
-#include "wx_deploy_modules.h"
+#include "wx_tasks.h"
+#include "wx_modules.h"
+#include "wx_frame.h"
 UINT8 g_curCoreId = WX_CORE_ID_0; /* 褰撳墠杩愯鐨勬牳ID */
 XScuGic g_wxScuGicInst = {0}; /* Instance of the Interrupt Controller */
-/* 鑾峰彇涓柇鎺у埗鍣ㄥ疄渚� */
+
 XScuGic *WX_GetOrCreateScuGicInstance(VOID)
 {
     if (g_wxScuGicInst.IsReady == XIL_COMPONENT_IS_READY) {
@@ -27,10 +25,14 @@ XScuGic *WX_GetOrCreateScuGicInstance(VOID)
     return &g_wxScuGicInst;
 }
 
-/* deploy current core */
-UINT32 WX_Deploy(UINT8 coreId)
+UINT32 WX_SetupFrame(UINT8 coreId)
 {
-    UINT32 ret = WX_DeployTasks(coreId);
+    /* 创建消息资源池 */
+    UINT32 ret = WX_CreateMsgResPool();
+    if (ret != WX_SUCCESS) {
+        return ret;
+    } 
+    ret = WX_DeployTasks(coreId);
     if (ret != WX_SUCCESS) {
         return ret;
     }
@@ -43,5 +45,3 @@ UINT32 WX_Deploy(UINT8 coreId)
 
     return WX_SUCCESS;
 }
-
-

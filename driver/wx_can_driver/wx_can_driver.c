@@ -3,7 +3,8 @@
 #include "wx_can_driver.h"
 #include "FreeRTOS.h"
 #include "queue.h"
-#include "wx_deploy.h"
+
+ #include "wx_frame.h"
 
 WxCanDriverCfg g_wxCanDriverCfg[] = {
     {},
