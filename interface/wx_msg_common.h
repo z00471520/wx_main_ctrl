@@ -29,12 +29,12 @@ typedef enum {
 #define WX_IsValidMsgType(t) ((t) > WX_MSG_TYPE_INVALID && (t) < WX_MSG_TYPE_BUTT)
 
 #define WX_INHERIT_MSG_HEADER                                       \
-    UINT8 sender;       /* 消息发送模块ID, 详见: WxModuleId */ \
-    UINT8 receiver; /* 消息接收模块ID, 详见: WxModuleId */ \
-   	UINT16 msgType; /* 消息类型, 详见枚举 WxMsgType 定义 */ \
-    UINT16 subMsgType; /* 消息子类型, 由大类确定 */ \
-    UINT8 outEvent;  /* 消息处理的出事件， WX_SUCCESS - 表示成功 */ \
-    UINT8 isFromIsr: 1; /* 消息是否来自中断，1-来自中断，0-来自任务 */ \
+    UINT8 sender;       /* 消息发送模块ID, 详见: WxModuleId */           \
+    UINT8 receiver; /* 消息接收模块ID, 详见: WxModuleId */               \
+   	UINT16 msgType; /* 消息类型, 详见枚举 WxMsgType 定义 */                 \
+    UINT16 subMsgType; /* 消息子类型, 由大类确定 */                        \
+    UINT8 outEvent;  /* 消息处理的出事件， WX_SUCCESS - 表示成功 */           \
+    UINT8 isFromISR: 1; /* 消息是否来自中断，1-来自中断，0-来自任务 */           \
     UINT8 resv: 7;  /* 保留位 */
 
 typedef struct {

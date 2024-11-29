@@ -4,6 +4,7 @@
 #include "queue.h"
 #include "wx_msg_common.h"
 #include "wx_rs422_master_driver_intf.h"
+#include "xuartns550.h"
 WxRs422DriverCfg g_rs422DriverMasterCfg = {
 
 };
@@ -60,7 +61,7 @@ VOID WX_RS422MasterDriver_ProcRecvAduFromISR(WxRs422DriverMaster *this)
 }
 
 
-/* RS422I中断处理函数 */
+/* RS422 master中断处理函数 */
 VOID WX_RS422I_DRIVER_MASTER_IntrHandler(VOID *callBackRef, UINT32 event, UINT32 eventData)
 {
     WxRs422DriverMaster *this = callBackRef;

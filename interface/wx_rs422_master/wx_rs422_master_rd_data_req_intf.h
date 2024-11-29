@@ -7,7 +7,7 @@ typedef struct {
     WxRs422MasterRdDataType dataType; /* 读数据需要明确提供数据的从机地址 */
     UINT8 reReadTime; /* 读数据校验错误重读次数*/
     UINT8 rsv[3];
-} WxRs422MasterRdDataReq
+} WxRs422MasterRdDataReq;
 
 /******************************************************************************
  * RS422消息

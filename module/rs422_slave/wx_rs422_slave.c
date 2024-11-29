@@ -103,7 +103,7 @@ UINT32 WX_RS422Slave_ProcReadDataReq(WxRs422Slave *this, WxModbusAdu *rxAdu, WxM
     return ret;
 }
 
-/* 从机处理写数据请求 */
+/* 从机处理驱动接收的发送过来的写数据请求ADU */
 UINT32 WX_RS422Slave_ProcWriteDataReq(WxRs422Slave *this, WxModbusAdu *rxAdu, WxModbusAdu *txAdu)
 {
     if (txAdu->dataAddr >= this->wrHandleNum) {
@@ -122,7 +122,7 @@ UINT32 WX_RS422Slave_ProcWriteDataReq(WxRs422Slave *this, WxModbusAdu *rxAdu, Wx
         return WX_RS422Slave_SendExcpRsp(this, txAdu, WX_MODBUS_EXCP_WR_HANDLE_UNFINE);
     }
     /* 先对写数据的ADU进行解码 */
-    UINT32 ret = handle->decAdu(&this->rxAdu, &txAdu->value);
+    UINT32 ret = handle->decAdu(rxAdu, &txAdu->value);
     if (ret != WX_SUCCESS) {
         wx_excp_cnt(WX_EXCP_RS422_SLAVE_DATA_DEC_FAIL);
         return WX_RS422Slave_SendExcpRsp(this, txAdu, WX_MODBUS_EXCP_WR_DATA_DEC_FAIL);

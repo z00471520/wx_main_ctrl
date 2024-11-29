@@ -8,11 +8,14 @@ typedef enum {
 } WxRs422Status;
 
 typedef struct {
-    UINT8 status; /* 鐘舵�� */
+    UINT8 status; /*  master's txrx status see WxRs422Status for detail  */
+    UINT8 moduleId; /* module id  */
+    UINT8 resv;
+    UINT8 resv1;
     WxModbusAdu txAdu; /* the adu to be send by rs422 */
     WxModbusAdu rxAdu;  /* the adu recieve from rs422 */
-    QueueHandle_t msgQueHandle; /* 鐢ㄤ簬缂撳瓨澶栭儴妯″潡鍙戦�佺粰RS422鐨勫緟鍙戦�佺殑娑堟伅闃熷垪 */
-    XUartNs550 rs422Inst; /* RS422瀹炰緥 */
+    QueueHandle_t msgQueHandle; /* adu to be sent */
+    XUartNs550 rs422Inst; /* RS422 inst  */
 } WxRs422DriverMaster;
 
 UINT32 WX_RS422MasterDriver_Construct(VOID *module);

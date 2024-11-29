@@ -6,7 +6,7 @@
 #include "wx_rs422_master_rd_data_rsp_intf.h"
 #include "wx_rs422_master_wr_data_req_intf.h"
 #include "wx_rs422_master_wr_data_rsp_intf.h"
-
+#include "wx_rs422_master.h"
 /* RS422 Master的从机地址定义 */
 typedef enum {
     WX_RS422_MASTER_SLAVE_ADDR_NA,
