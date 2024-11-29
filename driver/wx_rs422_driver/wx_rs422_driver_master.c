@@ -45,7 +45,8 @@ VOID WX_RS422MasterDriver_ProcRecvAduFromISR(WxRs422DriverMaster *this)
         /* 清空并预设预期接收的报文大小，防止任务被抢占来不及缓存导致串口消息丢失 */
         UINT32 recvCount; 
         do {
-            recvCount = XUartNs550_Recv(&this->rs422Inst, &this->rxAdu.value, txAdu->expectRspLen);
+            recvCount = XUartNs550_Recv(&this->rs422Inst, this->rxAdu.value,
+            	(unsigned int)txAdu->expectRspLen);
         } while (recvCount);
         
         /* 首次发送消息会被缓存到实例，返回缓存了多少报文 */
@@ -161,7 +162,7 @@ UINT32 WX_RS422MasterDriver_Entry(VOID *module, WxMsg *evtMsg)
     /* 子消息类型 */
     switch (evtMsg->subMsgType) {
         case WX_SUB_MSG_RS422_DRIVER_MASTER_TX_ADU: {
-            return WX_RS422MasterDriver_ProcTxAduMsg(this, evtMsg);
+            return WX_RS422MasterDriver_ProcTxAduMsg(this, (WxRs422MasterDriverMsg *)evtMsg);
         }
         default: {
             return WX_ERR;

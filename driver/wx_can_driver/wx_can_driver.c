@@ -178,7 +178,7 @@ UINT32 WX_CAN_DRIVER_ProcCanFrameMsg(WxCanDriver *this, WxMsg *evtMsg)
 		return WX_SUCCESS;
 	}
 	if (ret == WX_CAN_DRIVER_CONFIG_TX_FAIL_FULL) {
-		return WX_CAN_DRIVER_SendCanFrameToSendQue(this, frame);
+		return WX_CAN_DRIVER_SendCanFrameToSendQue(this->sendQueue, frame);
 	}
 
 	return ret;
@@ -228,7 +228,7 @@ UINT32 WX_CAN_DRIVER_Entry(VOID *module, WxMsg *evtMsg)
     WxCanDriver *this = WX_GetModuleInfo(module);
     switch (evtMsg->msgType) {
 		case WX_MSG_TYPE_CAN_FRAME: {
-			return WX_CAN_DRIVER_ProcCanFrameMsg(&this->canInst, evtMsg);
+			return WX_CAN_DRIVER_ProcCanFrameMsg(this, evtMsg);
 		}
 		default: {
 			return WX_CAN_DRIVER_MSG_TYPE_INVALID;	

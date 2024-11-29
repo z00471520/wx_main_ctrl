@@ -33,7 +33,7 @@ VOID WX_RS422SlaveDriver_SentRxAdu2Upper(WxRs422SlaverDriver *this, WxModbusAdu 
     /* 发送消息 */
     UINT32 ret = WX_MsgShedule(this->moduleId, msg->receiver, msg);
     if (ret != WX_SUCCESS) {
-        WX_FreeEvtMsg(&msg);
+        WX_FreeEvtMsg((WxMsg **)&msg);
     }
 }
 
@@ -69,8 +69,8 @@ VOID WX_RS422SlaveDriver_ProcRecvAduFromISR(WxRs422SlaverDriver *this)
     if (!WX_RS422SlaveDriver_IsSupportFuncCode(this, this->rxAdu.funcCode)) {
         wx_excp_cnt(WX_EXCP_RS422_SLAVE_RECV_DATA_FUNC_CODE_ERR);
         /* 发送异常响应报文 */
-        WX_Modbus_AduGenerateExceptionRsp(&this->txAdu, slaveAddr, funcCode,
-        	WX_MODBUS_EXCP_ILLEGAL_FUNCTION);
+        WX_Modbus_AduGenerateExceptionRsp(slaveAddr, funcCode,
+        	WX_MODBUS_EXCP_ILLEGAL_FUNCTION, &this->txAdu);
         /* 首次发送消息会被缓存到实例，返回缓存了多少报文 */
         UINT32 sendCount = XUartNs550_Send(&this->rs422Inst, this->txAdu.value,
         	(unsigned int)this->txAdu.valueLen);

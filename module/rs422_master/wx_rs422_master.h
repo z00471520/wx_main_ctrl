@@ -19,7 +19,7 @@ typedef enum {
  * 读数据相关
  **/
 /* buff = [data0][data1] */
-typedef UINT32 (*WxRs422MasterRdDateDecFunc)(UINT8 buff[], UINT8 buffSize, WxRs422MasterReadData *rspStruct);
+typedef UINT32 (*WxRs422MasterRdDateDecFunc)(UINT8 *buff, UINT8 buffSize, WxRs422MasterReadData *rspStruct);
 /* 不同读类型对应的编码 */
 typedef struct tagWxRs422MasterRdDataHandle{
     WxRs422MasterSlaveAddrDef slaveDevice; /* 读数据的对应从机设备ID */

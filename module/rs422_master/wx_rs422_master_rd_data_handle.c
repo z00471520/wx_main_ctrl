@@ -1,12 +1,12 @@
 #include "wx_rs422_master.h"
 #include "wx_include.h"
-UINT32 WX_RS422_MASTER_DecRdDataX(UINT8 buff[], UINT8 buffSize, WxRs422MasterReadData *rspStruct)
+UINT32 WX_RS422_MASTER_DecRdDataX(UINT8 *buff, UINT8 buffSize, WxRs422MasterReadData *rspStruct)
 {
     return WX_ERR;
 }
 
 
-UINT32 WX_RS422_MASTER_DecRdDataY(UINT8 buff[], UINT8 buffSize, WxRs422MasterReadData *rspStruct)
+UINT32 WX_RS422_MASTER_DecRdDataY(UINT8 *buff, UINT8 buffSize, WxRs422MasterReadData *rspStruct)
 {
     return WX_ERR;
 }
@@ -31,7 +31,7 @@ UINT32 WX_RS422_MASTER_DecRdDataAdu(WxModbusAdu *rxAdu, WxRs422MasterReadData *r
     }
 
     /* 指向数据区 */
-    CHAR *data = &rxAdu->value[WX_MODBUS_ADU_RD_RSP_DATA_START_IDX];
+    UINT8 *data = &rxAdu->value[WX_MODBUS_ADU_RD_RSP_DATA_START_IDX];
     /* 获取读数据类型对应的解码函数 */
     WxRs422MasterRdDateDecFunc decFunc = g_wxRs422MasterReadDataHandles[rxAdu->subMsgType].decFunc;
     if (decFunc == NULL) {
