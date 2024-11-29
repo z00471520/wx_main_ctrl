@@ -5,7 +5,7 @@
 #include "wx_deploy.h"
 #include "wx_rs422_slave.h"
 #include "wx_rs422_slave_addr_intf.h"
-#include "wx_msg_schedule.h"
+ 
 #include "wx_msg_res_pool.h"
 /*
  * This is the configuration of the RS422I-master

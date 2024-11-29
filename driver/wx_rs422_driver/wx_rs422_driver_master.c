@@ -7,6 +7,7 @@
 #include "xuartns550.h"
 #include "wx_deploy.h"
 #include "wx_uart_ns50.h"
+#include "wx_"
 WxRs422MasterDriverCfg g_rs422DriverMasterCfg = {0};
 
 VOID WX_RS422MasterDriver_SentRspAdu2Rs422Master(WxRs422DriverMaster *this, WxModbusAdu *rxAdu)

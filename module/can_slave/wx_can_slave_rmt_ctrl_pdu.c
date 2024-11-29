@@ -2,7 +2,7 @@
 #include "wx_can_slave_rmt_ctrl_pdu.h"
 #include "wx_msg_res_pool.h"
 #include "wx_msg_can_frame_intf.h"
-#include "wx_msg_schedule.h"
+ 
 // WxCanSlave *canSlave = this;
 UINT32 WX_CAN_SLAVE_DecRmtCtrlPduReset(VOID *this, WxRmtCtrlPdu *pdu, WxRmtCtrlReqMsg *msg)
 {

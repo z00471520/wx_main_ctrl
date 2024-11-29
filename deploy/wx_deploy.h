@@ -2,6 +2,7 @@
 #define __WX_DEPLOY_H__
 #include "wx_include.h"
 #include "wx_id_def.h"
+ 
 UINT8 g_curCoreId;
 
 #define INTC_DEVICE_ID		XPAR_SCUGIC_SINGLE_DEVICE_ID
@@ -57,6 +58,10 @@ typedef struct tagWxDeployTasks {
     WxTask taskList[0];
 } WxDeployTasks;
 
+UINT32 WX_RegModuleRouter(WxModuleId moduleId, UINT8 coreId, 
+    WxTask *belongTask, WxModule *belongModule);
+/* 消息调度 */
+UINT32 WX_MsgShedule(UINT8 sender, UINT8 receiver, VOID *msg);
 XScuGic *WX_GetOrCreateScuGicInstance(VOID);
 UINT32 WX_Deploy(UINT8 coreId);
 #define WX_GetCurCoreId() g_curCoreId

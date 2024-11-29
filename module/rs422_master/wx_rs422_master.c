@@ -2,7 +2,7 @@
 #include "wx_rs422_master.h"
 #include "wx_rs422_master_rd_data_rsp_intf.h"
 #include "wx_rs422_master_wr_data_rsp_intf.h"
-#include "wx_msg_schedule.h"
+ 
 #include "wx_deploy.h"
 #include "wx_rs422_master_adu_rsp_intf.h"
 UINT32 WX_RS422_MASTER_SendAdu2Driver(WxRs422Master *this, WxModbusAdu *adu)
