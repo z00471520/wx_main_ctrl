@@ -189,7 +189,7 @@ UINT32 WX_CAN_DRIVER_Construct(VOID *module)
     UINT32 ret;
     WxCanDriver *this = WX_Mem_Alloc(WX_GetModuleName(module), 1, sizeof(WxCanDriver));
     if (this == NULL) {
-        return WX_ERR;
+        return WX_CAN_DRIVER_MEM_ALLOC_FAIL;
     }
     WX_CLEAR_OBJ(this);
     this->moduleId = WX_GetModuleCoreId(module);

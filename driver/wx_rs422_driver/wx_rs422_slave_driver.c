@@ -111,7 +111,7 @@ UINT32 WX_RS422SlaveDriver_Construct(VOID *module)
     /* allocate memory for module */
     WxRs422SlaverDriver *this = WX_Mem_Alloc(WX_GetModuleName(module), 1, sizeof(WxRs422SlaverDriver));
     if (this == NULL) {
-        return WX_ERR;
+        return WX_RS422_SLAVE_DRIVER_MEM_ALLOC_FAIL;
     }
     WxRs422SlaveDriverCfg *cfg = &g_rs422SlaverDriverCfg;
     /* the inst or rs422 used for uart data tx/rx */

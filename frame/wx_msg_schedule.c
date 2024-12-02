@@ -14,7 +14,7 @@ UINT32 WX_CreateModuleRouterList(void)
     if (g_wxModuleRouterList == NULL) {
         g_wxModuleRouterList = (WxModuleRouterList *)WX_Mem_Alloc(WxModuleRouterList, 1, sizeof(WxModuleRouterList));
         if (g_wxModuleRouterList == NULL) {
-            return WX_FAIL_MEM_ALLOC;
+            return WX_MEM_ALLOC_FAIL;
         }
         memset(g_wxModuleRouterList, 0, sizeof(WxModuleRouterList));
     }
@@ -76,14 +76,14 @@ WxMsgSendMethod WX_MsgSchedule_CalcMsgSendMethod(WxModuleRouter *sender, WxModul
     }
 }
 
-/* 鍙戦�佹秷鎭埌鍏朵粬鏍� TODO*/
+/* shedule msg to core */
 UINT32 WX_SheduleMsgToCore(WxModuleRouter *receiver, VOID *msg)
 {
     /* TODO */
-    return WX_ERR;
+    return WX_SHEDULE_TO_CORE_NOT_SPT;
 }
 
-/* 鍙戦�佹秷鎭埌浠诲姟 */
+/* shedule msg to task */
 UINT32 WX_SheduleMsgToTask(WxModuleRouter *receiver, VOID *msg)
 {
     WxTask *task = receiver->belongTask;

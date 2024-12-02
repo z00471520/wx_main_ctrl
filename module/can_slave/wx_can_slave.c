@@ -91,7 +91,7 @@ UINT32 WX_CAN_SLAVE_Construct(VOID *module)
 {
     WxCanSlave *this = WX_Mem_Alloc(WX_GetModuleName(module), 1, sizeof(WxCanSlave));
     if (this == NULL) {
-        return WX_ERR;
+        return WX_MEM_ALLOC_FAIL;
     }
    
     this->moduleId = WX_GetModuleId(module);
@@ -125,7 +125,7 @@ UINT32 WX_CAN_SLAVE_Entry(VOID *module, WxMsg *evtMsg)
         }
         /* if more please add here */
         default: {
-            return WX_ERR;
+            return WX_CAN_SLAVE_UNSPT_MSG_TYPE;
         }
     }
 }

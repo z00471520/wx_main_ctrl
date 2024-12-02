@@ -2,13 +2,13 @@
 #include "wx_include.h"
 UINT32 WX_RS422_MASTER_DecRdDataX(UINT8 *buff, UINT8 buffSize, WxRs422MasterReadData *rspStruct)
 {
-    return WX_ERR;
+    return WX_NOT_SUPPORT;
 }
 
 
 UINT32 WX_RS422_MASTER_DecRdDataY(UINT8 *buff, UINT8 buffSize, WxRs422MasterReadData *rspStruct)
 {
-    return WX_ERR;
+    return WX_NOT_SUPPORT;
 }
 
 /* 不同读操作的编码信息, 方便添加我把所有的都放到这里了 */

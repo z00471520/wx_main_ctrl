@@ -224,7 +224,7 @@ UINT32 WX_RS422_MASTER_Construct(VOID *module)
 {
     WxRs422Master *this = WX_Mem_Alloc(WX_GetModuleName(module), 1, sizeof(WxRs422Master));
     if (this == NULL) {
-        return WX_ERR;
+        return WX_MEM_ALLOC_FAIL;
     }
     WX_CLEAR_OBJ(this);
 
@@ -262,5 +262,5 @@ UINT32 WX_RS422_MASTER_Entry(VOID *module, WxMsg *msg)
         }
     }
 
-    return WX_ERR;
+    return WX_RS422_MASTER_UNSPT_MSGTYPE;
 }

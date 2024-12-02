@@ -4,7 +4,7 @@ UINT32 WX_CAN_SLAVE_ProcRmtCtrlReqMsgReset(VOID *this, WxRmtCtrlReqMsg *reqMsg)
 {
     /* DO reset */
 
-	return WX_ERR;
+	return WX_NOT_SUPPORT;
 }
 
 WxRmtCtrlReqMsgHandle g_wxRmtCtrlReqMsgHandle[WX_RMT_CTRL_REQ_MSG_TYPE_BUTT] = {

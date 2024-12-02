@@ -126,7 +126,7 @@ UINT32 WX_RS422MasterDriver_Construct(VOID *module)
     UINT32 ret;
     WxRs422DriverMaster *this = WX_Mem_Alloc(WX_GetModuleName(module), 1, sizeof(WxRs422DriverMaster));
     if (this == NULL) {
-        return WX_ERR;
+        return WX_RS422_MASTER_MEM_ALLOC_FAIL;
     }
     WxRs422MasterDriverCfg *cfg = &g_rs422DriverMasterCfg;
     /* 创建RS422消息缓存队列 */
@@ -157,7 +157,7 @@ UINT32 WX_RS422MasterDriver_Entry(VOID *module, WxMsg *evtMsg)
 {
     WxRs422DriverMaster *this = WX_GetModuleInfo(module);
     if (evtMsg->msgType != WX_MSG_TYPE_RS422_MASTER_DRIVER) {
-        return WX_ERR;
+        return WX_RS422_MASTER_DRIVER_UNSPT_MSGTYPE;
     }
     /* 子消息类型 */
     switch (evtMsg->subMsgType) {
@@ -165,7 +165,7 @@ UINT32 WX_RS422MasterDriver_Entry(VOID *module, WxMsg *evtMsg)
             return WX_RS422MasterDriver_ProcTxAduMsg(this, (WxRs422MasterDriverMsg *)evtMsg);
         }
         default: {
-            return WX_ERR;
+            return WX_RS422_MASTER_UNSPT_SUBTYPE;
         }
     }
 }

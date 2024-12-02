@@ -32,5 +32,5 @@ UINT32 WX_DEBUG_SendRemoteDbgCmd(VOID *this)
 
     return ret;
 #endif
-    return WX_ERR;
+    return WX_NOT_SUPPORT;
 }

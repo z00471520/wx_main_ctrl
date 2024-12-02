@@ -150,7 +150,7 @@ VOID WX_Debug_ThisDevice(CHAR *argv[], UINT32 argc)
 /* 杩滅璋冭瘯鍛戒护 */
 UINT32 WX_Debug_OtherDevice(CHAR *argv[], UINT32 argc)
 {
-    return WX_ERR;
+    return WX_NOT_SUPPORT;
 }
 
 VOID WX_Debug_ProcCmd(CHAR *argv[], UINT32 argc)

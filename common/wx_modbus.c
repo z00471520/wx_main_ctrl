@@ -83,7 +83,7 @@ UINT16 WX_Modbug_GetAduCrcValue(WxModbusAdu *adu)
 UINT32 WX_Modbus_AduCrcCheck(WxModbusAdu *adu)
 {
     if (adu->valueLen < WX_MODBUS_ADU_MIN_SIZE) {
-        return WX_ERR;
+        return WX_MODBUS_CRC_CHECK_VALUE_LEN_ERR;
     }
     UINT16 expectCrc16 = WX_Modbus_Crc16(adu->value, adu->valueLen - WX_MODBUS_CRC_LEN);
     UINT16 realCrc16 = WX_Modbug_GetAduCrcValue(adu);

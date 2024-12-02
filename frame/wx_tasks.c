@@ -36,15 +36,15 @@ WxTaskDeploy g_wxTaskDeployInfo[] = {
 };
 
 /* 任务处理消息 */
-UINT32 WX_TaskHandleMsg(WxTask *task, WxMsg *evtMsg)
+UINT32 WX_ProcTaskMsg(WxTask *task, WxMsg *evtMsg)
 {
     UINT32 reciver = evtMsg->receiver;
     if (!WX_IsValidModuleId(reciver)) {
-        return WX_ERR;
+        return WX_INVALID_MODULE_ID ;
     }
 
     if (task->modules[reciver].entryFunc == NULL) {
-        return WX_ERR;
+        return WX_ERR_NO_ENTRY_FUNC;
     }
 
     return task->modules[reciver].entryFunc(&task->modules[reciver], evtMsg);
@@ -59,7 +59,7 @@ VOID WX_TaskHandle(VOID *param)
     for (;;) {
         /* 在这里阻塞等待消息的到来 */
         if (xQueueReceive(task->msgQueHandle, &evtMsg, portMAX_DELAY) == pdPASS) {
-            ret = WX_TaskHandleMsg(task, evtMsg);
+            ret = WX_ProcTaskMsg(task, evtMsg);
             if (ret != WX_SUCCESS) {
                 wx_fail_code_cnt(ret);
             }

@@ -25,24 +25,23 @@ UINT32 WX_CAN_SLAVE_DecRmtCtrlPdu(WxCanSlave *this, WxRmtCtrlPdu *pdu, WxRmtCtrl
     return handle->decHandle(this, pdu, msg);
 }
 
-
-/* 鎶奝DU灏佽鎴怌AN Frames, 浠ヤ究鍚庣画鍙戦�� */
+/* 编码PDU数据到CAN帧数据 */
 UINT32 WX_CAN_SLAVE_EncapPdu2CanFrames(WxCanSlave *this, WxRmtCtrlPdu *pdu, WxCanFrameList *canFrameList)
 {
     canFrameList->canFrameNum = 0;
     WxCanSlaveCfg *cfgInfo = this->cfgInfo;
     if (cfgInfo == NULL) {
-        return WX_ERR;
+        return WX_CAN_SLAVE_CFG_INFO_UN_INIT;
     }
     UINT8 canFrameDataLen = cfgInfo->canFrameDataLen;
     if (canFrameDataLen == 0) {
-        return WX_ERR;
+        return WX_CAN_SLAVE_CAN_FRAME_LEN_ZERO;
     }
     UINT32 messID = cfgInfo->messId;
-    /* 鍚戜笂鍙栨暣 */
+    /* CALCULATE THE NUMBER OF CAN FRAME NEEDED */
     UINT32 frameNum = (pdu->dataLen + canFrameDataLen - 1) % canFrameDataLen;
     if (frameNum > WX_CAN_DRIVER_FRAME_LIST_MAX_ITERM_NUM) {
-        return WX_ERR;
+        return WX_CAN_SLAVE_FRAME_NUM_EXCEED_LIMIT;
     }
 
     WxCanFrame *curFrame = NULL;

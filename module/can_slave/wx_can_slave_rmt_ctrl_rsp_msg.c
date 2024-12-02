@@ -3,7 +3,7 @@
 #include "wx_can_slave_rmt_ctrl_pdu.h"
 UINT32 WX_CAN_SLAVE_EncodeRspPduReset(WxCanSlave *this, WxRmtCtrlRspMsg *rspMsg, WxRmtCtrlPdu *pdu)
 {
-    return WX_ERR;
+    return WX_NOT_SUPPORT;
 }
 
 /* 响应消息的编码为PDU */

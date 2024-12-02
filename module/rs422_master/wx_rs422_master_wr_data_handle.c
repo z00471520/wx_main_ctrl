@@ -3,7 +3,7 @@
 #include "wx_rs422_master.h"
 UINT8 WX_RS422_MASTER_EncodeWrDataX(UINT8 buf[], UINT8 bufSize, VOID *data)
 {
-    return WX_ERR;
+    return WX_NOT_SUPPORT;
 }
 
 /* messege wrdata proc handle */

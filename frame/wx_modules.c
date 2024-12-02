@@ -120,7 +120,7 @@ UINT32 WX_DeployOneModule(WxTask *task, WxModule *module, WxModuleDeploy *module
     
     /* 构建函数必须有效 */
     if (moduleDeploy->constructFunc == NULL) {
-        return WX_ERR;
+        return WX_MODULE_CONSTRUCT_FUNC_NULL;
     }
     /* 根据构建函数创建该模块 */
     UINT32 ret = moduleDeploy->constructFunc(module);
@@ -157,7 +157,7 @@ UINT32 WX_DeployModules(UINT8 curCoreId)
         task = WX_QueryTask(deploy->taskName);
         if (task == NULL) {
             wx_critical("Error Exit: WX_QueryTask(%s) fail", deploy->taskName);
-            return WX_ERR;            
+            return WX_MODULE_TASK_NOT_EXIST;            
         }
         module = &task->modules[deploy->moduleId];
         ret = WX_DeployOneModule(task, module, deploy);
