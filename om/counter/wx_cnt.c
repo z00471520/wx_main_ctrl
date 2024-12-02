@@ -10,9 +10,9 @@ VOID WX_Cnt_DbgShow(char *argv[], UINT32 argc)
     }
 
     if ((strcmp("norm", argv[0]) != 0)) {
-        WX_NormCnt_DbgShow()
+        WX_NormCnt_DbgShow(&argv[1], argc - 1);
     } else if ((strcmp("excp", argv[0]) != 0)) {
-        WX_ExcpCnt_DbgShow()
+        WX_ExcpCnt_DbgShow(&argv[1], argc - 1);
     } else {
         wx_show("<cmd> [excp|norm].");
     }

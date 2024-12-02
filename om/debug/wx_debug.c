@@ -1,60 +1,45 @@
 #include "wx_include.h"
 #include "wx_debug.h"
 #include "wx_debug_req_intf.h"
-/*  主板子类型  */
-WxDbgBoardCore g_wxDbgBoard[] = 
-{
-	{"0", 	    "BOARD_MAIN_CTRL"},
-    /* if more please add here */
-	{"1",	    "BOARD_BUTT"}
-    
-};
+#include "wx_frame.h"
 
-/*  Core子类型  */
-WxDbgBoardCore g_wxDbgCore[] = 
-{
-	{"0", 	    "CORE_ID_0"},
-	{"1",	    "CORE_ID_1"}
-    /* if more please add here */
-};
-
-/* 先定义 */
+/* 鍏堝畾涔� */
 VOID WX_Debug_Help(CHAR *argv[], UINT32 argc);
 VOID WX_Debug_Show(CHAR *argv[], UINT32 argc);
 VOID WX_Debug_Set(CHAR *argv[], UINT32 argc);
 
-/* 判断是否为数字字符串 */
 BOOL WX_IsNumStr(CHAR *str) 
 {
-    while (*str) {
-        if (!isdigit(*str)) {
-            return 0;
+	CHAR *p = str;
+    while ((*p) != '\0') {
+        if ((*p) >= '0' && (*p) <= '9') {
+        	p++;
         }
-        str++;
+        return FALSE;
     }
-    return 1;
+    return TRUE;
 }
 
-/* 字符串转uint32 */
+/* 瀛楃涓茶浆uint32 */
 UINT32 WX_Str2U32Value(CHAR *str, UINT32 *value) 
 {   
-    if (str[0] == '\0'){/* 空字符串 */
+    if (str[0] == '\0'){/* 绌哄瓧绗︿覆 */
         return WX_DBG_CHECK_ID_EMPTY;
     }
 
-    if (!WX_IsNumStr(str)) {/* 不是数字字符串  */
+    if (!WX_IsNumStr(str)) {/* 涓嶆槸鏁板瓧瀛楃涓�  */
         return WX_DBG_Str2U32_ID_NOT_NUM;
     }
 
     CHAR *endptr;
-    UINT32 errorno = 0; /* 错误号 */
+    UINT32 errorno = 0; /* 閿欒鍙� */
     UINT32 temp = strtoul(str, &endptr, 0);
 
-    if (*endptr != '\0') { /* 有额外非数字字符 */
+    if (*endptr != '\0') { /* 鏈夐澶栭潪鏁板瓧瀛楃 */
         return WX_DBG_Str2U32_TRANS_FAIL;
     }
     
-    if (temp > WX_U32_MAX) { /* 超出UINT32范围 */
+    if (temp > WX_U32_MAX) { /* 瓒呭嚭UINT32鑼冨洿 */
         return WX_DBG_Str2U32_OUT_OF_RANGE;
     }
 
@@ -63,23 +48,23 @@ UINT32 WX_Str2U32Value(CHAR *str, UINT32 *value)
     return errorno;
 }
 
-/* 检查Id合法性 */
+/* 妫�鏌d鍚堟硶鎬� */
 UINT32 WX_CheckId(CHAR *str, UINT32 *value) 
 {    
     UINT32 ret = WX_Str2U32Value(str, value);
 
-    if (ret != 0) {/*  转换失败  */
+    if (ret != 0) {/*  杞崲澶辫触  */
         wx_show("Error Exit: WX_CheckId %s fail(%u)", str, ret);
         return ret;
     }
 
-    return ret;/*  转换成功 */
+    return ret;/*  杞崲鎴愬姛 */
 }
 
-/* 检查调试命令格式 */
+/* 妫�鏌ヨ皟璇曞懡浠ゆ牸寮� */
 UINT32 WX_CheckDebugCmd(CHAR *argv[], UINT32 argc)
 {
-    /* 参数个数检查 */
+    /* 鍙傛暟涓暟妫�鏌� */
     if (argc < WX_DBG_MIN_ARGC_NUM) {
         return WX_DBG_CHECK_ARGC_ERR;
     }
@@ -102,13 +87,13 @@ UINT32 WX_CheckDebugCmd(CHAR *argv[], UINT32 argc)
     return WX_SUCCESS;
 }
 
-/* 判断是否为当前设备 */
+/* 鍒ゆ柇鏄惁涓哄綋鍓嶈澶� */
 UINT32 WX_Debug_IsBoardCoreLocate(UINT32 boardId,UINT32 coreId)
 {
     return 1;
 }
 
-/* handle 目录 */
+/* handle 鐩綍 */
 WxDbgCmdItem g_wxDbgItems[] = 
 {
     {"?",           "show help",        WX_Debug_Help},
@@ -129,28 +114,27 @@ WxDbgCmdItem g_wxDbgItems[] =
 */
 VOID WX_Debug_Help(CHAR *argv[], UINT32 argc) 
 {
-    WxDbgCmdItem *help = NULL;
-
     wx_show("DEBUG Handle Help\n");
     wx_show("-----------------\n");
     wx_show("%-16s %s\n", "(Cmd)", "(Description)");
+    WxDbgCmdItem *item = NULL;
     for (UINT32 i = 0; i < sizeof(g_wxDbgItems) / sizeof(g_wxDbgItems[0]); i++) {
-        help = &g_wxDbgItems[i];
-        wx_show("%-16s %s\n", help->helpItem, help->helpDesc);
+    	item = &g_wxDbgItems[i];
+        wx_show("%-16s %s\n", item->cmdName, item->helpDesc);
     }
 }
 
-/* 本地调试命令 cmd func */
+/* 鏈湴璋冭瘯鍛戒护 cmd func */
 VOID WX_Debug_ThisDevice(CHAR *argv[], UINT32 argc)
 {
     WxDbgCmdItem *item = NULL;
     for (UINT32 i= 0; i < sizeof(g_wxDbgItems) / sizeof(g_wxDbgItems[0]); i++) {
         item = &g_wxDbgItems[i];
         if (strcmp(argv[0], item->cmdName) != 0) {
-            continue;/* 循环直到找到匹配handle */
+            continue;/* 寰幆鐩村埌鎵惧埌鍖归厤handle */
         }
 
-        if (item->cmdExecFunc == NULL) { /* 当前handle无操作函数*/
+        if (item->cmdExecFunc == NULL) { /* 褰撳墠handle鏃犳搷浣滃嚱鏁�*/
             wx_show("<cmd> %s not support.", item->cmdName);
             return;
         }
@@ -159,33 +143,26 @@ VOID WX_Debug_ThisDevice(CHAR *argv[], UINT32 argc)
         
     }
     
-    wx_show("(cmd) %s not exist.", argv[0]); /*没有找到匹配的handle*/
+    wx_show("(cmd) %s not exist.", argv[0]); /*娌℃湁鎵惧埌鍖归厤鐨刪andle*/
     return;
 }
 
-/* 远端调试命令 */
+/* 杩滅璋冭瘯鍛戒护 */
 UINT32 WX_Debug_OtherDevice(CHAR *argv[], UINT32 argc)
 {
-    UINT32 ret;
-    /* 申请消息 */
-    
-    /* 初始化消息头 */
-    /* 填写消息信息 */
-    /* 发送消息 */
-    
-    return ret;
+    return WX_ERR;
 }
 
 VOID WX_Debug_ProcCmd(CHAR *argv[], UINT32 argc)
 {
-    /*  判断命令合法 */
+    /*  鍒ゆ柇鍛戒护鍚堟硶 */
     UINT32 ret = WX_CheckDebugCmd(argv, argc);
     if (ret != WX_SUCCESS) {
         wx_show("Error Exit: WX_CheckDebugCmd fail(%u)", ret);
         return;
     }
 
-    /* 判断board和core Id*/
+    /* 鍒ゆ柇board鍜宑ore Id*/
     UINT32 boardId, coreId;
     if (WX_CheckId(argv[WX_DBG_ARGV_BOARDID], &boardId)){
         return;
@@ -195,55 +172,50 @@ VOID WX_Debug_ProcCmd(CHAR *argv[], UINT32 argc)
     }
 
     // [dbgcmd][board][x][core][y][cmd]
-    /*  判断当前设备 */
+    /*  鍒ゆ柇褰撳墠璁惧 */
     if (WX_Debug_IsBoardCoreLocate(boardId, coreId)) {
-        WX_Debug_ThisDevice(&argv[WX_DBG_ARGV_HANDLE], argc - 5); /* 本地调试命令 */
+        WX_Debug_ThisDevice(&argv[WX_DBG_ARGV_HANDLE], argc - 5); /* 鏈湴璋冭瘯鍛戒护 */
     } else {
-        WX_Debug_OtherDevice(argv, argc); /* 远端调试命令，非本设备 */
+        WX_Debug_OtherDevice(argv, argc); /* 杩滅璋冭瘯鍛戒护锛岄潪鏈澶� */
     }   
 
     return;
 }
-
+/* cmd str 2 arg list */
 UINT32 WX_Debug_Cmd2ArgList(WxDbgCmd *dbgCmd, CHAR *argv[], UINT32 *argc)
 {
     *argc = 0;
     return WX_SUCCESS;
 }
 
-/* 处理DEBUG请求 */
+/* 澶勭悊DEBUG璇锋眰 */
 UINT32 WX_DEBUG_ProcDbgReqMsg(WxDebug *this, WxMsg *msg)
 {
     WxDebugReqMsg *dbgReqMsg = (WxDebugReqMsg *)msg->msgData;
-    UINT32 ret = WX_Debug_CmdStr2ArgList(&dbgReqMsg->dbgCmd, this->argv, &this->argc);
+    UINT32 ret = WX_Debug_Cmd2ArgList(&dbgReqMsg->dbgCmd, this->argv, &this->argc);
     if (ret != WX_SUCCESS) {
         return ret;
     }
-    UINT32 ret = WX_Debug_ProcCmd(this->argv, this->argc);
-	if (ret != WX_SUCCESS) {
-		return ret; /* 错误码 */
-	}
-	
+    WX_Debug_ProcCmd(this->argv, this->argc);
 	return WX_SUCCESS; /* WX_SUCCESS */
 
 }
 
-/* 模块构建函数 */
+/* 妯″潡鏋勫缓鍑芥暟 */
 UINT32 WX_DEBUG_Construct(VOID *module)
 {
-    UINT32 ret;
     WxDebug *this = WX_Mem_Alloc(WX_GetModuleName(module), 1, sizeof(WxDebug));
     if (this == NULL) {
         return WX_DEBUG_MALLOC_ERR;
     }
     this->moduleId = WX_GetModuleId(module);
-    this->coreId = WX_GetCoreId(module);
-    /* 设置上Module */
+    this->coreId = WX_GetModuleCoreId(module);
+    /* 璁剧疆涓奙odule */
     WX_SetModuleInfo(module, this);
     return WX_SUCCESS;
 }
 
-/* 模块析构函数 */
+/* 妯″潡鏋愭瀯鍑芥暟 */
 UINT32 WX_DEBUG_Destruct(VOID *module)
 {
     WxDebug *this = WX_GetModuleInfo(module);
@@ -255,10 +227,10 @@ UINT32 WX_DEBUG_Destruct(VOID *module)
     return WX_SUCCESS;
 }
 
-/* 模块消息处理入口 */
+/* 妯″潡娑堟伅澶勭悊鍏ュ彛 */
 UINT32 WX_DEBUG_Entry(VOID *module, WxMsg *msg)
 {
-    WxDebugInfo *this = WX_GetModuleInfo(module);
+    WxDebug *this = WX_GetModuleInfo(module);
     switch (msg->msgType){
         case WX_MSG_TYPE_BEBUG_REQ: {
             return WX_DEBUG_ProcDbgReqMsg(this, msg);

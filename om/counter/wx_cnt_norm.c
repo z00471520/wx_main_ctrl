@@ -1,19 +1,23 @@
 
 #include "wx_debug.h"
-#define WX_CNT_DEF(cntId) #cntId
+#define WX_CNT_DEF(cntId) [cntId] = #cntId
 
 /* CntId */
 CHAR *g_wxCntNormDesc[WX_NORM_CNT_BUTT] = {
 	WX_CNT_DEF(WX_NORM_CNT_START),
-	WX_CNT_DEF(WX_NORM_CNT_1),
-	WX_CNT_DEF(WX_NORM_CNT_2),
-	WX_CNT_DEF(WX_NORM_CNT_BUTT)
+	WX_CNT_DEF(WX_NORM_CNT_RESV_1),
+	WX_CNT_DEF(WX_NORM_CNT_RESV_2),
+	WX_CNT_DEF(WX_NORM_CNT_RESV_3),
+	WX_CNT_DEF(WX_NORM_CNT_RESV_4),
+	WX_CNT_DEF(WX_NORM_CNT_RESV_5),
+	WX_CNT_DEF(WX_NORM_CNT_RESV_6),
+	/* if more please add here */
 };
 
 /* CntValue */
 UINT64 g_wxNormCnt[WX_NORM_CNT_BUTT] = {1,2,3,4,5};
 
-VOID WX_NormCnt_DbgShow(VOID)
+VOID WX_NormCnt_DbgShow(char *argv[], UINT32 argc)
 {
 	/*
 	Normal CNT INFOS

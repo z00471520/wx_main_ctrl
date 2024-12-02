@@ -18,18 +18,18 @@ VOID WX_Debug_ShowHelp(CHAR *argv[], UINT32 argc)
     wx_show("%-16s %s\n", "(Cmd)", "(Description)");
     for (UINT32 i = 0; i < sizeof(g_wxDbgShowHelp) / sizeof(g_wxDbgShowHelp[0]); i++) {
         help = &g_wxDbgShowHelp[i];
-        wx_show("%-16s %s\n", help->helpItem, help->helpDesc);
+        wx_show("%-16s %s\n", help->helpDesc, help->helpDesc);
     }
 }
 
-/* ShowCnt在wx_cnt里定义*/
+/* ShowCnt鍦╳x_cnt閲屽畾涔�*/
 VOID WX_Debug_ShowCnt(CHAR *argv[], UINT32 argc)
 {
     wx_show("Cnt");
 }
 
 
-/* argv[]是show之后的子数组 */
+/* argv[]鏄痵how涔嬪悗鐨勫瓙鏁扮粍 */
 VOID WX_Debug_Show(CHAR *argv[], UINT32 argc)
 {
     if(argc == 0){
@@ -43,19 +43,19 @@ VOID WX_Debug_Show(CHAR *argv[], UINT32 argc)
     for (UINT32 i= 0; i < sizeof(g_wxDbgShowHelp) / sizeof(g_wxDbgShowHelp[0]); i++) {
         handle = &g_wxDbgShowHelp[i];
         
-        if (strcmp(itemName, handle->helpItem) != 0) {/* 找不到 */
+        if (strcmp(itemName, handle->helpDesc) != 0) {
             continue;
         }
 
-        if (handle->helpFunc == NULL) {/* 不支持当前命令 */
-            wx_show("<cmd> Show %s not support.",handle->helpItem);
+        if (handle->cmdExecFunc == NULL) {
+            wx_show("<cmd> Show %s not support.",handle->helpDesc);
             return;
         } 
         
-        handle->helpFunc(&argv[1], argc - 1);
+        handle->cmdExecFunc(&argv[1], argc - 1);
         return;
     }
 
-    wx_show("(cmd) Show %s not exist.", argv[0]);/*没有找到匹配的handle*/
+    wx_show("(cmd) Show %s not exist.", argv[0]);/*娌℃湁鎵惧埌鍖归厤鐨刪andle*/
     return;
 }

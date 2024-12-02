@@ -1,5 +1,6 @@
 #include "wx_debug.h"
-#define WX_CNT_DEF(cntId) [cntId] = {#cntId}
+#include "wx_cnt_excp.h"
+#define WX_CNT_DEF(cntId) [cntId] = #cntId
 
 /* CntId */
 CHAR *g_wxCntExcpDesc[WX_EXCP_CNT_BUTT] = {
@@ -11,7 +12,7 @@ CHAR *g_wxCntExcpDesc[WX_EXCP_CNT_BUTT] = {
 /* CntValue */
 UINT64 g_wxExcpCnt[WX_EXCP_CNT_BUTT] = {0};
 
-VOID WX_ExcpCnt_DbgShow(char *argv[], UINT32 argc))
+VOID WX_ExcpCnt_DbgShow(char *argv[], UINT32 argc)
 {
 	/*
 	Exceptional CNT INFOS
@@ -23,7 +24,7 @@ VOID WX_ExcpCnt_DbgShow(char *argv[], UINT32 argc))
 	wx_show("Exceptional CNT INFOS");
 	wx_show("-------------");
 	wx_show("%64s %s", "CntId", "CntValue");
-	for (i = 0; i < WX_EXCP_CNT_BUTT; i++) {
+	for (UINT32 i = 0; i < WX_EXCP_CNT_BUTT; i++) {
 		if (g_wxExcpCnt[i] == 0) {
 			continue;
 		}

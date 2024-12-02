@@ -27,6 +27,9 @@ typedef enum {
 #define wx_notice(...)
 #define wx_critical(...)
 #define wx_warning(...)
-/* 串口打印 */
-#define wx_show(...) WX_UartPrint(...)
+
+#define wx_show(format,...) 				\
+do {										\
+	xil_printf(format"\r\n", ##__VA_ARGS__);\
+} while(0)
 #endif

@@ -8,14 +8,13 @@ WxDbgCmdItem g_wxDbgSetHelp[] =
 };
 VOID WX_Debug_SetHelp(CHAR *argv[], UINT32 argc) 
 {
-    WxDbgCmdItem *help = NULL;
-
     wx_show("DEBUG Set Help\n");
     wx_show("-----------------\n");
     wx_show("%-16s %s\n", "(Cmd)", "(Description)");
+    WxDbgCmdItem *item = NULL;
     for (UINT32 i = 0; i < sizeof(g_wxDbgSetHelp) / sizeof(g_wxDbgSetHelp[0]); i++) {
-        help = &g_wxDbgSetHelp[i];
-        wx_show("%-16s %s\n", help->helpItem, help->helpDesc);
+    	item = &g_wxDbgSetHelp[i];
+        wx_show("%-16s %s\n", item->cmdName, item->helpDesc);
     }
 }
 
@@ -32,16 +31,16 @@ VOID WX_Debug_Set(CHAR *argv[], UINT32 argc)
     for (UINT32 i= 0; i < sizeof(g_wxDbgSetHelp) / sizeof(g_wxDbgSetHelp[0]); i++) {
         handle = &g_wxDbgSetHelp[i];
         
-        if (strcmp(itemName, handle->helpItem) != 0) {/* 鎵句笉鍒� */
+        if (strcmp(itemName, handle->cmdName) != 0) {/* 鎵句笉鍒� */
             continue;
         }
 
-        if (handle->helpFunc == NULL) {/* 涓嶆敮鎸佸綋鍓嶅懡浠� */
-            wx_show("<cmd> Set %s not support.",handle->helpItem);
+        if (handle->cmdExecFunc == NULL) {/* 涓嶆敮鎸佸綋鍓嶅懡浠� */
+            wx_show("<cmd> Set %s not support.",handle->cmdName);
             return;
         } 
         
-        handle->helpFunc(&argv[1], argc - 1);
+        handle->cmdExecFunc(&argv[1], argc - 1);
         return;
     }
 

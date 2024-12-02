@@ -1,5 +1,5 @@
-#ifndef WX_CNT_EXCP_H
-#define WX_CNT_EXCPM_H
+#ifndef __WX_CNT_EXCP_H__
+#define __WX_CNT_EXCP_H__
 /* excp cnt from 0  */
 typedef enum {
 	WX_EXCP_CNT_START, // keep this first
@@ -43,5 +43,5 @@ typedef enum {
 #define wx_excp_cnt(a) 
 
 
-VOID WX_ExcpCnt_DbgShow(VOID);
+VOID WX_ExcpCnt_DbgShow(char *argv[], UINT32 argc);
 #endif

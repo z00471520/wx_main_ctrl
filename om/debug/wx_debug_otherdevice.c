@@ -1,38 +1,36 @@
 #include "wx_include.h"
 
 typedef struct {
-    UINT32 argv[10];    // 参数数组，假设最多10个参数
-    UINT32 argc;        // 数组长度
+    UINT32 argv[10];    // 鍙傛暟鏁扮粍锛屽亣璁炬渶澶�10涓弬鏁�
+    UINT32 argc;        // 鏁扮粍闀垮害
 } WxRemoteDbgCmd;
 
-typedef struct {
-    WxMsgHead msgHead;    // 消息头
-    WxRemoteCmd cmd;      // 命令内容
-} WxRemoteCmdMsg;
 
-UINT32 WX_DEBUG_SendRemoteDbgCmd(WxModule *this)
+
+UINT32 WX_DEBUG_SendRemoteDbgCmd(VOID *this)
 {
+#if 0
     UINT32 ret;
-    /* 申请命令消息 */
+    /* 鐢宠鍛戒护娑堟伅 */
     WxMsg *msg = WX_ApplyEvtMsg(WX_MSG_TYPE_REMOTE_DBG_CMD);
     if (msg == NULL) {
         return WX_APPLY_EVT_MSG_ERR;
     }
 
-    /* 初始化消息头 */
+    /* 鍒濆鍖栨秷鎭ご */
     WX_CLEAR_OBJ(msg);
 
-    /* 填写消息信息 */
     msg->sender = this->moduleId;
-    msg->receiver = WX_MODULE_DRIVER_RS422_MASTER;  /* 发给其他核 */
+    msg->receiver = WX_MODULE_DRIVER_RS422_MASTER;  /* 鍙戠粰鍏朵粬鏍� */
     msg->msgType = WX_MSG_TYPE_BEBUG;
     msg->msgDataLen = sizeof(WxModbusAdu);
 
-    /* 发送消息 */
     ret = WX_MsgShedule(this->moduleId, targetModuleId, cmdMsg);
     if (ret != WX_SUCCESS) {
         WX_FreeEvtMsg(&msg));
     }
 
     return ret;
+#endif
+    return WX_ERR;
 }
