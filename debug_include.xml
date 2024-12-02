@@ -18,8 +18,9 @@
 <includepath workspace_path="true">/wx_main_app/src/module/rs422_master</includepath>
 <includepath workspace_path="true">/wx_main_app/src/module/rs422_slave</includepath>
 <includepath workspace_path="true">/wx_main_app/src/frame</includepath>
-<includepath workspace_path="true">/wx_main_app/src/om</includepath>
-<includepath workspace_path="true">/wx_main_app/src/module/debug</includepath>
+<includepath workspace_path="true">/wx_main_app/src/om/debug</includepath>
+<includepath workspace_path="true">/wx_main_app/src/om/counter</includepath>
+<includepath workspace_path="true">/wx_main_app/src/om/log</includepath>
 
 </language>
 <language name="Object File">
