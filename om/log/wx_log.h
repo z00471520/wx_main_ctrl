@@ -1,6 +1,6 @@
-#ifndef WX_LOG_H
-#define WX_LOG_H
-
+#ifndef __WX_LOG_H__
+#define __WX_LOG_H__
+#include "wx_include.h"
 /*
  * Alert: The device is experiencing a fatal anomaly, and the system is unable to recover to normal.
  * 		  The device must be restarted, such as due to program abnormalities causing device restart or memory usage errors.
@@ -21,6 +21,10 @@ typedef enum {
 	WX_ERROR = 4, /* Incorrect operation or abnormal process of the device, which will not affect subsequent business */
 	WX_CRITICAL = 5, /* he device is severely abnormal and immediate measures need to be taken */
 } WxLogLelevDef;
+
+// REF xil_printf function
+VOID WX_Print2Uart( const CHAR *ctrl1, ...);
+
 #define wx_log(lev,...)
 #define wx_debug(...)
 #define wx_info(...)

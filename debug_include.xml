@@ -21,6 +21,8 @@
 <includepath workspace_path="true">/wx_main_app/src/om/debug</includepath>
 <includepath workspace_path="true">/wx_main_app/src/om/counter</includepath>
 <includepath workspace_path="true">/wx_main_app/src/om/log</includepath>
+<includepath workspace_path="true">/wx_main_app/src/interface/wx_debug</includepath>
+<includepath workspace_path="true">/wx_main_app/src/interface/wx_ps_uart_driver</includepath>
 
 </language>
 <language name="Object File">
