@@ -6,25 +6,27 @@
 #include "FreeRTOS.h"
 #include "wx_msg_common.h"
 #include "queue.h"
-/* RS422配置信息 */
+/* RS422閰嶇疆淇℃伅 */
 typedef struct {
-    UINT32 rs422DevId;  /* 设备ID */
-    UINT32 intrId;      /* 中断ID */
-    UINT8 slaveAddr;    /* 从机地址 */
-    XUartNs550Format rs422Format; /* 串口配置信息 */
+    UINT32 rs422DevId;  /* 璁惧ID */
+    UINT32 intrId;      /* 涓柇ID */
+    UINT8 slaveAddr;    /* 浠庢満鍦板潃 */
+    UINT8 moduleId;     /* moduleId */
+    UINT8 upperModuleId; /* upperModuleId */
+    UINT8 resv8;      /* resv16 */
+    XUartNs550Format rs422Format; /* 涓插彛閰嶇疆淇℃伅 */
 } WxRs422SlaveDriverCfg;
 
 /* RS422 Slave Driver */
 typedef struct {
-    UINT8 status; /* 状态 */
-    UINT8 moduleId;
-    UINT8 slaveAddr; /* the slave addr of he device */
-    UINT16 res;
-    UINT32 resv;
-    WxModbusAdu txAdu; /* the adu to be send by rs422 */
-    WxModbusAdu rxAdu;  /* the adu recieve from rs422 */
-    QueueHandle_t msgQueHandle; /* 用于待发送的消息 */
-    XUartNs550 rs422Inst; /* RS422实例 */
+    UINT8 resv; 			/* resv for you no thks */
+    UINT8 moduleId;			/* the module ID of module */
+    UINT8 slaveAddr; 		/* the slave addr of he device */
+    UINT8 upperModuleId; 	/* upperModuleId */
+    UINT32 resv3222;
+    WxModbusAdu txAdu; 		/* the adu to be send by rs422 */
+    WxModbusAdu rxAdu;  	/* the adu recieve from rs422 */
+    XUartNs550 rs422Inst; 	/* RS422 instance */
 } WxRs422SlaverDriver;
 
 UINT32 WX_RS422SlaveDriver_Construct(VOID *module);

@@ -157,6 +157,7 @@ VOID WX_CAN_DRIVER_IntrSendHandler(VOID *callBackRef)
 		UINT32 ret = WX_CAN_DRIVER_SendFrameDirectly(&this->canInst, &frame);
 		if (ret != WX_SUCCESS) {
 			wx_excp_cnt(WX_EXCP_CAN_SLAVE_TX_FAIL);
+			wx_fail_code_cnt(ret);
 		}
 	}
 }

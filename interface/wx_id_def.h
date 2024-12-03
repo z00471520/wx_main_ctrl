@@ -19,10 +19,10 @@ typedef enum {
  * module ID
  *****************************************************************************/
 typedef enum {
-    WX_MODULE_INVALID, /* ��Ч��ģ��ID */
+    WX_MODULE_INVALID, /* this is invalid module ID */
     WX_MODULE_CAN_SLAVE_A,
     WX_MODULE_CAN_SLAVE_B,
-    WX_MODULE_RS422_I_MASTER,
+    WX_MODULE_RS422_MASTER,
     WX_MODULE_RS422_SLAVE,
     WX_MODULE_ZJ_SPI_DRIVER,
     WX_MODULE_DRIVER_CAN_A,

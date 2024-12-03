@@ -6,22 +6,35 @@
 #include "wx_uart_ns550.h"
 #include "wx_msg_res_pool.h"
  #include "wx_frame.h"
-WxRs422SlaveDriverCfg g_rs422SlaverDriverCfg = {0};
+WxRs422SlaveDriverCfg g_rs422SlaverDriverCfg = {
+    .moduleId = WX_MODULE_DRIVER_RS422_SLAVE,
+    .upperModuleId = WX_MODULE_RS422_SLAVE,
+    .intrId = XPAR_FABRIC_UARTNS550_1_VEC_ID,     /* interrupt ID */
+    .slaveAddr = 0x01,   /* slave address of the device */
+    .rs422DevId = XPAR_UARTNS550_1_DEVICE_ID,
+    .rs422Format = {
+        .DataBits = XUN_FORMAT_8_BITS,
+        .StopBits = XUN_FORMAT_1_STOP_BIT,
+        .Parity = XUN_FORMAT_NO_PARITY,
+        .BaudRate = 115200
+    },
+};
 
 VOID WX_RS422SlaveDriver_SentRxAdu2Upper(WxRs422SlaverDriver *this, WxModbusAdu *rxAdu)
 {
     /* 鐢宠娑堟伅 */
 	WxRs422SlaveRxAduReq *msg = WX_ApplyEvtMsg(WX_MSG_TYPE_RS422_SLAVE_RX_ADU_REQ);
     if (msg == NULL) {
+        wx_excp_cnt(WX_EXCP_RS422_SLAVE_MALLOC_MSG_FAIL);
         return;
     }
 
-    /* 鍒濆鍖栨秷鎭ご */
+    /* clear the object */
     WX_CLEAR_OBJ((WxMsg *)msg);
 
-    /* 濉啓娑堟伅淇℃伅 */
+    /* set the message content */
     msg->sender = this->moduleId;
-    msg->receiver = WX_MODULE_RS422_SLAVE;
+    msg->receiver = this->upperModuleId;
     msg->msgType = WX_MSG_TYPE_RS422_SLAVE_RX_ADU_REQ;
     msg->rxAdu.failCode = WX_SUCCESS;
     for (UINT8 i = 0; i < rxAdu->valueLen; i++) {
@@ -29,14 +42,15 @@ VOID WX_RS422SlaveDriver_SentRxAdu2Upper(WxRs422SlaverDriver *this, WxModbusAdu 
     }
     msg->rxAdu.valueLen = rxAdu->valueLen;
 
-    /* 鍙戦�佹秷鎭� */
+    /* send the message to the upper layer */
     UINT32 ret = WX_MsgShedule(this->moduleId, msg->receiver, msg);
     if (ret != WX_SUCCESS) {
+        wx_fail_code_cnt(ret);
         WX_FreeEvtMsg((WxMsg **)&msg);
     }
 }
 
-/* 鏄惁鏄敮鎸佺殑鍔熻兘鐮� */
+/* is support function code */
 BOOL WX_RS422SlaveDriver_IsSupportFuncCode(WxRs422SlaverDriver *this, UINT8 funcCode)
 {
     return (funcCode == WX_MODBUS_FUNC_CODE_READ_DATA ||
@@ -45,21 +59,21 @@ BOOL WX_RS422SlaveDriver_IsSupportFuncCode(WxRs422SlaverDriver *this, UINT8 func
             funcCode == WX_MODBUS_FUNC_CODE_WRITE_FILE);
 
 }
-/* 澶勭悊鎺ユ敹鍒扮殑PDU */
+/* proc recv adu from isr */
 VOID WX_RS422SlaveDriver_ProcRecvAduFromISR(WxRs422SlaverDriver *this)
 {
-    /* 妫�鏌ユ帴鏀跺埌鐨勬姤鏂� */
+    /* invalid data length */
     if (this->rxAdu.valueLen < WX_MODBUS_ADU_MIN_SIZE) {
         wx_excp_cnt(WX_EXCP_RS422_SLAVE_RECV_DATA_LEN_ERR);
         return;
     }
-    /* 妫�鏌ュ湴鍧� */
+    /* get the slave address */
     UINT8 slaveAddr = this->rxAdu.value[WX_MODBUS_SLAVE_ADDR_IDX];
     if (slaveAddr != this->slaveAddr) {
         wx_excp_cnt(WX_EXCP_RS422_SLAVE_RECV_DATA_ADDR_ERR);
         return;
     }
-    /* 妫�鏌RC */
+    /* CRC check OF the received data */
     if (WX_Modbus_AduCrcCheck(&this->rxAdu) != WX_SUCCESS) {
         wx_excp_cnt(WX_EXCP_RS422_SLAVE_RECV_DATA_CRC_ERR);
         return;
@@ -67,10 +81,10 @@ VOID WX_RS422SlaveDriver_ProcRecvAduFromISR(WxRs422SlaverDriver *this)
     UINT8 funcCode = this->rxAdu.value[WX_MODBUS_FUNC_CODE_IDX];
     if (!WX_RS422SlaveDriver_IsSupportFuncCode(this, this->rxAdu.funcCode)) {
         wx_excp_cnt(WX_EXCP_RS422_SLAVE_RECV_DATA_FUNC_CODE_ERR);
-        /* 鍙戦�佸紓甯稿搷搴旀姤鏂� */
+        /* Exception response */
         WX_Modbus_AduGenerateExceptionRsp(slaveAddr, funcCode,
         	WX_MODBUS_EXCP_ILLEGAL_FUNCTION, &this->txAdu);
-        /* 棣栨鍙戦�佹秷鎭細琚紦瀛樺埌瀹炰緥锛岃繑鍥炵紦瀛樹簡澶氬皯鎶ユ枃 */
+        /* send the exception response */
         UINT32 sendCount = XUartNs550_Send(&this->rs422Inst, this->txAdu.value,
         	(unsigned int)this->txAdu.valueLen);
         if (sendCount == 0) {
@@ -79,17 +93,17 @@ VOID WX_RS422SlaveDriver_ProcRecvAduFromISR(WxRs422SlaverDriver *this)
         return;
     }
 
-    /* 鎶ユ枃鍙戦�佺粰涓婂眰澶勭悊 */
+    /* check ok send the recevie adu to upper layer */
     WX_RS422SlaveDriver_SentRxAdu2Upper(this, &this->rxAdu);
     return;
 }
 
 
-/* RS422I涓柇澶勭悊鍑芥暟 */
+/* interrupt handle function */
 VOID WX_RS422SlaveDriver_IntrHandle(VOID *callBackRef, UINT32 event, UINT32 eventData)
 {
     WxRs422SlaverDriver *this = callBackRef;
-    /* 浠庢満鏁版嵁鍙戦�佸畬姣曡浆鎹负鎺ユ敹 */
+    /* data send finish switch to recv new adu from master */
 	if (event == XUN_EVENT_SENT_DATA) {
         UINT32 recvCount = XUartNs550_Recv(&this->rs422Inst, this->rxAdu.value, WX_MODBUS_ADU_MAX_SIZE);
         if (recvCount == 0) {
@@ -113,33 +127,36 @@ UINT32 WX_RS422SlaveDriver_Construct(VOID *module)
         return WX_RS422_SLAVE_DRIVER_MEM_ALLOC_FAIL;
     }
     WxRs422SlaveDriverCfg *cfg = &g_rs422SlaverDriverCfg;
+    this->moduleId = cfg->moduleId;
+    this->upperModuleId = cfg->upperModuleId;
+    this->slaveAddr = cfg->slaveAddr;
     /* the inst or rs422 used for uart data tx/rx */
     ret = WX_InitUartNs550(&this->rs422Inst, cfg->rs422DevId, &cfg->rs422Format);
     if (ret != WX_SUCCESS) {
         return ret;
     }
 
-    /* 璁剧疆涓柇 */
+    /* set up the interrupt */
     ret = WX_SetupUartNs550Interrupt(&this->rs422Inst, WX_RS422SlaveDriver_IntrHandle, cfg->intrId, this);
     if (ret != WX_SUCCESS) {
         return ret;
     }
 
-    /* 鎺ユ敹鍑嗗 */
+    /* prepare to receive data */
     UINT32 recvCount; 
     do {
         recvCount = XUartNs550_Recv(&this->rs422Inst, this->rxAdu.value, WX_MODBUS_ADU_MAX_SIZE);
     } while (recvCount);
 
-    /* 璁剧疆涓奙odule */
+    /* set the module information */
     WX_SetModuleInfo(module, this);
     return WX_SUCCESS;
 }
 
-/* 澶勭悊鍙戦�佹姤鏂囪姹� */
+/* proc tx adu request from upper layer and send to master */
 UINT32 WX_RS422SlaveDriver_ProcTxAduReq(WxRs422SlaverDriver *this, WxRs422SlaverDriverTxAduReq *msg)
 {
-    /* 棣栨鍙戦�佹秷鎭細琚紦瀛樺埌瀹炰緥锛岃繑鍥炵紦瀛樹簡澶氬皯鎶ユ枃 */
+    /* send the data to master */
     UINT32 sendCount = XUartNs550_Send(&this->rs422Inst, this->txAdu.value, this->txAdu.valueLen);
     if (sendCount == 0) {
         wx_excp_cnt(WX_EXCP_RS422_SLAVE_SEND_DATA_FAIL_0);
@@ -148,7 +165,7 @@ UINT32 WX_RS422SlaveDriver_ProcTxAduReq(WxRs422SlaverDriver *this, WxRs422Slaver
     return WX_SUCCESS;
 }
 
-/* 娑堟伅澶勭悊鍏ュ彛鍑芥暟 */
+/* entry function */
 UINT32 WX_RS422SlaveDriver_Entry(VOID *module, WxMsg *evtMsg)
 {
     WxRs422SlaverDriver *this = WX_GetModuleInfo(module);
@@ -163,6 +180,7 @@ UINT32 WX_RS422SlaveDriver_Entry(VOID *module, WxMsg *evtMsg)
     }
 }
 
+/* destruct function */
 UINT32 WX_RS422SlaveDriver_Destruct(VOID *module)
 {
     WxRs422SlaverDriver *this = WX_GetModuleInfo(module);

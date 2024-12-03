@@ -32,11 +32,12 @@ VOID WX_RS422MasterDriver_SentRspAdu2Rs422Master(WxRs422DriverMaster *this, WxMo
     /* init the data */
     *(WxModbusAdu *)(msg->msgData) = *rxAdu;
     msg->sender = this->moduleId;
-    msg->receiver = WX_MODULE_RS422_I_MASTER;
+    msg->receiver = WX_MODULE_RS422_MASTER;
     msg->msgType = WX_MSG_TYPE_RS422_MASTER_ADU_RSP;
     /* send the msg */
     UINT32 ret = WX_MsgShedule(this->moduleId, msg->receiver, msg);
     if (ret != WX_SUCCESS) {
+        wx_fail_code_cnt(ret);
         WX_FreeEvtMsg(&msg);
     }
 }
