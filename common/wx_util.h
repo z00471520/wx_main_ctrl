@@ -21,5 +21,5 @@ do {					\
 
 #define WX_8BYTE_ALIGN_SIZE(size) (((size) + 7 / 8) * 8)
 // only for boot debug
-#define boot_debug(fmt, args...) xil_printf("%s:%d: "fmt"\r\n", __FILE__, __LINE__, ##args)
+#define boot_debug(fmt, args...) xil_printf("%-32s:%3d: "fmt"\r\n", __FILE__, __LINE__, ##args)
 #endif

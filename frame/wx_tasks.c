@@ -53,7 +53,8 @@ UINT32 WX_ProcTaskMsg(WxTask *task, WxMsg *evtMsg)
 /* 这是一个通用的任务处理函数 */
 VOID WX_TaskHandle(VOID *param)
 {
-    WxTask *task = param;
+    WxTask *task = (WxTask *)param;
+    boot_debug("Task(%s) start...", task->taskName);
     UINT32 ret;
     WxMsg *evtMsg = NULL;
     for (;;) {
