@@ -25,10 +25,10 @@
 <includepath workspace_path="true">/wx_main_app/src/interface/wx_ps_uart_driver</includepath>
 
 </language>
-<language name="Object File">
+<language name="ld">
 
 </language>
-<language name="ld">
+<language name="Object File">
 
 </language>
 </section>
@@ -39,10 +39,10 @@
 <language name="c,S">
 
 </language>
-<language name="Object File">
+<language name="ld">
 
 </language>
-<language name="ld">
+<language name="Object File">
 
 </language>
 </section>
