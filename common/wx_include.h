@@ -17,4 +17,6 @@
 #include "wx_msg_common.h"
 #include "xcanps.h"
 #include "xparameters.h"	/* SDK generated parameters */
+#include "FreeRTOSConfig.h"
+#include "xparameters_ps.h"
 #endif

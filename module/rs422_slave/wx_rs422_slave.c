@@ -182,6 +182,7 @@ UINT32 WX_RS422Slave_Construct(VOID *module)
 {
     WxRs422Slave *this = WX_Mem_Alloc(WX_GetModuleName(module), 1, sizeof(WxRs422Slave));
     if (this == NULL) {
+        boot_debug("Error Exit: memory allocation failed");
         return WX_MEM_ALLOC_FAIL;
     }
     WX_CLEAR_OBJ(this);

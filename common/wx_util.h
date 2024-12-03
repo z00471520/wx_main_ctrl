@@ -2,10 +2,9 @@
 #define __WX_UTIL_H__
 #include "wx_typedef.h"
 #include "stdlib.h"
-
+#include "xil_printf.h"
 #define WX_Mem_Alloc(memname, item_num, item_byte_size) malloc((item_num) * (item_byte_size))
 
-/* 清楚一个对象，把其值设备为0 */
 #define WX_CLEAR_OBJ(op) 			\
 do {								\
 	memset((op), sizeof(*(op)), (UINT8)0);\
@@ -21,4 +20,6 @@ do {					\
 } while (FALSE)
 
 #define WX_8BYTE_ALIGN_SIZE(size) (((size) + 7 / 8) * 8)
+// only for boot debug
+#define boot_debug(fmt, args...) xil_printf("%s:%d: "fmt"\r\n", __FILE__, __LINE__, ##args)
 #endif

@@ -1,8 +1,7 @@
 #include "wx_include.h"
 #include "wx_frame.h"
-/*
- * 初始化指定的UART NS550 IP core
- */
+#include "xuartns550.h"
+
 UINT32 WX_InitUartNs550(XUartNs550 *this, UINT32 deviceId, XUartNs550Format *format)
 {
 	/*
@@ -20,7 +19,7 @@ UINT32 WX_InitUartNs550(XUartNs550 *this, UINT32 deviceId, XUartNs550Format *for
 	 */
 	Status = XUartNs550_SelfTest(this);
 	if (Status != XST_SUCCESS) {
-		wx_log(WX_CRITICAL, "Error Exit: XUartNs550_SelfTest(%u) fail(%d)", Status);
+		boot_debug("Error Exit: XUartNs550_SelfTest(%u) fail(%d)", Status);
 		return WX_UARTNS550_SELF_TEST_FAIL;
 	}
 	XUartNs550_SetOptions(this, (u16)XUN_OPTION_FIFOS_ENABLE);
@@ -37,7 +36,7 @@ UINT32 WX_SetupUartNs550Interrupt(XUartNs550 *uartInstPtr, XUartNs550_Handler ha
 		return WX_UART_NS550_INTR_CTRL_UNREADY;
 
 	}
-	/* 设置优先级 */
+
 	XScuGic_SetPriorityTriggerType(intcInst, intrId, 0xA0, 0x3);
 	/*
 	 * Connect a device driver handler that will be called when an interrupt
@@ -47,7 +46,7 @@ UINT32 WX_SetupUartNs550Interrupt(XUartNs550 *uartInstPtr, XUartNs550_Handler ha
 	int status = XScuGic_Connect(intcInst, intrId,
 				 (Xil_ExceptionHandler)XUartNs550_InterruptHandler, uartInstPtr);
 	if (status != XST_SUCCESS) {
-		wx_log(WX_CRITICAL, "Error Exit: XScuGic_Connect RS422(%u) fail(%u)", status);
+		boot_debug("Error Exit: XScuGic_Connect RS422(%u) fail(%u)", status);
 		return WX_SCUGIC_CONNECT_RS422_FAIL;
 	}
 

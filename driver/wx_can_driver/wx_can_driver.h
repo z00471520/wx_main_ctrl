@@ -8,16 +8,18 @@
 
 typedef struct {
     UINT32 deviceId; /* 设备ID */
-    UINT8 baudPrescalar; /* 需要结合输入时钟的频率进行设置，用于确定最终的波特率 */
+    /* The CAN clock for the CAN controller is divided by (prescaler+1) to generate the quantum 
+clock needed for sampling and synchronization.*/
+    UINT8 baudPrescalar; /* 需要结合输入时钟的频率进行设置，用于确定最终的波特率 +1 is the real value */
     UINT8 syncJumpWidth; /* SyncJumpWidth is the Synchronization Jump Width value to set. Valid values are from 0 to 3 */
     UINT8 timeSegment1;  /* TimeSegment1 is the Time Segment 1 value to set. Valid values are from 0 to 15 */
     UINT8 timeSegment2;  /* TimeSegment2 is the Time Segment 2 value to set. Valid values are from 0 to 7 */
-    UINT32 bufferQueLen; /* 缓冲CAN帧数量 */
     /* if more please add here */
 } WxCanDriverDevCfg;
 
 typedef struct {
     UINT32 intrId;  /* 中断ID */
+    UINT32 resv;    /* 保留 */
     XCanPs_SendRecvHandler sendHandle;  /* 发送Handle */
     XCanPs_SendRecvHandler recvHandle;  /* 接收handle */
     XCanPs_ErrorHandler errHandle;      /* 错误Handle */
@@ -27,6 +29,8 @@ typedef struct {
 typedef struct {
     UINT32 moduleId;  /* 模块ID */
     UINT32 txQueueDepth; /* the tx que depth  */
+    UINT32 messageId;   /* message id */
+    UINT32 upperModuleId; /* upper module id */
     WxCanDriverDevCfg devCfg;   /* device cfg */  
     WxCanDriverIntrCfg intrCfg;  /* interrupt cfg */
 } WxCanDriverCfg;
@@ -73,11 +77,18 @@ typedef struct {
 
 typedef struct {
     XCanPs canInst;
-    QueueHandle_t sendQueue;    /* to buff the send can frame */
-    WxModuleId moduleId;
-    UINT32 resv;
+    QueueHandle_t sendQueue;    /* to buff the send can frame WxCanFrame */
+    WxModuleId moduleId; /* module id */
+    WxModuleId upperModuleId; /* upper module id */
     WxCanDriverCfg *cfg; /* driver cfg */
+    UINT32 rxFrame[WX_CAN_DRIVER_FRAME_U32_LEN];
 } WxCanDriver;
+
+
+VOID WX_CAN_DRIVER_IntrRecvHandler(VOID *callBackRef);
+VOID WX_CAN_DRIVER_IntrSendHandler(VOID *callBackRef);
+VOID WX_CAN_DRIVER_IntrErrorHandler(VOID *callBackRef, UINT32 errorMask);
+VOID WX_CAN_DRIVER_IntrEventHandler(VOID *callBackRef, UINT32 intrMask);
 
 UINT32 WX_CAN_DRIVER_Construct(VOID *module);
 UINT32 WX_CAN_DRIVER_Entry(VOID *module, WxMsg *evtMsg);

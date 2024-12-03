@@ -109,7 +109,7 @@ UINT32 WX_DeployTasks_DeployTask(WxTask *task, WxTaskDeploy *taskDeploy)
 {
     WX_CLEAR_OBJ(task);
     task->taskName = taskDeploy->taskName;
-
+    boot_debug("Deploy task(%s) start...", taskDeploy->taskName);
     /* 创建任务消息队列 */
     if (taskDeploy->msgQueDepth > 0) {
         task->msgQueHandle = xQueueCreate(taskDeploy->msgQueDepth, sizeof(WxMsg *));
@@ -123,25 +123,22 @@ UINT32 WX_DeployTasks_DeployTask(WxTask *task, WxTaskDeploy *taskDeploy)
         BaseType_t xReturned = xTaskCreate(WX_TaskHandle, taskDeploy->taskName, taskDeploy->stackDepth, 
             (VOID *) task, taskDeploy->priority, &task->handle);
         if (xReturned != pdPASS) {
-            wx_critical(WX_EXCP_UNDEFINE, "Error Exit: core[%u] task(%s) create fail!", coreId, taskDeploy->taskName);
+            boot_debug("Error Exit: task(%s) create fail!", taskDeploy->taskName);
             return WX_TASK_CREATE_FAIL;
         }
     }
-    wx_log(WX_NOTICE, "Create task(%s) success!", taskDeploy->taskName);
+    boot_debug("Deploy task(%s) success!", taskDeploy->taskName);
     return WX_SUCCESS;   
 }
 
 /* 部署指定核的任务 */
 UINT32 WX_DeployTasks(UINT8 curCoreId)
 {
-    /* 创建消息资源池 */
-    UINT32 ret = WX_CreateMsgResPool();
-    if (ret != WX_SUCCESS) {
-        return ret;
-    } 
+    boot_debug("Delploy tasks on core[%u] start...", curCoreId);
     UINT32 taskDeployNum = sizeof(g_wxTaskDeployInfo) / sizeof(g_wxTaskDeployInfo[0]);
     WxDeployTasks *taskList = WX_CreateTasks(curCoreId, taskDeployNum);
     WxTaskDeploy *taskDeploy = NULL;
+    UINT32 ret = WX_SUCCESS;
     for (UINT32 i = 0; i < taskDeployNum; i++) {
         taskDeploy = &g_wxTaskDeployInfo[i];
         /* 如果当前任务不需要部署到该核该不处理 */
@@ -155,6 +152,6 @@ UINT32 WX_DeployTasks(UINT8 curCoreId)
         }
         taskList->taskNum++;
     }
-
+    boot_debug("Delploy tasks on core[%u] success! taskNum=%u", curCoreId, taskList->taskNum);
     return WX_SUCCESS;
 }

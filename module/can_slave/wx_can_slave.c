@@ -13,10 +13,12 @@ WxCanSlaveCfg g_wxCanSlaveCfg[] = {
     {
         .canFrameDataLen = 8,
         .moduleId = WX_MODULE_CAN_SLAVE_A,
+        .messId = 0x0001,
     }, 
     {
         .canFrameDataLen = 8,
         .moduleId = WX_MODULE_CAN_SLAVE_B,
+        .messId = 0x0002,
     }
 };
 
@@ -91,13 +93,14 @@ UINT32 WX_CAN_SLAVE_Construct(VOID *module)
 {
     WxCanSlave *this = WX_Mem_Alloc(WX_GetModuleName(module), 1, sizeof(WxCanSlave));
     if (this == NULL) {
+        boot_debug("Error Exit: memory allocation failed");
         return WX_MEM_ALLOC_FAIL;
     }
    
     this->moduleId = WX_GetModuleId(module);
     this->cfgInfo =  WX_CanSlave_GetCfg(this->moduleId);
     if (this->cfgInfo == NULL) {
-        wx_critical("Error Exit: WX_CanSlave_GetCfg(%u) fail", this->moduleId);
+        boot_debug("Error Exit: WX_CanSlave_GetCfg(%u) fail", this->moduleId);
         return WX_CAN_SLAVE_MODULE_CFG_UNDEF;
     }
     WX_SetModuleInfo(module, this);

@@ -8,12 +8,12 @@
 #include "wx_frame.h"
 WxModuleRouterList *g_wxModuleRouterList = NULL;
 
-/* 鍒涘缓娑堟伅璋冨害鐨勮矾鐢辫〃 */
-UINT32 WX_CreateModuleRouterList(void)
+UINT32 WX_CreateModuleRouterList(VOID)
 {
     if (g_wxModuleRouterList == NULL) {
         g_wxModuleRouterList = (WxModuleRouterList *)WX_Mem_Alloc(WxModuleRouterList, 1, sizeof(WxModuleRouterList));
         if (g_wxModuleRouterList == NULL) {
+            boot_debug("Error Exit: memory allocation failed");
             return WX_MEM_ALLOC_FAIL;
         }
         memset(g_wxModuleRouterList, 0, sizeof(WxModuleRouterList));
@@ -32,7 +32,6 @@ UINT32 WX_DestroyModuleRouterList(void)
     return WX_SUCCESS;
 }
 
-/* 娉ㄥ唽妯″潡鐨勮皟搴﹁矾鐢� */
 UINT32 WX_RegModuleRouter(WxModuleId moduleId, UINT8 coreId, 
     WxTask *belongTask, WxModule *belongModule)
 {

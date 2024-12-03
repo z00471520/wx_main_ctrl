@@ -3,5 +3,5 @@
 #include "wx_include.h"
 #include "wx_msg_common.h"
 #include "wx_id_def.h"
-
+UINT32 WX_CreateModuleRouterList(VOID);
 #endif

@@ -2,39 +2,41 @@
 #include "wx_msg_common.h"
 #include "FreeRTOS.h"
 #include "queue.h"
-#define TASK_EVT_MSG_NODE_NUM           8196 /* 涓�涓换鍔＄殑娑堟伅闃熷垪鏢�寔鐨勬秷鎭妭鐐规暄1�71ￄ1�77 */
+#define TASK_EVT_MSG_NODE_NUM           8196 /* 娑擄拷娑擃亙鎹㈤崝锛勬畱濞戝牊浼呴梼鐔峰灙閺拷顖涘瘮閻ㄥ嫭绉烽幁顖濆Ν閻愯鏆�1锟�71锟�1锟�77 */
 typedef struct {
     QueueHandle_t evtMsgQue;
     WxMsgType evtMsgArray[TASK_EVT_MSG_NODE_NUM];
 } WxMsgTypePool;
 
 WxMsgTypePool *g_wxEvtMsgPool = NULL;
-/* 创建消息资源池 */
+/* 鍒涘缓娑堟伅璧勬簮姹� */
 UINT32 WX_CreateMsgResPool(VOID)
 {
+	boot_debug("Create event msg start...");
     if (g_wxEvtMsgPool != NULL) {
         return WX_SUCCESS;
     }
-    /* 申请节点 */
+    /* alloc mem */
     WxMsgTypePool *evtMsgPool = WX_Mem_Alloc("WxMsgTypePool", 1, sizeof(WxMsgTypePool));
-    /* 创建一个消息队列用于维护节点指针 */
+    /* create a queue to store the msg ptr */
     evtMsgPool->evtMsgQue = xQueueCreate((UBaseType_t)TASK_EVT_MSG_NODE_NUM, (UBaseType_t)sizeof(WxMsg *));
     if (evtMsgPool->evtMsgQue == NULL) {
+    	boot_debug("Error Exit: Create queue fail!");
         WX_Mem_Free(evtMsgPool);
         return WX_CREATE_QUEUE_FAIL;
     }
-    /* 把节点指针加入到消息队列中 */
+    /* add the msg point to the que for future alloc */
     WxMsg *evtMsg = NULL;
     for (UINT32 i = 0; i < TASK_EVT_MSG_NODE_NUM; i++) {
         evtMsg = (WxMsg *)&evtMsgPool->evtMsgArray[i];
         xQueueSend(evtMsgPool->evtMsgQue, (void *)&evtMsg, (TickType_t)0);
     }
-
+    boot_debug("Create event msg success!");
     g_wxEvtMsgPool = evtMsgPool;
     return WX_SUCCESS;
 }
 
-/* 中断申请 */
+/* 涓柇鐢宠 */
 VOID *WX_ApplyEvtMsgFromISR(WxMsgType msgType)
 {
     WxMsg *evtMsg = NULL;
@@ -57,13 +59,13 @@ VOID *WX_ApplyEvtMsg(WxMsgType msgType)
     evtMsg->msgType = msgType;
     return evtMsg;
 }
-/* 非中断释放 */
+/* 闈炰腑鏂噴鏀� */
 VOID WX_FreeEvtMsg(WxMsg **pp)
 {
     if (*pp == NULL) {
         return;
     }
-    /* 节点节点到消息队列 */
+    /* 鑺傜偣鑺傜偣鍒版秷鎭槦鍒� */
     if (xQueueSend(g_wxEvtMsgPool->evtMsgQue, (VOID *)pp, (TickType_t)0) != pdPASS) {
         return;
     }
@@ -71,13 +73,13 @@ VOID WX_FreeEvtMsg(WxMsg **pp)
     return;
 }
 
-/* 中断释放消息节点 */
+/* 涓柇閲婃斁娑堟伅鑺傜偣 */
 VOID WX_FreeEvtMsgFromISR(WxMsg **pp)
 {
     if (*pp == NULL) {
         return;
     }
-    /* 发送节点到消息队列 */
+    /* 鍙戦�佽妭鐐瑰埌娑堟伅闃熷垪 */
     if (xQueueSendFromISR(g_wxEvtMsgPool->evtMsgQue, (VOID *)pp, (TickType_t)0) != pdPASS) {
         return;
     }

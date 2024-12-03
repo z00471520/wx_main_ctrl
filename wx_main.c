@@ -25,16 +25,25 @@
 #include "wx_frame.h"
 int main(void)
 {
-	xil_printf("WX_SetupFrame start...!");
+	boot_debug("\r\n");
+	boot_debug("===========================================================");
+	boot_debug("======================WX BOOT STATT========================");
+	boot_debug("===========================================================");
+	boot_debug("WX_SetupFrame start...!");
 	UINT32 ret = WX_SetupFrame(WX_GetCurCoreId());
 	if (ret != WX_SUCCESS) {
-		xil_printf("WX_SetupFrame failed(%u)\r\n", ret);
+		boot_debug("WX_SetupFrame failed(%u)\r\n", ret);
 	} else {
-		xil_printf("WX_SetupFrame successful!");
-		/* 使能中断开始 */
+		boot_debug("Enable exception!");
+		/* enable excption */
 		Xil_ExceptionEnable();
+		boot_debug("\r\n");
+		boot_debug("===========================================================");
+		boot_debug("======================WX BOOT SUCCESS======================");
+		boot_debug("===========================================================");
 		/* Start the scheduler. */
 		vTaskStartScheduler();
+			
 	}
 	
 	/* If all is well, the scheduler will now be running, and the following line
