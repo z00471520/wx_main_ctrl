@@ -9,6 +9,7 @@
 WxRs422SlaveDriverCfg g_rs422SlaverDriverCfg = {
     .moduleId = WX_MODULE_DRIVER_RS422_SLAVE,
     .upperModuleId = WX_MODULE_RS422_SLAVE,
+    .gpioDevId = XPAR_GPIO_1_DEVICE_ID,
     .intrId = XPAR_FABRIC_UARTNS550_1_VEC_ID,     /* interrupt ID */
     .slaveAddr = 0x01,   /* slave address of the device */
     .rs422DevId = XPAR_UARTNS550_1_DEVICE_ID,
@@ -109,13 +110,34 @@ VOID WX_RS422SlaveDriver_IntrHandle(VOID *callBackRef, UINT32 event, UINT32 even
         if (recvCount == 0) {
             wx_excp_cnt(WX_EXCP_RS422_SLAVE_RECV_DATA_TX_FINISH);
         }
+        /* 0 - rx, 1 - tx */
+        XGpio_DiscreteWrite(&this->gpipInst, 1, 0);
 	}
 
     /* All of the data has been received. or Data was received, but not the expected number of bytes */
-	if (event == XUN_EVENT_RECV_DATA || event ==XUN_EVENT_RECV_TIMEOUT) {
+	if (event == XUN_EVENT_RECV_DATA || event == XUN_EVENT_RECV_TIMEOUT) {
         this->rxAdu.valueLen = eventData;
         WX_RS422SlaveDriver_ProcRecvAduFromISR(this);
+        /* 0 - rx, 1 - tx */
+        XGpio_DiscreteWrite(&this->gpipInst, 1, 1);
 	}
+}
+
+/* init the gpio */
+UINT32 WX_RS422SlaveDriver_InitGpio(XGpio *gpipInstPtr, UINT32 gpioId)
+{
+	/* initial gpio */
+	int status = XGpio_Initialize(gpipInstPtr, gpioId);
+	if (status != XST_SUCCESS) {
+        return WX_RS422_SLAVE_DRIVER_INIT_GPIO_FAIL;
+    }
+
+	/* set gpio as output */
+	XGpio_SetDataDirection(gpipInstPtr, 1, 0x0);
+    /* 0 - rx, 1 - tx */
+    XGpio_DiscreteWrite(gpipInstPtr, 1, 0);
+
+    return WX_SUCCESS;
 }
 
 UINT32 WX_RS422SlaveDriver_Construct(VOID *module)
@@ -130,6 +152,14 @@ UINT32 WX_RS422SlaveDriver_Construct(VOID *module)
     this->moduleId = cfg->moduleId;
     this->upperModuleId = cfg->upperModuleId;
     this->slaveAddr = cfg->slaveAddr;
+
+    /* this is only for test */
+    ret = WX_RS422SlaveDriver_InitGpio(&this->gpipInst, cfg->gpioDevId);
+    if (ret != WX_SUCCESS) {
+        boot_debug("Error: RS422 slave driver init gpio fail(%u)", ret);
+        return ret;
+    }
+
     /* the inst or rs422 used for uart data tx/rx */
     ret = WX_InitUartNs550(&this->rs422Inst, cfg->rs422DevId, &cfg->rs422Format);
     if (ret != WX_SUCCESS) {

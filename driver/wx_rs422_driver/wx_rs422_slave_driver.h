@@ -14,6 +14,8 @@ typedef struct {
     UINT8 moduleId;     /* moduleId */
     UINT8 upperModuleId; /* upperModuleId */
     UINT8 resv8;      /* resv16 */
+    UINT32 gpioDevId;   /* GPIO device ID */
+    UINT32 resv;
     XUartNs550Format rs422Format; /* 涓插彛閰嶇疆淇℃伅 */
 } WxRs422SlaveDriverCfg;
 
@@ -25,8 +27,9 @@ typedef struct {
     UINT8 upperModuleId; 	/* upperModuleId */
     UINT32 resv3222;
     WxModbusAdu txAdu; 		/* the adu to be send by rs422 */
-    WxModbusAdu rxAdu;  	/* the adu recieve from rs422 */
+    WxModbusAdu rxAdu;  	/* the adu receive from rs422 */
     XUartNs550 rs422Inst; 	/* RS422 instance */
+    XGpio gpipInst;			/* GPIO instance to control the direction of rs422 */
 } WxRs422SlaverDriver;
 
 UINT32 WX_RS422SlaveDriver_Construct(VOID *module);

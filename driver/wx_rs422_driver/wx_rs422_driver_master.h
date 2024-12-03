@@ -8,12 +8,13 @@ typedef enum {
     WX_RS422_MASTER_STATUS_RX_ADU,
 } WxRs422Status;
 
-/* RS422閰嶇疆淇℃伅 */
 typedef struct {
-    UINT32 rs422DevId;  /* 设备ID */
-    UINT32 intrId;      /* 中断ID */
-    UINT32 msgQueItemNum;	/* 待发送的ADU的缓存队列 */
-    XUartNs550Format rs422Format; /* 配置 */
+    UINT32 rs422DevId;
+    UINT32 intrId;
+    UINT32 gpioDevId;
+    UINT32 resv;
+    UINT32 msgQueItemNum;
+    XUartNs550Format rs422Format;
 } WxRs422MasterDriverCfg;
 
 typedef struct {
@@ -25,6 +26,7 @@ typedef struct {
     WxModbusAdu rxAdu;  /* the adu recieve from rs422 */
     QueueHandle_t msgQueHandle; /* adu to be sent */
     XUartNs550 rs422Inst; /* RS422 inst  */
+    XGpio gpipInst; /* GPIO inst to control rs422's direction */
 } WxRs422DriverMaster;
 
 UINT32 WX_RS422MasterDriver_Construct(VOID *module);

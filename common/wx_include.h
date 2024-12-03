@@ -19,4 +19,5 @@
 #include "xparameters.h"	/* SDK generated parameters */
 #include "FreeRTOSConfig.h"
 #include "xparameters_ps.h"
+#include "xgpio.h"
 #endif

@@ -11,6 +11,7 @@
 #include "xuartns550.h"
 WxRs422MasterDriverCfg g_rs422DriverMasterCfg = {
     .rs422DevId = XPAR_UARTNS550_0_DEVICE_ID,
+    .gpioDevId = XPAR_GPIO_0_DEVICE_ID,
     .rs422Format = {
         .DataBits = XUN_FORMAT_8_BITS,
         .StopBits = XUN_FORMAT_1_STOP_BIT,
@@ -81,7 +82,8 @@ VOID WX_RS422I_DRIVER_MASTER_IntrHandler(VOID *callBackRef, UINT32 event, UINT32
 	 * All of the data has been sent.
 	 */
 	if (event == XUN_EVENT_SENT_DATA) {
-        /* 鍙戦�佸畬姣曞悗鍒囨崲鍒版帴鏀剁姸鎬� */
+        /* 0 - rx, 1 - tx */
+        XGpio_DiscreteWrite(&this->gpipInst, 1, 0);
         this->status = WX_RS422_MASTER_STATUS_RX_ADU;
 	}
 
@@ -92,6 +94,8 @@ VOID WX_RS422I_DRIVER_MASTER_IntrHandler(VOID *callBackRef, UINT32 event, UINT32
         
         this->rxAdu.valueLen = eventData;
         WX_RS422MasterDriver_ProcRecvAduFromISR(this);
+        /* 0 - rx, 1 - tx */
+        XGpio_DiscreteWrite(&this->gpipInst, 1, 1);
 	}
 
 	/*
@@ -101,6 +105,8 @@ VOID WX_RS422I_DRIVER_MASTER_IntrHandler(VOID *callBackRef, UINT32 event, UINT32
 	if (event == XUN_EVENT_RECV_TIMEOUT) {
         this->rxAdu.valueLen = eventData;
         WX_RS422MasterDriver_ProcRecvAduFromISR(this);
+        /* 0 - rx, 1 - tx */
+        XGpio_DiscreteWrite(&this->gpipInst, 1, 1);
 	}
 }
 
@@ -131,6 +137,23 @@ UINT32 WX_RS422MasterDriver_ProcTxAduMsg(WxRs422DriverMaster *this, WxRs422Maste
     return WX_SUCCESS;
 }
 
+/* init the gpio */
+UINT32 WX_RS422MasterDriver_InitGpio(XGpio *gpipInstPtr, UINT32 gpioId)
+{
+	/* initial gpio */
+	int status = XGpio_Initialize(gpipInstPtr, gpioId);
+	if (status != XST_SUCCESS) {
+        return WX_RS422_SLAVE_DRIVER_INIT_GPIO_FAIL;
+    }
+
+	/* set gpio as output */
+	XGpio_SetDataDirection(gpipInstPtr, 1, 0x0);
+    /* 0 - rx, 1 - tx */
+    XGpio_DiscreteWrite(gpipInstPtr, 1, 1);
+
+    return WX_SUCCESS;
+}
+
 UINT32 WX_RS422MasterDriver_Construct(VOID *module)
 {
     UINT32 ret;
@@ -139,19 +162,26 @@ UINT32 WX_RS422MasterDriver_Construct(VOID *module)
         return WX_RS422_MASTER_MEM_ALLOC_FAIL;
     }
     WxRs422MasterDriverCfg *cfg = &g_rs422DriverMasterCfg;
-    /* 鍒涘缓RS422娑堟伅缂撳瓨闃熷垪 */
+    /* create a queue to buff the tx adu */
     this->msgQueHandle = xQueueCreate(cfg->msgQueItemNum, sizeof(WxModbusAdu));
     if (this->msgQueHandle == NULL) {
         boot_debug("Error Exit: xQueueCreate fail");
         return WX_RS422_MASTER_CREATE_MSG_QUE_FAIL;
     }
+    /* init the rs422 master driver 's gpio */
+    ret = WX_RS422MasterDriver_InitGpio(&this->gpipInst, cfg->gpioDevId);
+    if (ret != WX_SUCCESS) {
+        boot_debug("Error Exit: WX_RS422MasterDriver_InitGpio fail(%u)", ret);
+        return ret;
+    }
+
     /* the inst or rs422 used for uart data tx/rx */
     ret = WX_InitUartNs550(&this->rs422Inst, cfg->rs422DevId, &cfg->rs422Format);
     if (ret != WX_SUCCESS) {
         return ret;
     }
 
-    /* 璁剧疆涓柇 */
+    /* setup the uart interrupt */
     ret = WX_SetupUartNs550Interrupt(&this->rs422Inst,
     	WX_RS422I_DRIVER_MASTER_IntrHandler, cfg->intrId, this);
     if (ret != WX_SUCCESS) {
