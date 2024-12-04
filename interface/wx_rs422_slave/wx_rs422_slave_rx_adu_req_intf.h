@@ -8,6 +8,6 @@
 typedef struct {
     WX_INHERIT_MSG_HEADER
     WxModbusAdu rxAdu; /* modbus adu received from driver */
-} WxRs422SlaveRxAduReq;
+} WxRs422SlaveRxReqAdu;
 
 #endif //__WX_RS422_SLAVE_RX_ADU_MSG_INTF_H__

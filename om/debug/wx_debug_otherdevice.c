@@ -21,7 +21,7 @@ UINT32 WX_DEBUG_SendRemoteDbgCmd(VOID *this)
     WX_CLEAR_OBJ(msg);
 
     msg->sender = this->moduleId;
-    msg->receiver = WX_MODULE_DRIVER_RS422_MASTER;  /* 鍙戠粰鍏朵粬鏍� */
+    msg->receiver = WX_MODULE_RS422_MASTER_DRIVER;  /* 鍙戠粰鍏朵粬鏍� */
     msg->msgType = WX_MSG_TYPE_BEBUG;
     msg->msgDataLen = sizeof(WxModbusAdu);
 

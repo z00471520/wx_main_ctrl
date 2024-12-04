@@ -7,7 +7,7 @@
 #include "wx_msg_res_pool.h"
  #include "wx_frame.h"
 WxRs422SlaveDriverCfg g_rs422SlaverDriverCfg = {
-    .moduleId = WX_MODULE_DRIVER_RS422_SLAVE,
+    .moduleId = WX_MODULE_RS422_SLAVE_DRIVER,
     .upperModuleId = WX_MODULE_RS422_SLAVE,
     .gpioDevId = XPAR_GPIO_1_DEVICE_ID,
     .intrId = XPAR_FABRIC_UARTNS550_1_VEC_ID,     /* interrupt ID */
@@ -24,7 +24,7 @@ WxRs422SlaveDriverCfg g_rs422SlaverDriverCfg = {
 VOID WX_RS422SlaveDriver_SentRxAdu2Upper(WxRs422SlaverDriver *this, WxModbusAdu *rxAdu)
 {
     /* 鐢宠娑堟伅 */
-	WxRs422SlaveRxAduReq *msg = WX_ApplyEvtMsg(WX_MSG_TYPE_RS422_SLAVE_RX_ADU_REQ);
+	WxRs422SlaveRxReqAdu *msg = WX_ApplyEvtMsg(WX_MSG_TYPE_RS422_SLAVE_RX_ADU_REQ);
     if (msg == NULL) {
         wx_excp_cnt(WX_EXCP_RS422_SLAVE_MALLOC_MSG_FAIL);
         return;
@@ -33,8 +33,6 @@ VOID WX_RS422SlaveDriver_SentRxAdu2Upper(WxRs422SlaverDriver *this, WxModbusAdu 
     /* set the message content */
     msg->sender = this->moduleId;
     msg->receiver = this->upperModuleId;
-    msg->msgType = WX_MSG_TYPE_RS422_SLAVE_RX_ADU_REQ;
-    msg->rxAdu.failCode = WX_SUCCESS;
     for (UINT8 i = 0; i < rxAdu->valueLen; i++) {
         msg->rxAdu.value[i] = rxAdu->value[i];
     }

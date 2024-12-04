@@ -6,10 +6,18 @@
 
 /* WX_MSG_TYPE_RS422_MASTER_ADU_RSP */
 typedef struct {
+    UINT16 reqMsgType;  /* request function code */
+    UINT16 reqSubMsgType;  /* request sub message type */
+    UINT16 rspCode; /* responce code */
+    UINT8 reqSender; /* request sender */
+    WxModbusAdu rspAdu; /* response modbus adu when msg */
+} WxRs422MasterDriverRspData;
+
+typedef struct {
     WX_INHERIT_MSG_HEADER
     union {
-        WxModbusAdu rspAdu; /* default 0 */
+        WxRs422MasterDriverRspData data; /* default 0 */
     };
-} WxRs422MasterRspAduMsg;
+} WxRs422MasterDriverRspMsg;
 
 #endif

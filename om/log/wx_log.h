@@ -25,9 +25,9 @@ typedef enum {
 // REF xil_printf function
 VOID WX_Print2Uart( const CHAR *ctrl1, ...);
 // only for boot debug
-#define boot_debug(fmt, args...) xil_printf("%-32s:%3d: "fmt"\r\n", __FILE__, __LINE__, ##args)
+#define boot_debug(fmt, args...) xil_printf("%s:%d: "fmt"\r\n", __FILE__, __LINE__, ##args)
 #define wx_log(lev,...)
-#define wx_debug(fmt, args...) xil_printf("%-32s:%3d: "fmt"\r\n", __FILE__, __LINE__, ##args)
+#define wx_debug(fmt, args...) xil_printf("%s:%d: "fmt"\r\n", __FILE__, __LINE__, ##args)
 #define wx_info boot_debug
 #define wx_notice boot_debug
 #define wx_critical boot_debug

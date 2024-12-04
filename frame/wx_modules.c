@@ -4,7 +4,7 @@
 #include "wx_include.h"
  
 #include "wx_can_driver.h"
-#include "wx_rs422_driver_master.h"
+#include "wx_rs422_master_driver.h"
 #include "wx_rs422_slave_driver.h"
 #include "wx_can_slave.h"
 #include "wx_rs422_master.h"
@@ -40,7 +40,7 @@ WxModuleDeploy g_wxModuleDepolyInfos[] = {
         WX_CAN_SLAVE_Entry,     
     },
     {
-        "driver_can_a",      
+        "can_a_driver",      
         WX_MODULE_DRIVER_CAN_A,
         WX_CORE_ID_0,            
         "task_driver",           
@@ -49,7 +49,7 @@ WxModuleDeploy g_wxModuleDepolyInfos[] = {
         WX_CAN_DRIVER_Entry,     
     },
     {
-        "driver_can_b",      
+        "can_b_driver",      
         WX_MODULE_DRIVER_CAN_B, /* 妯″潡ID */
         WX_CORE_ID_0,               
         "task_driver",               
@@ -58,8 +58,8 @@ WxModuleDeploy g_wxModuleDepolyInfos[] = {
         WX_CAN_DRIVER_Entry,        
     },
     {
-        "driver_rs422_master",    
-        WX_MODULE_DRIVER_RS422_MASTER, /* 妯″潡ID */
+        "rs422_master_driver",    
+        WX_MODULE_RS422_MASTER_DRIVER, /* 妯″潡ID */
         WX_CORE_ID_0,               
         "task_driver",               
         WX_RS422MasterDriver_Construct,    
@@ -67,8 +67,8 @@ WxModuleDeploy g_wxModuleDepolyInfos[] = {
         WX_RS422MasterDriver_Entry,        
     },
     {
-        "driver_rs422_slave",        
-        WX_MODULE_DRIVER_RS422_SLAVE,  
+        "rs422_slave_driver",        
+        WX_MODULE_RS422_SLAVE_DRIVER,  
         WX_CORE_ID_0,                  
         "task_driver",                  
         WX_RS422SlaveDriver_Construct,    

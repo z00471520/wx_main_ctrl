@@ -83,17 +83,14 @@ typedef enum {
 } WxModbusExcpCode;
 
 typedef struct {
-    UINT32 failCode;       /* 鍝嶅簲澶辫触鐮侊紝WX_SUCCESS锛氱浉搴旀垚鍔燂紝鍏朵粬锛氱浉搴斿け璐ワ紝璇﹁failcode瀹氫箟 */
-    UINT16 msgType;       /* 璇锋眰瀵瑰簲鐨勬秷鎭被鍨嬶紝RS422椹卞姩鏍规嵁璇锋眰娑堟伅濉啓 */
-    UINT16 subMsgType;     /* 璇锋眰瀵瑰簲鐨勫瓙娑堟伅绫诲瀷锛孯S422椹卞姩鏍规嵁璇锋眰娑堟伅濉啓 */
-    UINT8 slaveAddr;      /* 浠庢満鍦板潃 */
-    UINT8 funcCode;   /* 鍔熻兘鐮� */
-    UINT8 receiver;   /* 鎺ユ敹鏂规ā鍧� */
-    UINT8 excpCode;
-    UINT16 dataAddr;      /* 鏁版嵁鍦板潃 */
-    UINT16 valueLen;      /* ADU鐨勬暟鎹暱搴� */
-    UINT16 expectRspLen; /* 鏈熸湜鐨勫搷搴旈暱搴� */
-    UINT8 value[WX_MODBUS_ADU_MAX_SIZE]; /* 鏁扮粍 */
+    UINT16 valueLen;      /* adu value length  */
+    UINT16 expectRspLen;  /* expect response length when master send request */
+    UINT16 dataAddr;      /* data address */
+    UINT8 funcCode;       /* function code */
+    UINT8 slaveAddr;      /* slave address */
+    UINT8 excpCode;       /* exception code */
+    UINT8 sender;         /* origin sender */
+    UINT8 value[WX_MODBUS_ADU_MAX_SIZE]; /* the adu value array */
 } WxModbusAdu;
 
 /* 璁＄畻CRC鐨勫彇鍊� */
