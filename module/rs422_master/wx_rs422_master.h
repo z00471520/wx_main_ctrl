@@ -52,4 +52,7 @@ typedef struct {
     UINT8 wrDataModule[WX_RS422_MASTER_MSG_WRITE_BUTT]; /* 这个用于记录写是那个模块发起的，用于响应填写接收者 */
 } WxRs422Master;
 
+UINT32 WX_RS422_MASTER_Construct(VOID *module);
+UINT32 WX_RS422_MASTER_Destruct(VOID *module);
+UINT32 WX_RS422_MASTER_Entry(VOID *module, WxMsg *msg);
 #endif

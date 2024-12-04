@@ -3,6 +3,7 @@
 #include "wx_msg_common.h"
 #include "wx_id_def.h"
 #include "wx_include.h"
+#include "wx_frame.h"
 UINT8 g_curCoreId;
 
 #define INTC_DEVICE_ID		XPAR_SCUGIC_SINGLE_DEVICE_ID
@@ -27,6 +28,8 @@ typedef struct tagWxTaskDeployInfo{
     UINT32 stackDepth;
     UINT16 priority;
     UINT16 coreIdMask;
+    UINT32 resv32;
+    VOID (*taskHanlder)(VOID *param);
 } WxTaskDeploy;
 
 /* 妯″潡瀹氫箟 */
@@ -52,11 +55,11 @@ typedef struct tagWxTask {
     WxModule modules[WX_MODULE_BUTT];
 } WxTask;
 
-typedef struct tagWxDeployTasks {
+typedef struct tagWxTasks {
     UINT32 maxTaskNum;
     UINT32 taskNum;
     WxTask taskList[0];
-} WxDeployTasks;
+} WxTasks;
 
 typedef enum {
     WX_MSG_SEND_TO_CORE,    /* 娑堟伅鍙戦�佸埌鍏朵粬鏍� */

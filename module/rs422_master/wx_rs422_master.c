@@ -8,18 +8,18 @@
  #include "wx_frame.h"
 UINT32 WX_RS422_MASTER_SendAdu2Driver(WxRs422Master *this, WxModbusAdu *adu)
 {
-    /* 申请消息 */
-    WxMsg *msg = WX_ApplyEvtMsg(WX_MSG_TYPE_CAN_FRAME);
+    /* create a event message */
+    WxMsg *msg = WX_ApplyEvtMsg(WX_MSG_TYPE_RS422_MASTER_DRIVER_REQ);
     if (msg == NULL) {
         return WX_APPLY_EVT_MSG_ERR;
     }
-    /* 初始化消息头 */
+    /* clear the message */
     WX_CLEAR_OBJ(msg);
-    /* 填写消息信息 */
+    /* init the message */
     msg->sender = this->moduleId;
     msg->receiver = WX_MODULE_DRIVER_RS422_MASTER;
-    msg->msgType = WX_MSG_TYPE_RS422_MASTER_DRIVER;
-    /* 填写数据内容 */
+    msg->msgType = WX_MSG_TYPE_RS422_MASTER_DRIVER_REQ;
+    /* set the message data */
     WxModbusAdu *modbusAdu = (WxModbusAdu *)msg->msgData;
     for (int i = 0; i < adu->valueLen; i++) {
         modbusAdu->value[i] = adu->value[i];
@@ -27,7 +27,7 @@ UINT32 WX_RS422_MASTER_SendAdu2Driver(WxRs422Master *this, WxModbusAdu *adu)
     modbusAdu->valueLen = adu->valueLen;
     modbusAdu->expectRspLen = adu->expectRspLen;
 
-    /* 发送消息 */
+    /* send msg to driver */
     UINT32 ret = WX_MsgShedule(this->moduleId, msg->receiver, msg);
     if (ret != WX_SUCCESS) {
         WX_FreeEvtMsg(&msg);
@@ -36,7 +36,7 @@ UINT32 WX_RS422_MASTER_SendAdu2Driver(WxRs422Master *this, WxModbusAdu *adu)
     return ret;
 }
 
-/* RS422主读其它设备最终返回的响应ADU */
+/* RS422涓昏鍏跺畠璁惧鏈�缁堣繑鍥炵殑鍝嶅簲ADU */
 UINT32 WX_RS422_MASTER_ProcRdDataRspAduMsg(WxRs422Master *this, WxRs422MasterRspAduMsg *rspAduMsg)
 {
     UINT32 ret = WX_SUCCESS;
@@ -46,18 +46,18 @@ UINT32 WX_RS422_MASTER_ProcRdDataRspAduMsg(WxRs422Master *this, WxRs422MasterRsp
         return WX_RS422_MASTER_PROC_RSP_ADU_SUB_MSG_TYPE_ERR;
     }
 
-    /* 申请响应消息 */
+    /* 鐢宠鍝嶅簲娑堟伅 */
     WxRs422MasterRdDataRspMsg *rdDataRspMsg = WX_ApplyEvtMsg(WX_MSG_TYPE_RS422_MASTER_RD_DATA_RSP);
-    /* 初始化消息 */
+    /* 鍒濆鍖栨秷鎭� */
     WX_CLEAR_OBJ((WxMsg *)rdDataRspMsg);
     rdDataRspMsg->subMsgType = rxAdu->subMsgType;
-    /* 谁读的就发给谁 */
+    /* 璋佽鐨勫氨鍙戠粰璋� */
     rdDataRspMsg->receiver = this->rdDataModule[rspAduMsg->rspAdu.subMsgType];
-    /* 如果失败告诉对方失败码 */
+    /* 濡傛灉澶辫触鍛婅瘔瀵规柟澶辫触鐮� */
     if (rspAduMsg->rspAdu.failCode != WX_SUCCESS) {
         rdDataRspMsg->rsp.failCode = rspAduMsg->rspAdu.failCode;
     } else {
-    	/* 需要进行解码 */
+    	/* 闇�瑕佽繘琛岃В鐮� */
         rdDataRspMsg->rsp.failCode = WX_RS422_MASTER_DecRdDataAdu(rxAdu, &rdDataRspMsg->rsp.data);
     }
     ret = WX_MsgShedule(this->moduleId, rdDataRspMsg->receiver, rdDataRspMsg);
@@ -70,9 +70,9 @@ UINT32 WX_RS422_MASTER_ProcRdDataRspAduMsg(WxRs422Master *this, WxRs422MasterRsp
 
 UINT32 WX_RS422_MASTER_ProcWrDataRspAduMsg(WxRs422Master *this, WxRs422MasterRspAduMsg *rspAduMsg)
 {
-    /* 申请响应消息 */
+    /* 鐢宠鍝嶅簲娑堟伅 */
     WxRs422MasterWrDatRspMsg *wrDataRspMsg = WX_ApplyEvtMsg(WX_MSG_TYPE_RS422_MASTER_WR_DATA_RSP);
-    /* 初始化消息 */
+    /* 鍒濆鍖栨秷鎭� */
     WX_CLEAR_OBJ((WxMsg *)wrDataRspMsg);
     wrDataRspMsg->rsp.subMsgType = rspAduMsg->rspAdu.subMsgType;
     wrDataRspMsg->rsp.failCode = rspAduMsg->rspAdu.failCode;
@@ -85,12 +85,12 @@ UINT32 WX_RS422_MASTER_ProcWrDataRspAduMsg(WxRs422Master *this, WxRs422MasterRsp
     return ret;
 }
 
-/* 处理从RS422驱动收到的响应ADU消息 */
+/* 澶勭悊浠嶳S422椹卞姩鏀跺埌鐨勫搷搴擜DU娑堟伅 */
 UINT32 WX_RS422_MASTER_ProRspcAduMsg(WxRs422Master *this, WxMsg *msg)
 {
     WxRs422MasterRspAduMsg *rspAduMsg = (WxRs422MasterRspAduMsg *)msg;
 
-    /* 响应消息对应的请求消息 */
+    /* 鍝嶅簲娑堟伅瀵瑰簲鐨勮姹傛秷鎭� */
     switch (rspAduMsg->rspAdu.msgType) {
         case WX_MSG_TYPE_RS422_MASTER_WR_DATA_REQ: {
             return WX_RS422_MASTER_ProcWrDataRspAduMsg (this, rspAduMsg);
@@ -104,7 +104,7 @@ UINT32 WX_RS422_MASTER_ProRspcAduMsg(WxRs422Master *this, WxMsg *msg)
     }
 }
 
-/* |salve address: 1byte| func code: 1byte| data addr: 2byte | data len：1byte | data: N | */
+/* |salve address: 1byte| func code: 1byte| data addr: 2byte | data len锛�1byte | data: N | */
 UINT32 WX_RS422_MASTER_EncWrDataReqMsg2Adu(WxRs422MasterWrDataReqMsg *msg, WxModbusAdu *adu)
 {
     WxRs422MasterWrDataEncHandle *handle = WX_RS422_MASTER_GetWrDataHandle(msg->subMsgType);
@@ -130,24 +130,24 @@ UINT32 WX_RS422_MASTER_EncWrDataReqMsg2Adu(WxRs422MasterWrDataReqMsg *msg, WxMod
     if (adu->value[WX_MODBUS_ADU_WR_REQ_DATA_LEN_IDX] == 0) {
         return WX_RS422_MASTER_WR_REQ_ENCODE_FAIL;
     }
-     /* 编码adu[4]存放的是长度，其本身占用1字节  */
+     /* 缂栫爜adu[4]瀛樻斁鐨勬槸闀垮害锛屽叾鏈韩鍗犵敤1瀛楄妭  */
     adu->valueLen += adu->value[WX_MODBUS_ADU_WR_REQ_DATA_LEN_IDX] + 1;
     /* to calc the crc value */
     UINT16 crcValue = WX_Modbus_Crc16(adu->value, adu->valueLen);
     adu->value[adu->valueLen++] = (UINT8)((crcValue >> 8) & 0xff);   
     adu->value[adu->valueLen++] = (UINT8)(crcValue & 0xff); 
-    adu->expectRspLen = adu->valueLen; /* 写多少字节，响应就应该是多少字节 */
+    adu->expectRspLen = adu->valueLen; /* 鍐欏灏戝瓧鑺傦紝鍝嶅簲灏卞簲璇ユ槸澶氬皯瀛楄妭 */
     return WX_SUCCESS;
 }
 
 /*
- * 函数功能: 对读数据请求消息进行编码，编码后的数据存放在txAdu中
- * ADU的格式: |slave address：1byte| func code: 1byte | data address: 2byte | data len：1byte |
- * 注意事项：参数合法性由调用者保证
+ * 鍑芥暟鍔熻兘: 瀵硅鏁版嵁璇锋眰娑堟伅杩涜缂栫爜锛岀紪鐮佸悗鐨勬暟鎹瓨鏀惧湪txAdu涓�
+ * ADU鐨勬牸寮�: |slave address锛�1byte| func code: 1byte | data address: 2byte | data len锛�1byte |
+ * 娉ㄦ剰浜嬮」锛氬弬鏁板悎娉曟�х敱璋冪敤鑰呬繚璇�
  **/
 UINT32 WX_RS422_MASTER_EncRdDataReqMsg2Adu(WxRs422MasterRdDataReqMsg *msg, WxModbusAdu *txAdu)
 {
-    /* 判断消息类型是否合理 */
+    /* 鍒ゆ柇娑堟伅绫诲瀷鏄惁鍚堢悊 */
     if (msg->subMsgType >= WX_RS422_MASTER_MSG_READ_DATA_BUTT) {
         return WX_RS422_MASTER_INVALID_SUB_OPR_TYPE;
     }
@@ -173,44 +173,44 @@ UINT32 WX_RS422_MASTER_EncRdDataReqMsg2Adu(WxRs422MasterRdDataReqMsg *msg, WxMod
     UINT16 crcValue = WX_Modbus_Crc16(txAdu->value, txAdu->valueLen);
     txAdu->value[txAdu->valueLen++] = (UINT8)((crcValue >> 8) & 0xff);   
     txAdu->value[txAdu->valueLen++] = (UINT8)(crcValue & 0xff); 
-    /* 期望响应的长度
-     * 响应的数据格式如下如下:
-     * |从站：1byte | 功能码：1byte | 数据长度：1byte | 数据： N byte | CRC: 2BYTE|
+    /* 鏈熸湜鍝嶅簲鐨勯暱搴�
+     * 鍝嶅簲鐨勬暟鎹牸寮忓涓嬪涓�:
+     * |浠庣珯锛�1byte | 鍔熻兘鐮侊細1byte | 鏁版嵁闀垮害锛�1byte | 鏁版嵁锛� N byte | CRC: 2BYTE|
      **/
     txAdu->expectRspLen = 1 + 1 + 1 + handle->dataLen + WX_MODBUS_CRC_LEN;
 
     return WX_SUCCESS;
 }
 
-/* 处理其他模块通过RS422写数据给外设的请求 */
+/* 澶勭悊鍏朵粬妯″潡閫氳繃RS422鍐欐暟鎹粰澶栬鐨勮姹� */
 UINT32 WX_RS422_MASTER_ProcWrDataReqMsg(WxRs422Master *this, WxMsg *msg)
 {
     UINT32 ret;
-    /* 把消息编码为ADU */
+    /* 鎶婃秷鎭紪鐮佷负ADU */
     ret = WX_RS422_MASTER_EncWrDataReqMsg2Adu((WxRs422MasterWrDataReqMsg*)msg, &this->txAdu);
     if (ret != WX_SUCCESS) {
         return ret;
     }
-    /* 发送ADU到RS422 Master的驱动 */
+    /* 鍙戦�丄DU鍒癛S422 Master鐨勯┍鍔� */
     ret = WX_RS422_MASTER_SendAdu2Driver(this, &this->txAdu);
     if (ret != WX_SUCCESS) {
         return ret;
     }
-    /* 记录发送者用于 */
+    /* 璁板綍鍙戦�佽�呯敤浜� */
     this->wrDataModule[msg->subMsgType] = msg->sender;
     return WX_SUCCESS;
 }
 
-/* 处理读数据请求 */
+/* 澶勭悊璇绘暟鎹姹� */
 UINT32 WX_RS422_MASTER_ProcRdDataReqMsg(WxRs422Master *this, WxMsg *msg)
 {
     UINT32 ret;
-    /* 编码读数据请求到MODBUS ADU */
+    /* 缂栫爜璇绘暟鎹姹傚埌MODBUS ADU */
     ret = WX_RS422_MASTER_EncRdDataReqMsg2Adu((WxRs422MasterRdDataReqMsg *)msg, &this->txAdu);
     if (ret != WX_SUCCESS) {
         return ret;
     }
-    /* 发送ADU到RS422 Master的驱动 */
+    /* 鍙戦�丄DU鍒癛S422 Master鐨勯┍鍔� */
     ret = WX_RS422_MASTER_SendAdu2Driver(this, &this->txAdu);
     if (ret != WX_SUCCESS) {
         return ret;
@@ -228,7 +228,7 @@ UINT32 WX_RS422_MASTER_Construct(VOID *module)
     }
     WX_CLEAR_OBJ(this);
 
-    /* 设置上Module */
+    /* 璁剧疆涓奙odule */
     WX_SetModuleInfo(module, this);
     return WX_SUCCESS;
 }

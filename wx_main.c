@@ -30,6 +30,9 @@ int main(void)
 	boot_debug("===========================================================");
 	boot_debug("======================WX BOOT STATT========================");
 	boot_debug("===========================================================");
+#ifdef __A_TEST__
+	boot_debug("this is test version!");
+#endif
 	boot_debug("WX_SetupFrame start...!");
 	UINT32 ret = WX_SetupFrame(WX_GetCurCoreId());
 	if (ret != WX_SUCCESS) {

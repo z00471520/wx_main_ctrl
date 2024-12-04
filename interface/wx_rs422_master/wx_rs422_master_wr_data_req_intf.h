@@ -6,6 +6,7 @@
 #include "wx_include.h"
 
 /******************************************************************************
+ * 消息大类：WX_MSG_TYPE_RS422_MASTER_WR_DATA_REQ
  * 写数据请求子类型定义
 ******************************************************************************/
 typedef enum {
@@ -18,11 +19,17 @@ typedef enum {
  * 写数据请求的结构体定义
 ******************************************************************************/
 typedef struct {
-
+	UINT8 data8;
+	UINT16 data16;
+	UINT32 data32;
+	UINT64 data64; 
 } WxRs422MasterWrDataX;
 
 typedef struct {
-    
+    UINT8 data8;
+	UINT16 data16;
+	UINT32 data32;
+	UINT64 data64; 
 } WxRs422MasterWrDataY;
 
 typedef struct {
@@ -31,6 +38,7 @@ typedef struct {
 		WxRs422MasterWrDataY NNN;
 	};
 }WxRs422MasterWrData;
+
 /******************************************************************************
  * RS422消息
  *****************************************************************************/

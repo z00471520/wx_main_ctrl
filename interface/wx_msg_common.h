@@ -9,7 +9,7 @@ typedef enum {
     WX_MSG_TYPE_INVALID,
     WX_MSG_TYPE_REMOTE_CTRL,        /* 遥控消息， see wx_remote_ctrl_msg_def.h for detail */
     WX_MSG_TYPE_CAN_FRAME,          /* CAN FRAME消息，see wx_msg_can_frame_intf.h for detail */
-    WX_MSG_TYPE_RS422_MASTER_DRIVER, /* WxRs422MasterDriverMsg */
+    WX_MSG_TYPE_RS422_MASTER_DRIVER_REQ, /* WxRs422MasterDriverMsg */
     /* RS422 master */
     WX_MSG_TYPE_RS422_MASTER_ADU_RSP,
     WX_MSG_TYPE_RS422_MASTER_WR_DATA_REQ, /* WxRs422MasterWrDatReqMsg */

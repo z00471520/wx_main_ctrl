@@ -7,56 +7,28 @@
 #include "wx_rs422_driver_master.h"
 #include "wx_rs422_slave_driver.h"
 #include "wx_can_slave.h"
+#include "wx_rs422_master.h"
+#include "wx_rs422_slave.h"
 #include "wx_frame.h"
 #include "wx_modules.h"
 #include "wx_tasks.h"
 #include "wx_debug.h"
 /* 妯″潡閮ㄧ讲淇℃伅 */
 WxModuleDeploy g_wxModuleDepolyInfos[] = {
-     {
-        "debug_c0",           /* 妯″潡鍚� */
-        WX_MODULE_DEBUG_C0,   /* 妯″潡ID */
-        WX_CORE_ID_0,                   /* 妯″潡杩愯鐨勬牳 */
-        "task_om",                  /* 椹卞姩浠诲姟鍚� */
-        WX_DEBUG_Construct,   /* 妯″潡鏋勫缓鍑芥暟-蹇呴�� */
-        WX_DEBUG_Destruct,    /* 妯″潡鏋愭瀯鍑芥暟 */
-        WX_DEBUG_Entry,       /* 妯″潡娑堟伅 */
-    },
+    {"debug_c0",        WX_MODULE_DEBUG_C0,  	WX_CORE_ID_0, "task_om",  	WX_DEBUG_Construct,  WX_DEBUG_Destruct, WX_DEBUG_Entry},
+    {"debug_c1",        WX_MODULE_DEBUG_C1,  	WX_CORE_ID_1, "task_om",  	WX_DEBUG_Construct,  WX_DEBUG_Destruct, WX_DEBUG_Entry},
+    {"debug_c2",        WX_MODULE_DEBUG_C2,  	WX_CORE_ID_2, "task_om",  	WX_DEBUG_Construct,  WX_DEBUG_Destruct, WX_DEBUG_Entry},
+    {"debug_c3",        WX_MODULE_DEBUG_C3,     WX_CORE_ID_3, "task_om",  	WX_DEBUG_Construct,  WX_DEBUG_Destruct, WX_DEBUG_Entry},
+    {"rs422_master",    WX_MODULE_RS422_MASTER, WX_CORE_ID_0, "task_main",  WX_RS422_MASTER_Construct, WX_RS422_MASTER_Destruct,  WX_RS422_MASTER_Entry},
+	{"rs422_slave",     WX_MODULE_RS422_SLAVE, 	WX_CORE_ID_0, "task_main",  WX_RS422Slave_Construct, WX_RS422Slave_Destruct,  WX_RS422Slave_Entry},
     {
-        "debug_c1",           /* 妯″潡鍚� */
-        WX_MODULE_DEBUG_C1,   /* 妯″潡ID */
-        WX_CORE_ID_1,                   /* 妯″潡杩愯鐨勬牳 */
-        "task_om",                  /* 椹卞姩浠诲姟鍚� */
-        WX_DEBUG_Construct,   /* 妯″潡鏋勫缓鍑芥暟-蹇呴�� */
-        WX_DEBUG_Destruct,    /* 妯″潡鏋愭瀯鍑芥暟 */
-        WX_DEBUG_Entry,       /* 妯″潡娑堟伅 */
-    },
-    {
-        "debug_c2",           /* 妯″潡鍚� */
-        WX_MODULE_DEBUG_C2,   /* 妯″潡ID */
-        WX_CORE_ID_2,                   /* 妯″潡杩愯鐨勬牳 */
-        "task_om",                  /* 椹卞姩浠诲姟鍚� */
-        WX_DEBUG_Construct,   /* 妯″潡鏋勫缓鍑芥暟-蹇呴�� */
-        WX_DEBUG_Destruct,    /* 妯″潡鏋愭瀯鍑芥暟 */
-        WX_DEBUG_Entry,       /* 妯″潡娑堟伅 */
-    },
-    {
-        "debug_c3",      /* 妯″潡鍚� */
-        WX_MODULE_DEBUG_C3,   /* 妯″潡ID */
-        WX_CORE_ID_3,          /* 妯″潡杩愯鐨勬牳 */
-        "task_om",                  /* 椹卞姩浠诲姟鍚� */
-        WX_DEBUG_Construct,   /* 妯″潡鏋勫缓鍑芥暟-蹇呴�� */
-        WX_DEBUG_Destruct,    /* 妯″潡鏋愭瀯鍑芥暟 */
-        WX_DEBUG_Entry,       /* 妯″潡娑堟伅 */
-    },
-    {
-        "can_slave_a",      /* 妯″潡鍚� */
-        WX_MODULE_CAN_SLAVE_A,/* 妯″潡ID */
-        WX_CORE_ID_0,              /* 妯″潡杩愯鐨勬牳  */
-        "task_main",               /* 妯″潡杩愯鐨勬牳鍐呬换鍔″悕 */
-        WX_CAN_SLAVE_Construct,  /* 妯″潡鏋勫缓鍑芥暟-蹇呴�� */
-        WX_CAN_SLAVE_Destruct,   /* 妯″潡鏋愭瀯鍑芥暟 */
-        WX_CAN_SLAVE_Entry,      /* 妯″潡娑堟伅 */
+        "can_slave_a",   
+        WX_MODULE_CAN_SLAVE_A,
+        WX_CORE_ID_0,              
+        "task_main",              
+        WX_CAN_SLAVE_Construct,   
+        WX_CAN_SLAVE_Destruct,    
+        WX_CAN_SLAVE_Entry,       
     },
     {
         "can_slave_b",     
@@ -79,29 +51,29 @@ WxModuleDeploy g_wxModuleDepolyInfos[] = {
     {
         "driver_can_b",      
         WX_MODULE_DRIVER_CAN_B, /* 妯″潡ID */
-        WX_CORE_ID_0,                /* 妯″潡杩愯鐨勬牳 */
-        "task_driver",               /* 椹卞姩浠诲姟鍚� */
-        WX_CAN_DRIVER_Construct,   /* 妯″潡鏋勫缓鍑芥暟-蹇呴�� */
-        WX_CAN_DRIVER_Destruct,    /* 妯″潡鏋愭瀯鍑芥暟 */
-        WX_CAN_DRIVER_Entry,       /* 妯″潡娑堟伅 */
+        WX_CORE_ID_0,               
+        "task_driver",               
+        WX_CAN_DRIVER_Construct,    
+        WX_CAN_DRIVER_Destruct,     
+        WX_CAN_DRIVER_Entry,        
     },
     {
-        "driver_rs422_master",       /* 妯″潡鍚� */
+        "driver_rs422_master",    
         WX_MODULE_DRIVER_RS422_MASTER, /* 妯″潡ID */
-        WX_CORE_ID_0,                /* 妯″潡杩愯鐨勬牳 */
-        "task_driver",               /* 椹卞姩浠诲姟鍚� */
-        WX_RS422MasterDriver_Construct,   /* 妯″潡鏋勫缓鍑芥暟-蹇呴�� */
-        WX_RS422MasterDriver_Destruct,    /* 妯″潡鏋愭瀯鍑芥暟 */
-        WX_RS422MasterDriver_Entry,       /* 妯″潡娑堟伅 */
+        WX_CORE_ID_0,               
+        "task_driver",               
+        WX_RS422MasterDriver_Construct,    
+        WX_RS422MasterDriver_Destruct,     
+        WX_RS422MasterDriver_Entry,        
     },
     {
-        "driver_rs422_slave",           /* 妯″潡鍚� */
-        WX_MODULE_DRIVER_RS422_SLAVE,   /* 妯″潡ID */
-        WX_CORE_ID_0,                   /* 妯″潡杩愯鐨勬牳 */
-        "task_driver",                  /* 椹卞姩浠诲姟鍚� */
-        WX_RS422SlaveDriver_Construct,   /* 妯″潡鏋勫缓鍑芥暟-蹇呴�� */
-        WX_RS422SlaveDriver_Destruct,    /* 妯″潡鏋愭瀯鍑芥暟 */
-        WX_RS422SlaveDriver_Entry,       /* 妯″潡娑堟伅 */
+        "driver_rs422_slave",        
+        WX_MODULE_DRIVER_RS422_SLAVE,  
+        WX_CORE_ID_0,                  
+        "task_driver",                  
+        WX_RS422SlaveDriver_Construct,    
+        WX_RS422SlaveDriver_Destruct,     
+        WX_RS422SlaveDriver_Entry,        
     },
 };
 

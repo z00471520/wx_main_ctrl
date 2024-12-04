@@ -45,6 +45,7 @@ UINT32 WX_RegModuleRouter(WxModuleId moduleId, UINT8 coreId,
     this->coreId = coreId;
     this->belongTask = belongTask;
     this->belongModule = belongModule;
+    boot_debug("module(%u) coreId = %u", moduleId, coreId);
     return WX_SUCCESS;
 }
 
@@ -64,10 +65,10 @@ UINT32 WX_CheckSheduleReq(UINT8 sender, UINT8 receiver, VOID *msg)
     }
     return WX_SUCCESS;
 }
-/* 璁＄畻娑堟伅鐨勫彂閫佹柟寮� */
+/* calculate msg send method */
 WxMsgSendMethod WX_MsgSchedule_CalcMsgSendMethod(WxModuleRouter *sender, WxModuleRouter *receiver)
 {
-    /* 鏍镐笉鍚屼笉鑳界洿鎺ュ彂閫佹秷鎭� */
+    /* if the receiver is in the same core with sender, send msg to task */
     if (receiver->coreId != sender->coreId) {
         return WX_MSG_SEND_TO_CORE;
     } else {
@@ -86,6 +87,10 @@ UINT32 WX_SheduleMsgToCore(WxModuleRouter *receiver, VOID *msg)
 UINT32 WX_SheduleMsgToTask(WxModuleRouter *receiver, VOID *msg)
 {
     WxTask *task = receiver->belongTask;
+    if (task == NULL) {
+        wx_excp_cnt(WX_EXCP_TYPE_TASK_HANDLE_NULL);
+        return WX_MSG_DISPATCH_NO_TASK_HANDLE;
+    }
     WxMsg *msgHead = (WxMsg *)msg;
     UINT32 sendResult;
     if (msgHead->isFromISR) {
@@ -99,15 +104,7 @@ UINT32 WX_SheduleMsgToTask(WxModuleRouter *receiver, VOID *msg)
     }
     return WX_SUCCESS;
 }
-
-
-/*
- * 鍑芥暟鍔熻兘锛氭秷鎭皟搴︼紝鐢ㄤ簬鍙戦�佹秷鎭埌鎸囧畾鐨勬ā鍧�
- * 鍙傛暟璇存槑
- * sender锛氬彂閫佽�呮ā鍧桰D
- * receiver锛氭帴鏀惰�呮ā鍧桰D
- * msg锛氭秷鎭綋鎸囬拡
- **/
+/* shedule msg */
 UINT32 WX_MsgShedule(UINT8 sender, UINT8 receiver, VOID *msg)
 {
     UINT32 ret = WX_CheckSheduleReq(sender, receiver, msg);
@@ -118,18 +115,13 @@ UINT32 WX_MsgShedule(UINT8 sender, UINT8 receiver, VOID *msg)
     WxMsg *msgHead = (WxMsg *)msg;
     msgHead->sender = sender;
     msgHead->receiver = receiver;
+    
     WxModuleRouter *dstRouter = &g_wxModuleRouterList->routers[receiver];
-    WxModuleRouter *srcRouter = &g_wxModuleRouterList->routers[sender];
-    WxMsgSendMethod sendMethod = WX_MsgSchedule_CalcMsgSendMethod(srcRouter, dstRouter);
-    switch (sendMethod) {
-        case WX_MSG_SEND_TO_CORE: {
-            return WX_SheduleMsgToCore(dstRouter, msg);
-        }
-        case WX_MSG_SEND_TO_TASK: {
-            ret = WX_SheduleMsgToTask(dstRouter, msg);
-            return ret;
-        }         
-        default:
-            return WX_MSG_DISPATCH_INVALID_SEND_METHOD;
+    if (WX_GetCurCoreId() != dstRouter->coreId) {
+        ret = WX_SheduleMsgToCore(dstRouter, msg);
+    } else {
+        ret = WX_SheduleMsgToTask(dstRouter, msg);
     }
+
+    return ret;
 }

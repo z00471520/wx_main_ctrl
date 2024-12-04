@@ -7,7 +7,7 @@ typedef enum {
     WX_SUB_MSG_RS422_DRIVER_MASTER_TX_ADU = 0x01,
 } WxRs422MasterDriverSubMsgId;
 
-/* WX_MSG_TYPE_RS422_MASTER_DRIVER */
+/* WX_MSG_TYPE_RS422_MASTER_DRIVER_REQ */
 typedef struct {
     WX_INHERIT_MSG_HEADER
     union {

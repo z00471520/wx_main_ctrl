@@ -196,7 +196,7 @@ UINT32 WX_RS422MasterDriver_Construct(VOID *module)
 UINT32 WX_RS422MasterDriver_Entry(VOID *module, WxMsg *evtMsg)
 {
     WxRs422DriverMaster *this = WX_GetModuleInfo(module);
-    if (evtMsg->msgType != WX_MSG_TYPE_RS422_MASTER_DRIVER) {
+    if (evtMsg->msgType != WX_MSG_TYPE_RS422_MASTER_DRIVER_REQ) {
         return WX_RS422_MASTER_DRIVER_UNSPT_MSGTYPE;
     }
     /* 瀛愭秷鎭被鍨� */

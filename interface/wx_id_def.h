@@ -20,6 +20,8 @@ typedef enum {
  *****************************************************************************/
 typedef enum {
     WX_MODULE_INVALID, /* this is invalid module ID */
+    WX_MODULE_TEST, /* for test */
+    WX_MODULE_CAN_MASTER,
     WX_MODULE_CAN_SLAVE_A,
     WX_MODULE_CAN_SLAVE_B,
     WX_MODULE_RS422_MASTER,
