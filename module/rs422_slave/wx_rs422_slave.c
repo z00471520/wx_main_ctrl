@@ -25,8 +25,6 @@ UINT32 WX_RS422Slave_SendAdu2Driver(WxRs422Slave *this, UINT8 receiver, WxModbus
     if (msg == NULL) {
         return WX_APPLY_EVT_MSG_ERR;
     }
-    /* 初始化消息头 */
-    WX_CLEAR_OBJ((WxMsg *)msg);
     /* 填写消息信息 */
     msg->sender = this->moduleId;
     msg->receiver = receiver;

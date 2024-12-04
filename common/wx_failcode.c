@@ -1,6 +1,6 @@
 #include "wx_failcode.h"
 #include "wx_include.h"
-UINT64 g_wxfailCodeCnt[WX_FAIL_CODE_BUTT] = {1,};
+UINT64 g_wxfailCodeCnt[WX_FAIL_CODE_BUTT] = {0};
 #define WX_FAIL_CODE_DEF(c) [c] = #c
 CHAR *g_wxFailCodeDesc[WX_FAIL_CODE_BUTT] = {
     WX_FAIL_CODE_DEF(WX_OK),
@@ -150,7 +150,7 @@ VOID WX_FailCode_DbgShow(char *argv[], UINT32 argc)
 	wx_show("-------------");
 	wx_show("%-64s %s", "FailCode", "CntValue");
     UINT64 cntValue = 0;
-	for (UINT32 i = 0; i < WX_EXCP_CNT_BUTT; i++) {
+	for (UINT32 i = 0; i < WX_FAIL_CODE_BUTT; i++) {
         cntValue = g_wxfailCodeCnt[i];
 		if (cntValue == 0) {
 			continue;

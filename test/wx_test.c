@@ -25,8 +25,7 @@ VOID WX_TestHandle(VOID *param)
 			boot_debug("WX_ApplyEvtMsg fail");
 			return;
 		}
-		/* clear the message */
-		WX_CLEAR_OBJ((WxMsg *)msg);
+
 		/* init the message */
 		msg->sender = WX_MODULE_TEST;
 		msg->receiver = WX_MODULE_RS422_MASTER;

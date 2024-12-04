@@ -34,9 +34,11 @@ typedef struct tagWxTaskDeployInfo{
 
 /* 妯″潡瀹氫箟 */
 typedef struct {
-    CHAR *moduleName;                   /* 妯″潡鍚嶅瓧 */
-    UINT8 coreId;                       /* 妯″潡閮ㄧ讲鐨勬牳ID,WxCoreId */
-    WxModuleId moduleId;                /* 妯″潡ID */
+    CHAR *moduleName;                   /* Module name */
+    UINT8 coreId;                       /* Module core ID */
+    UINT8 resv;
+    UINT16 res16;
+    WxModuleId moduleId;                /* Module ID */
     VOID *moduleInfo;                   /* 鑷畾涔夌殑妯″潡淇℃伅 */
     VOID *belongTask;             	    /* 妯″潡鎵�灞炵殑浠诲姟 */
     WxModuleConstructFunc   constructFunc; /* 妯″潡鐨勬瀯寤哄嚱鏁� */

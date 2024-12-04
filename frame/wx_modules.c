@@ -13,7 +13,7 @@
 #include "wx_modules.h"
 #include "wx_tasks.h"
 #include "wx_debug.h"
-/* 妯″潡閮ㄧ讲淇℃伅 */
+/* module deploy info */
 WxModuleDeploy g_wxModuleDepolyInfos[] = {
     {"debug_c0",        WX_MODULE_DEBUG_C0,  	WX_CORE_ID_0, "task_om",  	WX_DEBUG_Construct,  WX_DEBUG_Destruct, WX_DEBUG_Entry},
     {"debug_c1",        WX_MODULE_DEBUG_C1,  	WX_CORE_ID_1, "task_om",  	WX_DEBUG_Construct,  WX_DEBUG_Destruct, WX_DEBUG_Entry},
@@ -78,18 +78,19 @@ WxModuleDeploy g_wxModuleDepolyInfos[] = {
 };
 
 
-/* 鎶婁竴涓换鍔￠儴缃插埌妯″潡 */
+/* deploy one module on current task */
 UINT32 WX_DeployOneModule(WxTask *task, WxModule *module, WxModuleDeploy *moduleDeploy)
 {
     WX_CLEAR_OBJ(module);
     module->moduleName = moduleDeploy->moduleName;
-    module->coreId = task->coreId;
+    module->coreId = WX_GetCurCoreId();
     module->moduleId = moduleDeploy->moduleId;
     module->constructFunc    = moduleDeploy->constructFunc;
     module->destructFunc     = moduleDeploy->destructFunc;
     module->entryFunc        = moduleDeploy->entryFunc;
     module->belongTask     = task;
-
+    boot_debug("Deploy Module(%s, %u) to Task(%s) Core(%u) success!", module->moduleName,
+        module->moduleId, task->taskName, module->coreId);
     if (moduleDeploy->constructFunc == NULL) {
         return WX_MODULE_CONSTRUCT_FUNC_NULL;
     }

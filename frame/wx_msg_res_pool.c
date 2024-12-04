@@ -43,7 +43,8 @@ VOID *WX_ApplyEvtMsgFromISR(WxMsgType msgType)
     if (xQueueReceiveFromISR(g_wxEvtMsgPool->evtMsgQue, (void *)&evtMsg, (TickType_t)0) != pdPASS) {
         return NULL;
     }
-    WX_CLEAR_OBJ(evtMsg);
+    /* init by value opr */
+    *((UINT64 *)evtMsg) = 0;
     evtMsg->msgType = msgType;
     evtMsg->isFromISR = TRUE;
     return evtMsg;
@@ -55,17 +56,18 @@ VOID *WX_ApplyEvtMsg(WxMsgType msgType)
     if (xQueueReceive(g_wxEvtMsgPool->evtMsgQue, (void *)&evtMsg, (TickType_t)0) != pdPASS) {
         return NULL;
     }
-    WX_CLEAR_OBJ(evtMsg);
+    /* init by value opr */
+    *((UINT64 *)evtMsg) = 0;
     evtMsg->msgType = msgType;
     return evtMsg;
 }
-/* 闈炰腑鏂噴鏀� */
+/* normal task */
 VOID WX_FreeEvtMsg(WxMsg **pp)
 {
     if (*pp == NULL) {
         return;
     }
-    /* 鑺傜偣鑺傜偣鍒版秷鎭槦鍒� */
+    /* sent the msg to que for future use */
     if (xQueueSend(g_wxEvtMsgPool->evtMsgQue, (VOID *)pp, (TickType_t)0) != pdPASS) {
         return;
     }

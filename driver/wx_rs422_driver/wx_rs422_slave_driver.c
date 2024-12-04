@@ -30,9 +30,6 @@ VOID WX_RS422SlaveDriver_SentRxAdu2Upper(WxRs422SlaverDriver *this, WxModbusAdu 
         return;
     }
 
-    /* clear the object */
-    WX_CLEAR_OBJ((WxMsg *)msg);
-
     /* set the message content */
     msg->sender = this->moduleId;
     msg->receiver = this->upperModuleId;

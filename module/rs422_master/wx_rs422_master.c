@@ -13,8 +13,7 @@ UINT32 WX_RS422_MASTER_SendAdu2Driver(WxRs422Master *this, WxModbusAdu *adu)
     if (msg == NULL) {
         return WX_APPLY_EVT_MSG_ERR;
     }
-    /* clear the message */
-    WX_CLEAR_OBJ(msg);
+
     /* init the message */
     msg->sender = this->moduleId;
     msg->receiver = WX_MODULE_DRIVER_RS422_MASTER;
@@ -48,19 +47,20 @@ UINT32 WX_RS422_MASTER_ProcRdDataRspAduMsg(WxRs422Master *this, WxRs422MasterRsp
 
     /* 鐢宠鍝嶅簲娑堟伅 */
     WxRs422MasterRdDataRspMsg *rdDataRspMsg = WX_ApplyEvtMsg(WX_MSG_TYPE_RS422_MASTER_RD_DATA_RSP);
-    /* 鍒濆鍖栨秷鎭� */
-    WX_CLEAR_OBJ((WxMsg *)rdDataRspMsg);
+    if (rdDataRspMsg == NULL) {
+        return WX_APPLY_EVT_MSG_ERR;
+    }
+    /* set the message data */
     rdDataRspMsg->subMsgType = rxAdu->subMsgType;
-    /* 璋佽鐨勫氨鍙戠粰璋� */
+    rdDataRspMsg->sender = this->moduleId;
     rdDataRspMsg->receiver = this->rdDataModule[rspAduMsg->rspAdu.subMsgType];
-    /* 濡傛灉澶辫触鍛婅瘔瀵规柟澶辫触鐮� */
     if (rspAduMsg->rspAdu.failCode != WX_SUCCESS) {
         rdDataRspMsg->rsp.failCode = rspAduMsg->rspAdu.failCode;
     } else {
     	/* 闇�瑕佽繘琛岃В鐮� */
         rdDataRspMsg->rsp.failCode = WX_RS422_MASTER_DecRdDataAdu(rxAdu, &rdDataRspMsg->rsp.data);
     }
-    ret = WX_MsgShedule(this->moduleId, rdDataRspMsg->receiver, rdDataRspMsg);
+    ret = WX_MsgShedule(rdDataRspMsg->sender, rdDataRspMsg->receiver, rdDataRspMsg);
     if (ret != WX_SUCCESS) {
         WX_FreeEvtMsg((WxMsg **)&rdDataRspMsg);
     }
@@ -70,15 +70,16 @@ UINT32 WX_RS422_MASTER_ProcRdDataRspAduMsg(WxRs422Master *this, WxRs422MasterRsp
 
 UINT32 WX_RS422_MASTER_ProcWrDataRspAduMsg(WxRs422Master *this, WxRs422MasterRspAduMsg *rspAduMsg)
 {
-    /* 鐢宠鍝嶅簲娑堟伅 */
+    /* apply the message */
     WxRs422MasterWrDatRspMsg *wrDataRspMsg = WX_ApplyEvtMsg(WX_MSG_TYPE_RS422_MASTER_WR_DATA_RSP);
-    /* 鍒濆鍖栨秷鎭� */
-    WX_CLEAR_OBJ((WxMsg *)wrDataRspMsg);
+    if (wrDataRspMsg == NULL) {
+        return WX_APPLY_EVT_MSG_ERR;
+    }
     wrDataRspMsg->rsp.subMsgType = rspAduMsg->rspAdu.subMsgType;
     wrDataRspMsg->rsp.failCode = rspAduMsg->rspAdu.failCode;
-
-    UINT8 reciever = this->wrDataModule[rspAduMsg->rspAdu.subMsgType];
-    UINT32 ret = WX_MsgShedule(this->moduleId, reciever, wrDataRspMsg);
+    wrDataRspMsg->sender = this->moduleId;
+    wrDataRspMsg->receiver = this->wrDataModule[rspAduMsg->rspAdu.subMsgType];
+    UINT32 ret = WX_MsgShedule(this->moduleId, wrDataRspMsg->receiver, wrDataRspMsg);
     if (ret != WX_SUCCESS) {
         WX_FreeEvtMsg((WxMsg **)&wrDataRspMsg);
     }
@@ -111,6 +112,7 @@ UINT32 WX_RS422_MASTER_EncWrDataReqMsg2Adu(WxRs422MasterWrDataReqMsg *msg, WxMod
     if (handle->encStruct == NULL) {
         return WX_RS422_MASTER_WR_REQ_ENCODE_FUNC_UNDEF;
     }
+    WX_CLEAR_OBJ(adu);
     UINT16 dataAddr = (UINT16)handle->dataAddr;
     /* slave address */
     adu->value[WX_MODBUS_ADU_WR_REQ_SLAVE_ADDR_IDX] = handle->slaveDevice;      
@@ -228,8 +230,8 @@ UINT32 WX_RS422_MASTER_Construct(VOID *module)
         return WX_MEM_ALLOC_FAIL;
     }
     WX_CLEAR_OBJ(this);
+    this->moduleId = WX_GetModuleId(module);
 
-    /* 璁剧疆涓奙odule */
     WX_SetModuleInfo(module, this);
     return WX_SUCCESS;
 }
@@ -265,6 +267,7 @@ UINT32 WX_RS422_MASTER_Entry(VOID *module, WxMsg *msg)
         }
         default: {
         	ret = WX_RS422_MASTER_UNSPT_MSGTYPE;
+            wx_critical("Error Exit:unsppt msg type(%u)", msg->msgType);
         	break;
         }
     }

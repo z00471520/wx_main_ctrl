@@ -9,15 +9,15 @@ UINT32 WX_CAN_SLAVE_DecRmtCtrlPduReset(VOID *this, WxRmtCtrlPdu *pdu, WxRmtCtrlR
     return WX_SUCCESS;
 }
 
-/* 解码接收到远程遥控PDU */
+/* 瑙ｇ爜鎺ユ敹鍒拌繙绋嬮仴鎺DU */
 UINT32 WX_CAN_SLAVE_DecRmtCtrlPdu(WxCanSlave *this, WxRmtCtrlPdu *pdu, WxRmtCtrlReqMsg *msg)
 {
-    UINT16 rmtCtrlCode = (UINT16)pdu->rmtCtrlCode; /* 閬ユ帶鎸囦护鐮� */
+    UINT16 rmtCtrlCode = (UINT16)pdu->rmtCtrlCode; /* 闁儲甯堕幐鍥︽姢閻拷 */
     if (rmtCtrlCode >= WX_RMT_CTRL_CODE_BUTT) {
-        wx_critical(WX_EXCP_CAN_SLAVE_INVALID_CTRL_CODE, "Error Exit: unknown rmtCtrlCode(%u)", rmtCtrlCode);
+        wx_critical("Error Exit: unknown rmtCtrlCode(%u)", rmtCtrlCode);
         return WX_CAN_SLAVE_INVALID_RMT_CTRL_CODE;
     }
-    /* 获取指令码对应的解码handle  */
+    /* 鑾峰彇鎸囦护鐮佸搴旂殑瑙ｇ爜handle  */
     WxRmtCtrlReqHandle *handle = &g_wxRmtCtrlReqHandles[rmtCtrlCode];
     if (handle == NULL) {
         return WX_CAN_SLAVE_CTRL_CODE_DEC_UNSPT;
@@ -25,7 +25,7 @@ UINT32 WX_CAN_SLAVE_DecRmtCtrlPdu(WxCanSlave *this, WxRmtCtrlPdu *pdu, WxRmtCtrl
     return handle->decHandle(this, pdu, msg);
 }
 
-/* 编码PDU数据到CAN帧数据 */
+/* 缂栫爜PDU鏁版嵁鍒癈AN甯ф暟鎹� */
 UINT32 WX_CAN_SLAVE_EncapPdu2CanFrames(WxCanSlave *this, WxRmtCtrlPdu *pdu, WxCanFrameList *canFrameList)
 {
     canFrameList->canFrameNum = 0;
@@ -48,7 +48,7 @@ UINT32 WX_CAN_SLAVE_EncapPdu2CanFrames(WxCanSlave *this, WxRmtCtrlPdu *pdu, WxCa
     UINT16 cnt = 0;
     for (UINT32 i = 0; i < frameNum; i++) {
         curFrame = &canFrameList->canFrames[i];
-        /* 娓呮瀵硅薄 */
+        /* 濞撳懏顨熺�电钖� */
         WX_CLEAR_OBJ(curFrame);
         curFrame->standardMessID = messID;
         curFrame->dataLengCode = canFrameDataLen;

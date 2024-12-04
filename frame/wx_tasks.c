@@ -62,8 +62,14 @@ UINT32 WX_ProcTaskMsg(WxTask *task, WxMsg *evtMsg)
     if (task->modules[reciver].entryFunc == NULL) {
         return WX_ERR_NO_ENTRY_FUNC;
     }
-
-    return task->modules[reciver].entryFunc(&task->modules[reciver], evtMsg);
+    wx_debug("@@@module <%s> proc msg(%u, %u) start...", task->modules[reciver].moduleName,
+            evtMsg->msgType, evtMsg->subMsgType);
+    UINT32 ret = task->modules[reciver].entryFunc(&task->modules[reciver], evtMsg);
+    if (ret != WX_SUCCESS) {
+        wx_debug("@@@module <%s> proc msg(%u, %u) fail(%u)!", task->modules[reciver].moduleName,
+            evtMsg->msgType, evtMsg->subMsgType, ret);
+    }
+    return ret;
 }
 
 VOID WX_TaskHandle(VOID *param)
@@ -122,6 +128,7 @@ UINT32 WX_DeployTasks_DeployTask(WxTask *task, WxTaskDeploy *taskDeploy)
 {
     WX_CLEAR_OBJ(task);
     task->taskName = taskDeploy->taskName;
+    task->coreId = WX_GetCurCoreId();
     boot_debug("Deploy task(%s) start...", taskDeploy->taskName);
 
     if (taskDeploy->msgQueDepth > 0) {

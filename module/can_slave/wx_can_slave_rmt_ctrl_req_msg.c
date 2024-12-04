@@ -15,7 +15,7 @@ WxRmtCtrlReqMsgHandle g_wxRmtCtrlReqMsgHandle[WX_RMT_CTRL_REQ_MSG_TYPE_BUTT] = {
 UINT32 WX_CAN_SLAVE_ProcRmtCtrlReqMsg(WxCanSlave *this, WxRmtCtrlReqMsg *reqMsg)
 {
     if (reqMsg->type >= WX_RMT_CTRL_REQ_MSG_TYPE_BUTT) {
-        wx_critical(WX_EXCP_CAN_SLAVE_INVALID_REQ_MSG_TYPE, "Error Exit: unknown reqMsg->type(%u)", reqMsg->type);
+        wx_critical("Error Exit: unknown reqMsg->type(%u)", reqMsg->type);
         return WX_CAN_SLAVE_INVALID_REQ_MSG_TYPE;
     }
     WxRmtCtrlReqMsgHandle handle = g_wxRmtCtrlReqMsgHandle[reqMsg->type];

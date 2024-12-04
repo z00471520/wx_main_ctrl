@@ -7,7 +7,7 @@
 
 #define WX_CLEAR_OBJ(op) 			\
 do {								\
-	memset((op), sizeof(*(op)), (UINT8)0);\
+	memset((op), 0, sizeof(*(op))); \
 } while(0)
 
 
@@ -20,6 +20,5 @@ do {					\
 } while (FALSE)
 
 #define WX_8BYTE_ALIGN_SIZE(size) (((size) + 7 / 8) * 8)
-// only for boot debug
-#define boot_debug(fmt, args...) xil_printf("%-32s:%3d: "fmt"\r\n", __FILE__, __LINE__, ##args)
+
 #endif
