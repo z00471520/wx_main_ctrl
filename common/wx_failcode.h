@@ -1,6 +1,6 @@
 #ifndef WX_FAILCODE_H
 #define WX_FAILCODE_H
-
+#include "wx_typedef.h"
 typedef enum {
     WX_OK = 0,
     WX_SUCCESS = WX_OK,
@@ -30,6 +30,7 @@ typedef enum {
     WX_MSG_DISPATCH_INVALID_SENDER,
     WX_MSG_DISPATCH_NO_TASK_HANDLE,
     WX_MSG_DISPATCH_NO_MSG_ROUTER_LIST,
+	WX_MSG_SH_MODULE_NOT_REG_ROUTER,
 	WX_CAN_DRIVER_MSG_TYPE_INVALID,
     WX_UART_NS550_INTR_DEVICE_UNREADY,
     WX_UART_NS550_INTR_HANDLE_NULL,
@@ -158,7 +159,10 @@ typedef enum {
     WX_DBG_Str2U32_OUT_OF_RANGE,
     WX_DEBUG_MALLOC_ERR,
 
+    /* 其他 */
+    WX_FAIL_CODE_BUTT,
 } WxFailCode;
-
-#define wx_fail_code_cnt(c)
+UINT64 g_wxfailCodeCnt[WX_FAIL_CODE_BUTT];
+#define wx_fail_code_cnt(c) (g_wxfailCodeCnt[c]++)
+VOID WX_FailCode_DbgShow(char *argv[], UINT32 argc);
 #endif

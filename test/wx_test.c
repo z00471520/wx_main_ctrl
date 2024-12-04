@@ -18,7 +18,6 @@ VOID WX_TestHandle(VOID *param)
 
 		WX_RegModuleRouter(WX_MODULE_TEST, 1, testTask, NULL);
 
-
 		/* create a event message */
 		WxRs422MasterWrDataReqMsg *msg = WX_ApplyEvtMsg(WX_MSG_TYPE_RS422_MASTER_WR_DATA_REQ);
 		if (msg == NULL) {
@@ -45,7 +44,10 @@ VOID WX_TestHandle(VOID *param)
 			WX_FreeEvtMsg((WxMsg **)&msg);
 		}
     } while(0);
-
+    usleep(1000000);
+	WX_NormCnt_DbgShow(NULL, 0);
+	WX_ExcpCnt_DbgShow(NULL, 0);
+	WX_FailCode_DbgShow(NULL, 0);
     boot_debug("Test task finish");
     vTaskDelete(NULL);
 }

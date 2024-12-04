@@ -26,7 +26,7 @@ WxTaskDeploy g_wxTaskDeployInfo[] = {
          .taskName = "task_om",
          .msgQueDepth = 8192,       
          .stackDepth = 1600,
-         .priority = 5, 
+         .priority = 6,
          .coreIdMask = WX_CORE_ID_0 + WX_CORE_ID_1 + WX_CORE_ID_2 + WX_CORE_ID_3, 
          .taskHanlder = WX_TaskHandle,
     },
@@ -43,7 +43,7 @@ WxTaskDeploy g_wxTaskDeployInfo[] = {
          .taskName = "task_test",  
          .msgQueDepth = 0,
          .stackDepth = 1600, 
-         .priority = 8,
+         .priority = 5,
          .coreIdMask = WX_CORE_ID_0 + WX_CORE_ID_1 + WX_CORE_ID_2 + WX_CORE_ID_3,
          .taskHanlder = WX_TestHandle,
     },
@@ -53,6 +53,7 @@ WxTaskDeploy g_wxTaskDeployInfo[] = {
 
 UINT32 WX_ProcTaskMsg(WxTask *task, WxMsg *evtMsg)
 {
+	wx_debug("task(%s) receive msg(%u, %u)", task->taskName, evtMsg->msgType, evtMsg->subMsgType);
     UINT32 reciver = evtMsg->receiver;
     if (!WX_IsValidModuleId(reciver)) {
         return WX_INVALID_MODULE_ID ;
@@ -164,6 +165,6 @@ UINT32 WX_DeployTasks(UINT8 curCoreId)
         }
         taskList->taskNum++;
     }
-    boot_debug("Delploy tasks on core[%u] success! taskNum=%u", curCoreId, taskList->taskNum);
+    boot_debug("Deploy tasks(%u) on core[%u] success!", taskList->taskNum, curCoreId);
     return WX_SUCCESS;
 }

@@ -32,13 +32,13 @@ UINT32 WX_RS422_MASTER_DecRdDataAdu(WxModbusAdu *rxAdu, WxRs422MasterReadData *r
 /******************************************************************************
  * 写数据相关
  **/
-/* 返回编码的长度 */
-typedef UINT8 (*WxRs422MasterEncStructFunc)(UINT8 buf[], UINT8 bufSize, VOID *data);
+/* 返回编码的长度 data is the struct to be encoded */
+typedef UINT8 (*WxRs422MasterEncStructFunc)(WxModbusAdu *adu, WxRs422MasterWrData *data);
 /* 不同写请求对应的编码信息 */
 typedef struct {
     WxRs422MasterSlaveAddrDef slaveDevice; /* 写操作对应从机设备ID */
     UINT32 dataAddr; /* 写操作的数据地址 */
-    WxRs422MasterEncStructFunc encStruct; /* 数据结构体编码函数 */
+    WxRs422MasterEncStructFunc encStruct; /* write data struct to data stream, 数据结构体编码函数 */
 } WxRs422MasterWrDataEncHandle;
 WxRs422MasterWrDataEncHandle* WX_RS422_MASTER_GetWrDataHandle(UINT16 subMsgType);
 WxRs422MasterRdDataHandle g_wxRs422MasterReadDataHandles[WX_RS422_MASTER_MSG_READ_DATA_BUTT];

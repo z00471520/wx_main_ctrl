@@ -104,7 +104,7 @@ UINT32 WX_RS422_MASTER_ProRspcAduMsg(WxRs422Master *this, WxMsg *msg)
     }
 }
 
-/* |salve address: 1byte| func code: 1byte| data addr: 2byte | data len锛�1byte | data: N | */
+/* |salve address: 1byte| func code: 1byte| data addr: 2byte | data len : 1byte | data: N | crc: 2byte | */
 UINT32 WX_RS422_MASTER_EncWrDataReqMsg2Adu(WxRs422MasterWrDataReqMsg *msg, WxModbusAdu *adu)
 {
     WxRs422MasterWrDataEncHandle *handle = WX_RS422_MASTER_GetWrDataHandle(msg->subMsgType);
@@ -122,26 +122,27 @@ UINT32 WX_RS422_MASTER_EncWrDataReqMsg2Adu(WxRs422MasterWrDataReqMsg *msg, WxMod
     adu->value[WX_MODBUS_ADU_WR_REQ_DATA_ADDR_LO_IDX] = (UINT8)(dataAddr & 0xff);         
     adu->valueLen = 4;
 
-    /* the length size can be used to encode */
-    UINT16 lelfLen = WX_MODBUS_ADU_MAX_SIZE - adu->valueLen - WX_MODBUS_CRC_LEN; /* the crc and adu len */
-    /* 4 is the data length */
-    adu->value[WX_MODBUS_ADU_WR_REQ_DATA_LEN_IDX] = 
-        handle->encStruct(&adu->value[WX_MODBUG_ADU_WR_REQ_DATA_START_IDX], lelfLen, &msg->wrData);
-    if (adu->value[WX_MODBUS_ADU_WR_REQ_DATA_LEN_IDX] == 0) {
+    /* data length not decided yet, so ignore it */
+    adu->valueLen = 5;
+   
+    /* set the data field by encode function */
+    UINT8 dataLen = handle->encStruct(adu, &msg->wrData);
+    if (dataLen == 0) {
         return WX_RS422_MASTER_WR_REQ_ENCODE_FAIL;
     }
-     /* 缂栫爜adu[4]瀛樻斁鐨勬槸闀垮害锛屽叾鏈韩鍗犵敤1瀛楄妭  */
-    adu->valueLen += adu->value[WX_MODBUS_ADU_WR_REQ_DATA_LEN_IDX] + 1;
+    /* here we set the data length to the adu data len */
+    adu->value[WX_MODBUS_ADU_WR_REQ_DATA_LEN_IDX] = dataLen;
+    
     /* to calc the crc value */
     UINT16 crcValue = WX_Modbus_Crc16(adu->value, adu->valueLen);
     adu->value[adu->valueLen++] = (UINT8)((crcValue >> 8) & 0xff);   
     adu->value[adu->valueLen++] = (UINT8)(crcValue & 0xff); 
-    adu->expectRspLen = adu->valueLen; /* 鍐欏灏戝瓧鑺傦紝鍝嶅簲灏卞簲璇ユ槸澶氬皯瀛楄妭 */
+    adu->expectRspLen = adu->valueLen; /* rsp len is the same as write length  */
     return WX_SUCCESS;
 }
 
 /*
- * 鍑芥暟鍔熻兘: 瀵硅鏁版嵁璇锋眰娑堟伅杩涜缂栫爜锛岀紪鐮佸悗鐨勬暟鎹瓨鏀惧湪txAdu涓�
+ * E
  * ADU鐨勬牸寮�: |slave address锛�1byte| func code: 1byte | data address: 2byte | data len锛�1byte |
  * 娉ㄦ剰浜嬮」锛氬弬鏁板悎娉曟�х敱璋冪敤鑰呬繚璇�
  **/
@@ -182,21 +183,21 @@ UINT32 WX_RS422_MASTER_EncRdDataReqMsg2Adu(WxRs422MasterRdDataReqMsg *msg, WxMod
     return WX_SUCCESS;
 }
 
-/* 澶勭悊鍏朵粬妯″潡閫氳繃RS422鍐欐暟鎹粰澶栬鐨勮姹� */
+/* proc write data request message */
 UINT32 WX_RS422_MASTER_ProcWrDataReqMsg(WxRs422Master *this, WxMsg *msg)
 {
     UINT32 ret;
-    /* 鎶婃秷鎭紪鐮佷负ADU */
+    /* encode msg 2 adu */
     ret = WX_RS422_MASTER_EncWrDataReqMsg2Adu((WxRs422MasterWrDataReqMsg*)msg, &this->txAdu);
     if (ret != WX_SUCCESS) {
         return ret;
     }
-    /* 鍙戦�丄DU鍒癛S422 Master鐨勯┍鍔� */
+    /* send adu 2 driver */
     ret = WX_RS422_MASTER_SendAdu2Driver(this, &this->txAdu);
     if (ret != WX_SUCCESS) {
         return ret;
     }
-    /* 璁板綍鍙戦�佽�呯敤浜� */
+    /* record the msg type sender for future rsp msg */
     this->wrDataModule[msg->subMsgType] = msg->sender;
     return WX_SUCCESS;
 }
@@ -247,20 +248,26 @@ UINT32 WX_RS422_MASTER_Destruct(VOID *module)
 UINT32 WX_RS422_MASTER_Entry(VOID *module, WxMsg *msg)
 {
     WxRs422Master *this = WX_GetModuleInfo(module);
+    wx_debug("module %s entry msg type %u", WX_GetModuleName(module), msg->msgType);
+    UINT32 ret;
     switch (msg->msgType) {
         case WX_MSG_TYPE_RS422_MASTER_ADU_RSP: {
-            return WX_RS422_MASTER_ProRspcAduMsg(this, msg);
+            ret = WX_RS422_MASTER_ProRspcAduMsg(this, msg);
+            break;
         }
         case WX_MSG_TYPE_RS422_MASTER_RD_DATA_REQ: {
-            return WX_RS422_MASTER_ProcRdDataReqMsg(this, msg);
+            ret = WX_RS422_MASTER_ProcRdDataReqMsg(this, msg);
+            break;
         }
         case WX_MSG_TYPE_RS422_MASTER_WR_DATA_REQ: {
-            return WX_RS422_MASTER_ProcWrDataReqMsg(this, msg);
+            ret = WX_RS422_MASTER_ProcWrDataReqMsg(this, msg);
+            break;
         }
         default: {
+        	ret = WX_RS422_MASTER_UNSPT_MSGTYPE;
         	break;
         }
     }
-
-    return WX_RS422_MASTER_UNSPT_MSGTYPE;
+    wx_debug("module return(%u)", ret);
+    return ret;
 }

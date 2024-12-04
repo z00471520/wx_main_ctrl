@@ -2,10 +2,12 @@
 #include "wx_debug_show.h"
 #include "wx_log.h"
 #include "wx_cnt.h"
+#include "wx_failcode.h"
 WxDbgCmdItem g_wxDbgShowHelp[] = 
 {
     {"?",           "Show help",             WX_Debug_ShowHelp},
 	{"cnt", 	    "Show counter",          WX_Cnt_DbgShow},
+    {"failcode",    "Show failcode",         WX_FailCode_DbgShow},
     /* if more please add here */
 };
 

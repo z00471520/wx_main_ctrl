@@ -9,24 +9,24 @@
 #define WX_MODBUS_EXCP_CODE_LEN             1       /* Excption-code is 1 byte */
 #define WX_MODBUS_DATA_ADDR_LEN             2       /* Data Address is 2 byte */
 #define WX_MODBUS_DATA_SIZE_LEN             1       /* data size is 1 byte  */
-#define WX_MODBUS_INVALID_SLAVE_ADDR        0xff    /* 0xFF不能作为从机地址使用 */
+#define WX_MODBUS_INVALID_SLAVE_ADDR        0xff    /* 0xFF涓嶈兘浣滀负浠庢満鍦板潃浣跨敤 */
 
 #define WX_MODBUS_SLAVE_ADDR_IDX            0
 #define WX_MODBUS_FUNC_CODE_IDX       1
 /* mobus function code define */
-#define WX_MODBUS_FUNC_CODE_READ_DATA       0x41    /* 读数据 */
-#define WX_MODBUS_FUNC_CODE_WRITE_DATA      0x42    /* 写数据 */
-#define WX_MODBUS_FUNC_CODE_READ_FILE       0x64    /* 读文件 */
-#define WX_MODBUS_FUNC_CODE_WRITE_FILE      0x65    /* 写文件 */
-#define WX_MODBUS_FUNC_CODE_READ_DATA_ERR    (WX_MODBUS_FUNC_CODE_READ_DATA + 0x80)    /* 读数据 */
-#define WX_MODBUS_FUNC_CODE_WRITE_DATA_ERR   (WX_MODBUS_FUNC_CODE_WRITE_DATA + 0x80)    /* 写数据 */
-#define WX_MODBUS_FUNC_CODE_READ_FILE_ERR    (WX_MODBUS_FUNC_CODE_READ_FILE + 0x80)    /* 读文件 */
-#define WX_MODBUS_FUNC_CODE_WRITE_FILE_ERR   (WX_MODBUS_FUNC_CODE_WRITE_FILE + 0x80)    /* 写文件 */
+#define WX_MODBUS_FUNC_CODE_READ_DATA       0x41    /* 璇绘暟鎹� */
+#define WX_MODBUS_FUNC_CODE_WRITE_DATA      0x42    /* 鍐欐暟鎹� */
+#define WX_MODBUS_FUNC_CODE_READ_FILE       0x64    /* 璇绘枃浠� */
+#define WX_MODBUS_FUNC_CODE_WRITE_FILE      0x65    /* 鍐欐枃浠� */
+#define WX_MODBUS_FUNC_CODE_READ_DATA_ERR    (WX_MODBUS_FUNC_CODE_READ_DATA + 0x80)    /* 璇绘暟鎹� */
+#define WX_MODBUS_FUNC_CODE_WRITE_DATA_ERR   (WX_MODBUS_FUNC_CODE_WRITE_DATA + 0x80)    /* 鍐欐暟鎹� */
+#define WX_MODBUS_FUNC_CODE_READ_FILE_ERR    (WX_MODBUS_FUNC_CODE_READ_FILE + 0x80)    /* 璇绘枃浠� */
+#define WX_MODBUS_FUNC_CODE_WRITE_FILE_ERR   (WX_MODBUS_FUNC_CODE_WRITE_FILE + 0x80)    /* 鍐欐枃浠� */
 #define WX_MODBUS_IS_EXCP_FUNC_CODE(funcCode) (((funcCode) & 0x80) != 0)
 
 /* Modus ADU */
-#define WX_MODBUS_ADU_MAX_SIZE              256     /* ADU的最大长度 */
-#define WX_MODBUS_ADU_MIN_SIZE              (4)     /* 从机地址(1) + function code(1) + crc(2) */
+#define WX_MODBUS_ADU_MAX_SIZE              256     /* ADU鐨勬渶澶ч暱搴� */
+#define WX_MODBUS_ADU_MIN_SIZE              (4)     /* 浠庢満鍦板潃(1) + function code(1) + crc(2) */
 #define WX_MODBUS_ADU_SLAVE_ADDR_IDX        0
 #define WX_MODBUS_ADU_FUNC_CODE_IDX         1         
 
@@ -51,7 +51,7 @@
 #define WX_MODBUS_ADU_WR_REQ_MIN_LEN            (8) /* the minimum length */
 #define WX_MODBUS_ADU_WR_REQ_SLAVE_ADDR_IDX     0   /* oct0 is the slave address */
 #define WX_MODBUS_ADU_WR_REQ_FUNC_CODE_IDX      1   /* oct1 is the function code */
-#define WX_MODBUS_ADU_WR_REQ_DATA_ADDR_HI_IDX   1   /* oct2 is the data address hi */
+#define WX_MODBUS_ADU_WR_REQ_DATA_ADDR_HI_IDX   2   /* oct2 is the data address hi */
 #define WX_MODBUS_ADU_WR_REQ_DATA_ADDR_LO_IDX   3   /* oct2 is the data address lo */
 #define WX_MODBUS_ADU_WR_REQ_DATA_LEN_IDX       4   /* oct2 is the data length */
 #define WX_MODBUG_ADU_WR_REQ_DATA_START_IDX     5   /* oct5 is data start position */
@@ -65,9 +65,9 @@
 #define WX_MODBUS_ADU_ERR_RSP_CRC_LO_IDX        4   // oct4 is the CRC lo
 
 
-#define WX_MODBUS_MAX_EXCP_CODE_NUM         256 /* 异常码U8最多支持256个数 */
+#define WX_MODBUS_MAX_EXCP_CODE_NUM         256 /* 寮傚父鐮乁8鏈�澶氭敮鎸�256涓暟 */
 
-/* 定义从机异常码的枚举值 */
+/* 瀹氫箟浠庢満寮傚父鐮佺殑鏋氫妇鍊� */
 typedef enum {
     WX_MODBUS_EXCP_NONE = 0,
     WX_MODBUS_EXCP_ILLEGAL_FUNCTION = 1,
@@ -83,20 +83,20 @@ typedef enum {
 } WxModbusExcpCode;
 
 typedef struct {
-    UINT32 failCode;       /* 响应失败码，WX_SUCCESS：相应成功，其他：相应失败，详见failcode定义 */
-    UINT16 msgType;       /* 请求对应的消息类型，RS422驱动根据请求消息填写 */
-    UINT16 subMsgType;     /* 请求对应的子消息类型，RS422驱动根据请求消息填写 */
-    UINT8 slaveAddr;      /* 从机地址 */
-    UINT8 funcCode;   /* 功能码 */
-    UINT8 receiver;   /* 接收方模块 */
+    UINT32 failCode;       /* 鍝嶅簲澶辫触鐮侊紝WX_SUCCESS锛氱浉搴旀垚鍔燂紝鍏朵粬锛氱浉搴斿け璐ワ紝璇﹁failcode瀹氫箟 */
+    UINT16 msgType;       /* 璇锋眰瀵瑰簲鐨勬秷鎭被鍨嬶紝RS422椹卞姩鏍规嵁璇锋眰娑堟伅濉啓 */
+    UINT16 subMsgType;     /* 璇锋眰瀵瑰簲鐨勫瓙娑堟伅绫诲瀷锛孯S422椹卞姩鏍规嵁璇锋眰娑堟伅濉啓 */
+    UINT8 slaveAddr;      /* 浠庢満鍦板潃 */
+    UINT8 funcCode;   /* 鍔熻兘鐮� */
+    UINT8 receiver;   /* 鎺ユ敹鏂规ā鍧� */
     UINT8 excpCode;
-    UINT16 dataAddr;      /* 数据地址 */
-    UINT16 valueLen;      /* ADU的数据长度 */
-    UINT16 expectRspLen; /* 期望的响应长度 */
-    UINT8 value[WX_MODBUS_ADU_MAX_SIZE]; /* 数组 */
+    UINT16 dataAddr;      /* 鏁版嵁鍦板潃 */
+    UINT16 valueLen;      /* ADU鐨勬暟鎹暱搴� */
+    UINT16 expectRspLen; /* 鏈熸湜鐨勫搷搴旈暱搴� */
+    UINT8 value[WX_MODBUS_ADU_MAX_SIZE]; /* 鏁扮粍 */
 } WxModbusAdu;
 
-/* 计算CRC的取值 */
+/* 璁＄畻CRC鐨勫彇鍊� */
 uint16_t WX_Modbus_Crc16(uint8_t *pFrame, uint16_t len);
 UINT32 WX_Modbus_AduCrcCheck(WxModbusAdu *adu);
 VOID WX_Modbus_AduGenerateExceptionRsp(UINT8 slaveAddr, UINT8 functionCode, UINT8 exceptionCode, WxModbusAdu *adu);

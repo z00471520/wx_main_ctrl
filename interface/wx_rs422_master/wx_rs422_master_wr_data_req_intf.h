@@ -6,8 +6,8 @@
 #include "wx_include.h"
 
 /******************************************************************************
- * 消息大类：WX_MSG_TYPE_RS422_MASTER_WR_DATA_REQ
- * 写数据请求子类型定义
+ * 娑堟伅澶х被锛� WX_MSG_TYPE_RS422_MASTER_WR_DATA_REQ
+ * 鍐欐暟鎹姹傚瓙绫诲瀷瀹氫箟
 ******************************************************************************/
 typedef enum {
     WX_RS422_MASTER_MSG_WRITE_MMM,  /* WxRs422MasterWrDataMMMInfo */
@@ -16,14 +16,14 @@ typedef enum {
 } WxRs422MasterWrDataType;
 
 /******************************************************************************
- * 写数据请求的结构体定义
+ * 鍐欐暟鎹姹傜殑缁撴瀯浣撳畾涔�
 ******************************************************************************/
 typedef struct {
 	UINT8 data8;
 	UINT16 data16;
 	UINT32 data32;
 	UINT64 data64; 
-} WxRs422MasterWrDataX;
+} __attribute__((packed)) WxRs422MasterWrDataX;
 
 typedef struct {
     UINT8 data8;
@@ -40,7 +40,7 @@ typedef struct {
 }WxRs422MasterWrData;
 
 /******************************************************************************
- * RS422消息
+ * RS422娑堟伅
  *****************************************************************************/
 typedef struct {
     WX_INHERIT_MSG_HEADER

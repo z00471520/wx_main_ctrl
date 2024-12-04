@@ -117,7 +117,7 @@ VOID WX_Modbus_AduGenerateExceptionRsp(UINT8 slaveAddr, UINT8 functionCode, UINT
 UINT32 WX_Modbus_AduEncodeBasic(WxModbusAdu *adu, intptr_t value, UINT32 valueSize)
 {
     /* 编码空间不足 */
-    if (adu->valueLen + valueSize > sizeof(adu->value)) {
+    if (adu->valueLen + valueSize > sizeof(adu->value) - WX_MODBUS_CRC_LEN) {
         return WX_MODBUS_ADU_ENCODE_INSUFFICIENT_SPACE;
     }
 
