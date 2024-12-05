@@ -146,7 +146,7 @@ CHAR *g_wxFailCodeDesc[WX_FAIL_CODE_BUTT] = {
 /* to show failcode cnt infos */
 VOID WX_FailCode_DbgShow(char *argv[], UINT32 argc)
 {
-    wx_show("FailCode CNT INFOS");
+    wx_show("\r\nFailCode CNT INFOS");
 	wx_show("-------------");
 	wx_show("%-64s %s", "FailCode", "CntValue");
     UINT64 cntValue = 0;

@@ -109,6 +109,7 @@ UINT32 WX_RS422_MASTER_EncWrDataReq(WxRs422MasterWrDataReqMsg *msg, WxRs422Maste
     }
     wrDataReq->msgType = msg->msgType;
     wrDataReq->subMsgType = msg->subMsgType;
+    wrDataReq->sender = msg->sender;
     WxModbusAdu *adu = &wrDataReq->adu;
     UINT16 dataAddr = (UINT16)handle->dataAddr;
     /* slave address */
@@ -131,7 +132,6 @@ UINT32 WX_RS422_MASTER_EncWrDataReq(WxRs422MasterWrDataReqMsg *msg, WxRs422Maste
     }
     /* here we set the data length to the adu data len */
     adu->value[WX_MODBUS_ADU_WR_REQ_DATA_LEN_IDX] = dataLen;
-    
     /* to calc the crc value */
     UINT16 crcValue = WX_Modbus_Crc16(adu->value, adu->valueLen);
     adu->value[adu->valueLen++] = (UINT8)((crcValue >> 8) & 0xff);   

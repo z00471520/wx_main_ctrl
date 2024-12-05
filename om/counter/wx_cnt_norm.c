@@ -1,5 +1,6 @@
 
 #include "wx_debug.h"
+#include "wx_cnt_norm.h"
 #define WX_CNT_DEF(cntId) [cntId] = #cntId
 
 /* CntId */

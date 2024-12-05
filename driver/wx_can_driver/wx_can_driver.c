@@ -348,7 +348,7 @@ VOID WX_CAN_DRIVER_IntrEventHandler(VOID *callBackRef, u32 intrMask)
 UINT32 WX_CAN_DRIVER_InitInterrupt(WxCanDriver *this, WxCanDriverIntrCfg *cfg)
 {
 	XCanPs *canInstPtr = &this->canInst;
-	XScuGic *intcInst = WX_GetOrCreateScuGicInstance();
+	XScuGic *intcInst = WX_GetScuGicInstance();
 	if (intcInst == NULL) {
 		return WX_UART_NS550_INTR_CTRL_UNREADY;
 	}

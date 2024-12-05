@@ -120,7 +120,7 @@ UINT32 WX_RS422Slave_ProcWriteDataReq(WxRs422Slave *this, WxModbusAdu *rxAdu, Wx
     }
     /* 检查Handles是否为空 */
     if (handle->decAdu == NULL || handle->writeData == NULL) {
-        wx_excp_cnt(WX_EXCP_RS422_SLAVE_DATA_WRITE_HANDLE_ITEM_MISS)
+        wx_excp_cnt(WX_EXCP_RS422_SLAVE_DATA_WRITE_HANDLE_ITEM_MISS);
         return WX_RS422Slave_SendExcpRsp(this, txAdu, WX_MODBUS_EXCP_WR_HANDLE_UNFINE);
     }
     WxRs422SlaveData data;

@@ -20,4 +20,6 @@
 #include "FreeRTOSConfig.h"
 #include "xparameters_ps.h"
 #include "xgpio.h"
+#include "wx_cnt_norm.h"
+#include "wx_cnt_excp.h"
 #endif

@@ -79,7 +79,7 @@ WxModuleDeploy g_wxModuleDepolyInfos[] = {
 
 
 /* deploy one module on current task */
-UINT32 WX_DeployOneModule(WxTask *task, WxModule *module, WxModuleDeploy *moduleDeploy)
+UINT32 WX_SaveModuleInfo2Task(WxTask *task, WxModule *module, WxModuleDeploy *moduleDeploy)
 {
     WX_CLEAR_OBJ(module);
     module->moduleName = moduleDeploy->moduleName;
@@ -131,9 +131,9 @@ UINT32 WX_DeployModules(UINT8 curCoreId)
             return WX_MODULE_TASK_NOT_EXIST;            
         }
         module = &task->modules[deploy->moduleId];
-        ret = WX_DeployOneModule(task, module, deploy);
+        ret = WX_SaveModuleInfo2Task(task, module, deploy);
         if (ret != WX_SUCCESS) {
-            boot_debug("Error Exit: WX_DeployOneModule(%s) fail(%u)", deploy->moduleName, ret);
+            boot_debug("Error Exit: WX_SaveModuleInfo2Task(%s) fail(%u)", deploy->moduleName, ret);
             return ret;
         }
         ret = WX_RegModuleRouter(deploy->moduleId, deploy->coreId, task, module);

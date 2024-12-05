@@ -22,12 +22,7 @@ UINT32 WX_InitUartNs550(XUartNs550 *this, UINT32 deviceId, XUartNs550Format *for
 		boot_debug("Error Exit: XUartNs550_SelfTest(%u) fail(%d)", Status);
 		return WX_UARTNS550_SELF_TEST_FAIL;
 	}
-	/*
-	 * Enable the interrupt of the UART so interrupts will occur, and keep the
-	 * FIFOs enabled.
-	 */
-	UINT16 options = XUN_OPTION_DATA_INTR | XUN_OPTION_FIFOS_ENABLE;
-	XUartNs550_SetOptions(this, options);
+
 	/* Set uart mode Baud Rate 115200, 8bits, no parity, 1 stop bit */
 	XUartNs550_SetDataFormat(this, format);
 	return WX_SUCCESS;
@@ -36,7 +31,7 @@ UINT32 WX_InitUartNs550(XUartNs550 *this, UINT32 deviceId, XUartNs550Format *for
 
 UINT32 WX_SetupUartNs550Interrupt(XUartNs550 *uartInstPtr, XUartNs550_Handler handler, UINT32 intrId, VOID *callBackRef)
 {
-	XScuGic *intcInst = WX_GetOrCreateScuGicInstance();
+	XScuGic *intcInst = WX_GetScuGicInstance();
 	if (intcInst == NULL) {
 		return WX_UART_NS550_INTR_CTRL_UNREADY;
 
@@ -66,6 +61,13 @@ UINT32 WX_SetupUartNs550Interrupt(XUartNs550 *uartInstPtr, XUartNs550_Handler ha
 	 * the handlers are able to access the instance data.
 	 */
 	XUartNs550_SetHandler(uartInstPtr, handler, callBackRef);
+
+	/*
+	 * Enable the interrupt of the UART so interrupts will occur, and keep the
+	 * FIFOs enabled.
+	 */
+	UINT16 options = XUN_OPTION_DATA_INTR | XUN_OPTION_FIFOS_ENABLE;
+	XUartNs550_SetOptions(uartInstPtr, options);
 
 	return WX_SUCCESS;
 }

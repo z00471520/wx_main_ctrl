@@ -48,7 +48,6 @@ int main(void)
 		taskEXIT_CRITICAL();
 		/* Start the scheduler. */
 		vTaskStartScheduler();
-			
 	}
 	
 	/* If all is well, the scheduler will now be running, and the following line

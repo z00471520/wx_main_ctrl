@@ -98,7 +98,7 @@ UINT32 WX_RegModuleRouter(WxModuleId moduleId, UINT8 coreId,
     WxTask *belongTask, WxModule *belongModule);
 /* 消息调度 */
 UINT32 WX_MsgShedule(UINT8 sender, UINT8 receiver, VOID *msg);
-XScuGic *WX_GetOrCreateScuGicInstance(VOID);
+XScuGic *WX_GetScuGicInstance(VOID);
 UINT32 WX_SetupFrame(UINT8 coreId);
 #define WX_GetCurCoreId() g_curCoreId
 #define WX_GetModuleName(m)         (((WxModule *)m)->moduleName)

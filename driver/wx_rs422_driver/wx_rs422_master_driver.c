@@ -80,8 +80,8 @@ VOID WX_RS422MasterDriver_ProcRecvAduFromISR(WxRs422DriverMaster *this)
 }
 
 
-/* RS422 master娑擃厽鏌囨径鍕倞閸戣姤鏆� */
-VOID WX_RS422I_DRIVER_MASTER_IntrHandler(VOID *callBackRef, UINT32 event, UINT32 eventData)
+/* RS422 master interrupt proc func*/
+VOID WX_RS422MasterDriver_IntrHandler(VOID *callBackRef, UINT32 event, UINT32 eventData)
 {
     WxRs422DriverMaster *this = callBackRef;
     /*
@@ -119,11 +119,16 @@ VOID WX_RS422I_DRIVER_MASTER_IntrHandler(VOID *callBackRef, UINT32 event, UINT32
 /* proccess the upper layer tx adu request msg */
 UINT32 WX_RS422MasterDriver_ProcTxAduMsg(WxRs422DriverMaster *this, WxRs422MasterDriverMsg *msg)
 {
+	wx_norm_cnt(WX_NORM_RS422_MASTER_DRIVER_RECV_TX_ADU_REQ);
+    wx_debug("ProcTxAduMsg start...");
     /* buffer the tx adu to queue for further process */
     if (this->status != WX_RS422_MASTER_STATUS_IDLE) {
+    	wx_debug("tx adu msg was buffer");
+    	wx_norm_cnt(WX_NORM_RS422_MASTER_DRIVER_TX_ADU_BUFFED);
         /* if not IDLE status we sent it buff */
         if (xQueueSend(this->msgQueHandle, &msg->reqTxData, 0) != pdPASS) {
-            return WX_RS422_MASTER_CACHE_MSG_FAIL;
+            wx_excp_cnt(WX_EXCP_RS422_SLAVE_DRIVER_BUFF_TX_ADU_FAIL);
+        	return WX_RS422_MASTER_CACHE_MSG_FAIL;
         }
         return WX_SUCCESS;
     }
@@ -132,7 +137,7 @@ UINT32 WX_RS422MasterDriver_ProcTxAduMsg(WxRs422DriverMaster *this, WxRs422Maste
 
     /* clear the receive buff before send */
     WxModbusAdu *rxAdu = &this->rxAdu;
-    UINT32 recvCount; 
+    UINT32 recvCount;
     do {
         recvCount = XUartNs550_Recv(&this->rs422Inst, rxAdu->value, this->txAduInfo.adu.expectRspLen);
     } while (recvCount);
@@ -145,6 +150,7 @@ UINT32 WX_RS422MasterDriver_ProcTxAduMsg(WxRs422DriverMaster *this, WxRs422Maste
     if (sendCount == 0) {
         return WX_RS422_MASTER_DRIVER_SEND_BY_UART_FAIL;
     }
+
     this->status = WX_RS422_MASTER_STATUS_TX_ADU;
     return WX_SUCCESS;
 }
@@ -199,7 +205,7 @@ UINT32 WX_RS422MasterDriver_Construct(VOID *module)
 
     /* setup the uart interrupt */
     ret = WX_SetupUartNs550Interrupt(&this->rs422Inst,
-    	WX_RS422I_DRIVER_MASTER_IntrHandler, cfg->intrId, this);
+    	WX_RS422MasterDriver_IntrHandler, cfg->intrId, this);
     if (ret != WX_SUCCESS) {
         return ret;
     }
@@ -214,7 +220,7 @@ UINT32 WX_RS422MasterDriver_Entry(VOID *module, WxMsg *evtMsg)
     if (evtMsg->msgType != WX_MSG_TYPE_RS422_MASTER_DRIVER_REQ) {
         return WX_RS422_MASTER_DRIVER_UNSPT_MSGTYPE;
     }
-    /* 鐎涙劖绉烽幁顖滆閸拷 */
+    /* based on the subtype process the msg */
     switch (evtMsg->subMsgType) {
         case WX_SUB_MSG_REQ_RS422_MASTER_DRIVER_TX_ADU: {
             return WX_RS422MasterDriver_ProcTxAduMsg(this, (WxRs422MasterDriverMsg *)evtMsg);

@@ -53,8 +53,8 @@ WxTaskDeploy g_wxTaskDeployInfo[] = {
 
 UINT32 WX_ProcTaskMsg(WxTask *task, WxMsg *evtMsg)
 {
-	wx_debug("task(%s) receive msg(%u, %u)", task->taskName, evtMsg->msgType, evtMsg->subMsgType);
     UINT32 reciver = evtMsg->receiver;
+	wx_debug("task(%s) receive msg(%u, %u)", task->taskName, evtMsg->msgType, evtMsg->subMsgType);
     if (!WX_IsValidModuleId(reciver)) {
         return WX_INVALID_MODULE_ID ;
     }
@@ -72,10 +72,27 @@ UINT32 WX_ProcTaskMsg(WxTask *task, WxMsg *evtMsg)
     return ret;
 }
 
+VOID WX_InitTask(WxTask *task)
+{
+    UINT32 ret;
+    boot_debug("Task(%s) init...", task->taskName);
+    for (UINT32 i = 0; i < WX_MODULE_BUTT; i++) {    
+        if (task->modules[i].constructFunc == NULL) {
+            continue;
+        }
+        boot_debug("Task(%s) init module(%s) start...", task->taskName, task->modules[i].moduleName);
+        ret = task->modules[i].constructFunc(&task->modules[i]);
+        if (ret != WX_SUCCESS) {
+            wx_fail_code_cnt(ret);
+        }
+    }
+    boot_debug("Task(%s) init finish! wait for msg!!!", task->taskName);
+}
+
 VOID WX_TaskHandle(VOID *param)
 {
     WxTask *task = (WxTask *)param;
-    boot_debug("Task(%s) start...", task->taskName);
+    WX_InitTask(task);
     UINT32 ret;
     WxMsg *evtMsg = NULL;
     for (;;) {
@@ -96,7 +113,9 @@ WxTasks *WX_CreateTasks(UINT8 coreId, UINT32 taskNum)
         if (g_wxTasks == NULL) {
             return g_wxTasks;
         }
-        
+    }
+    for (UINT32 i = 0; i < taskNum; i++) {
+        WX_CLEAR_OBJ(&g_wxTasks->taskList[i]);
     }
     g_wxTasks->taskNum = 0;
     g_wxTasks->maxTaskNum = taskNum;

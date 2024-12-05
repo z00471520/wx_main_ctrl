@@ -10,7 +10,7 @@ CHAR *g_wxCntExcpDesc[WX_EXCP_CNT_BUTT] = {
 
 };
 /* CntValue */
-UINT64 g_wxExcpCnt[WX_EXCP_CNT_BUTT] = {1,};
+UINT64 g_wxExcpCnt[WX_EXCP_CNT_BUTT] = {0};
 
 VOID WX_ExcpCnt_DbgShow(char *argv[], UINT32 argc)
 {

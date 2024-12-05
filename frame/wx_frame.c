@@ -6,32 +6,14 @@
 #include "wx_msg_schedule.h"
 
 UINT8 g_curCoreId = WX_CORE_ID_0; /* 褰撳墠杩愯鐨勬牳ID */
-XScuGic g_wxScuGicInst = {0}; /* Instance of the Interrupt Controller */
-
-XScuGic *WX_GetOrCreateScuGicInstance(VOID)
+extern XScuGic xInterruptController;
+XScuGic *WX_GetScuGicInstance(VOID)
 {
-    if (g_wxScuGicInst.IsReady == XIL_COMPONENT_IS_READY) {
-        return &g_wxScuGicInst;
+    if (xInterruptController.IsReady == XIL_COMPONENT_IS_READY) {
+        return &xInterruptController;
+    } else {
+        return NULL;
     }
-
-    XScuGic_Config *intcConfig = XScuGic_LookupConfig(INTC_DEVICE_ID);
-	if (NULL == intcConfig) {
-		return NULL;
-	}
-
-	int status = XScuGic_CfgInitialize(&g_wxScuGicInst, intcConfig, intcConfig->CpuBaseAddress);
-	if (status != XST_SUCCESS) {
-		return NULL;
-	}
-    Xil_ExceptionInit();
-    /*
-	 * Connect the interrupt controller interrupt handler to the hardware
-	 * interrupt handling logic in the processor.
-	 */
-	Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_IRQ_INT,
-				(Xil_ExceptionHandler)XScuGic_InterruptHandler,
-				&g_wxScuGicInst);
-    return &g_wxScuGicInst;
 }
 
 UINT32 WX_InitGlobalParams(VOID)
