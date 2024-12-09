@@ -95,11 +95,6 @@ UINT32 WX_SaveModuleInfo2Task(WxTask *task, WxModule *module, WxModuleDeploy *mo
         return WX_MODULE_CONSTRUCT_FUNC_NULL;
     }
 
-    UINT32 ret = moduleDeploy->constructFunc(module);
-    if (ret != WX_SUCCESS) {
-        return ret;
-    }
-
     return WX_SUCCESS;
 }
 

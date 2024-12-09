@@ -5,6 +5,7 @@
 #include "wx_frame.h"
 #include "wx_msg_schedule.h"
 
+
 UINT8 g_curCoreId = WX_CORE_ID_0; /* 褰撳墠杩愯鐨勬牳ID */
 extern XScuGic xInterruptController;
 XScuGic *WX_GetScuGicInstance(VOID)
@@ -22,11 +23,13 @@ UINT32 WX_InitGlobalParams(VOID)
     /* create the event msg pool  */
     UINT32 ret = WX_CreateMsgResPool();
     if (ret != WX_SUCCESS) {
+        boot_debug("Error Exit: WX_CreateMsgResPool fail(%u)", ret);
         return ret;
     }
     /* create the module router list */
     ret = WX_CreateModuleRouterList();
     if (ret != WX_SUCCESS) {
+        boot_debug("Error Exit: WX_CreateModuleRouterList fail(%u)", ret);
         return ret;
     }
     boot_debug("WX_InitGlobalParams end");
